@@ -26,7 +26,7 @@
 		"mocha": "*",
     "coffee-script": "~1.3"
   },
-  "main": "lib/emblem/module.js",
+  "main": "lib/emblem/.js",
   "bin": {
     "handlebars": "bin/emblem"
   },

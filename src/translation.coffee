@@ -1,8 +1,7 @@
-# Code for translating Emblem AST into HB AST
+Handlebars = require 'handlebars'
+Emblem     = require './emblem'
 
-{Preprocessor} = require 'preprocessor'
-{parse} = require 'parser'
-
+"BEGIN BROWSER"
 
 # Simple wrapped around a string. Gets passed around for the purpose
 # of coalescing adjacent content nodes into one
@@ -17,8 +16,6 @@ class ContentStack
     ret = @current
     @current = ""
     ret
-
-
 
 #Handlebars.AST.ProgramNode = function(statements, inverse) {
 
@@ -94,8 +91,8 @@ Emblem.parse = (string) ->
   stack = new ContentStack
 
   # Pre-process, parse, translate.
-  processed = Preprocessor.processSync string
-  emblemAST = parse(processed)
+  processed = Emblem.Preprocessor.processSync string
+  emblemAST = Emblem.Parser.parse(processed)
   hbAST = processNodes emblemAST, stack
 
   # Flush out any remaining static text content
@@ -103,4 +100,8 @@ Emblem.parse = (string) ->
   hbAST.push new Handlebars.AST.ContentNode c if c
 
   hbAST
+
+
+"END BROWSER"
+
 

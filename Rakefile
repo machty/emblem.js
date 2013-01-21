@@ -1,14 +1,52 @@
 require "rubygems"
 require "bundler/setup"
+require 'find'
+require 'uglifier'
 
-def compile_parser
-  system "./node_modules/.bin/pegjs src/grammar.peg lib/emblem/parser.js"
-  unless $?.success?
-    puts "Failed to run pegjs."
+SRC_PATH   = './src'        
+BUILD_PATH = './lib' 
+
+COFFEES = %w{ emblem compiler preprocessor translation emberties }
+
+#minimal_deps = %w(base compiler/parser compiler/base compiler/ast utils compiler/compiler runtime).map do |file|
+
+desc 'Compiles and concatenates source coffeescript files'
+task :coffee do
+  files = join_filenames(
+    COFFEES.map { |file| "#{file}.coffee" },
+    SRC_PATH
+  )
+ 
+  # Compile everything
+  `coffee -b --output #{BUILD_PATH} --compile #{files}`
+  if $?.to_i == 0
+    puts "Compiled successfully."
+  else
+    # Send a growl notification on failure if enabled
+    system "growlnotify -m 'An error occured while compiling!' 2>/dev/null"
   end
 end
 
-file "lib/emblem/parser.js" => ["src/grammar.pegjs"] do
+def join_filenames(filenames, base='./')
+  filenames.map { |f| File.expand_path(File.join(base, f)) }.join(' ')
+end
+
+def compile_parser
+  system "./node_modules/.bin/pegjs --export-var Emblem.Parser src/grammar.pegjs"
+  if $?.success?
+    File.open("lib/parser.js", "w") do |file|
+      file.puts File.read("src/parser-prefix.js") + File.read("src/grammar.js") + File.read("src/parser-suffix.js")
+    end
+
+    # Remove tmp file.
+    sh "rm src/grammar.js"
+  else
+    raise StandardError.new "Failed to run pegjs."
+  end
+end
+
+
+file "lib/parser.js" => ["src/grammar.pegjs", "src/parser-prefix.js", "src/parser-suffix.js"] do
   if File.exists?('./node_modules/pegjs')
     compile_parser
   else
@@ -18,7 +56,7 @@ file "lib/emblem/parser.js" => ["src/grammar.pegjs"] do
   end
 end
 
-task :compile => "lib/emblem/parser.js"
+task :compile => ["lib/parser.js", :coffee]
 
 desc "run the spec suite"
 task :spec => [:release] do
@@ -35,17 +73,13 @@ end
 task :default => [:compile, :spec, :npm_test]
 
 def remove_exports(string)
-  match = string.match(%r{^// BEGIN\(BROWSER\)\n(.*)\n^// END\(BROWSER\)}m)
+  match = string.match(%r{^"BEGIN BROWSER";\n(.*)\n^"END BROWSER";}m)
   match ? match[1] : string
 end
 
-minimal_deps = %w(compiler emblem preprocessor translation parser).map do |file|
-  "lib/emblem/#{file}.js"
+minimal_deps = %w(emblem parser compiler preprocessor translation emberties).map do |file|
+  "lib/#{file}.js"
 end
-
-#runtime_deps = %w(base utils runtime).map do |file|
-  #"lib/emblem/#{file}.js"
-#end
 
 directory "dist"
 
@@ -56,6 +90,11 @@ def build_for_task(task)
   FileUtils.mkdir_p("dist")
 
   contents = []
+
+  # Prepend the HB lib on to everything.
+  contents << File.read('./vendor/StringScanner.js')
+  contents << File.read('./node_modules/handlebars/dist/handlebars.js')
+
   task.prerequisites.each do |filename|
     next if filename == "dist"
 
@@ -71,19 +110,13 @@ file "dist/emblem.js" => minimal_deps do |task|
   build_for_task(task)
 end
 
-file "dist/emblem.runtime.js" => runtime_deps do |task|
-  build_for_task(task)
-end
-
 task :build => [:compile, "dist/emblem.js"]
-#task :runtime => [:compile, "dist/emblem.runtime.js"]
 
-desc "build the build and runtime (eventually) version of emblem"
-#task :release => [:build, :runtime]
+desc "build the browser and version of emblem"
 task :release => [:build]
 
+=begin
 directory "vendor"
-
 desc "benchmark against dust.js and mustache.js"
 task :bench => "vendor" do
   require "open-uri"
@@ -102,3 +135,4 @@ task :bench => "vendor" do
 
   system "node bench/emblem.js"
 end
+=end

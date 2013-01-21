@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+// TODO this is all completely unfinished NONSENSE.
+
 var optimist = require('optimist')
     .usage('Precompile handlebar templates.\nUsage: $0 template...', {
       'f': {

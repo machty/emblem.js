@@ -1,8 +1,11 @@
 StringScanner = require 'StringScanner'
+Emblem = require './emblem'
 
-inspect = (o) -> (require 'util').inspect o, no, 9e9, yes
+#inspect = (o) -> (require 'util').inspect o, no, 9e9, yes
 
-@Preprocessor = class Preprocessor
+"BEGIN BROWSER"
+
+Emblem.Preprocessor = class Preprocessor
 
   ws = '\\t\\x0B\\f \\xA0\\u1680\\u180E\\u2000-\\u200A\\u202F\\u205F\\u3000\\uFEFF'
   INDENT = '\uEFEF'
@@ -22,7 +25,7 @@ inspect = (o) -> (require 'util').inspect o, no, 9e9, yes
     @base = @indent = null
     @context = []
     @context.peek = -> if @length then this[@length - 1] else null
-    @context.err = (c) -> throw new Error "Unexpected " + inspect c
+    @context.err = (c) -> throw new Error "Unexpected " + c
     @output = ''
 
     # This function pushes context, validating that the present
@@ -158,7 +161,7 @@ inspect = (o) -> (require 'util').inspect o, no, 9e9, yes
         @p "#{DEDENT}"
         
       # Check if there's still something unclosed.
-      throw new Error 'Unclosed ' + (inspect @context.peek()) + ' at EOF' if @context.length
+      throw new Error 'Unclosed ' + (@context.peek()) + ' at EOF' if @context.length
 
   processData: processInput no
   processEnd: processInput yes
@@ -167,3 +170,7 @@ inspect = (o) -> (require 'util').inspect o, no, 9e9, yes
     pre.processData input
     do pre.processEnd
     pre.output
+
+"END BROWSER"
+
+

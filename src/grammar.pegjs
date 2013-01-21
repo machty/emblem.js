@@ -89,7 +89,7 @@ equalSign = "==" _ { return true; } / "=" _  { return false; }
 
 // TODO: how to DRY this?
 htmlTag
-  = h:htmlTagName t:attrShortcuts? attributes { return { type: 'html', tagName: h,    attrs:(t||{})  }; }
+  = h:htmlTagName t:attrShortcuts? { return { type: 'html', tagName: h,    attrs:(t||{})  }; }
   / t:attrShortcuts                { return { type: 'html', tagName: null, attrs: t  }; }
 
 attrShortcuts
@@ -98,6 +98,7 @@ attrShortcuts
 
 idShortcut = '#' t:cssIdentifier { return t;}
 classShortcut = '.' c:cssIdentifier { return c; }
+
 
 cssIdentifier = ident
 
@@ -147,3 +148,4 @@ whitespace
   = [ \t\n\r]
 
 ws = whitespace
+

@@ -34,13 +34,6 @@ module.exports =
   compile: (csAst, options) ->
     Compiler.compile csAst, options
 
-  sourceMap: (jsAst, name = 'unknown', options = {}) ->
-    throw new Error 'escodegen not found: run `npm install escodegen`' unless escodegen?
-    escodegen.generate jsAst.toJSON(),
-      comment: not options.compact
-      sourceMap: name
-      format: if options.compact then escodegenCompactDefaults else options.format ? escodegenFormatDefaults
-
 Emblem = module.exports.Emblem = module.exports
 
 require './run'

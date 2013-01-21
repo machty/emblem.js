@@ -1,0 +1,29 @@
+.row.container
+  p Butt
+  strong
+    Borfles
+    McSnorfles
+
+    each monkey in butt florg="asdasd" snogBinding="narf" bun=true fun=2
+
+  p Sblorg
+  munk
+
+view App.View contentBinding="controller.thingeroo"
+  p This replaces the template for App.View
+
+foo sass=gnarly buns="App.fun.whatever"
+
+p#clams.snarly.ploop
+  span Woot woot woot
+  #hooray.plunk
+    span This is why I do the things I do
+    | Because it's fun, dammit. {{yolo funk=4 forJesus=true}}
+
+App.View
+  p This is the thaanng yo.
+  #funk.woot.woot2
+    p I just think this is so sweet
+    p 
+      | Yall have any idea why I do what I do? ima tell {{person}} right now.
+ 

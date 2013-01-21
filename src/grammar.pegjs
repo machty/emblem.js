@@ -1,14 +1,10 @@
 
 start = content
-
-content = statements
-
-statements
- = statement*
+content = statement*
 
 statement
   = html
-  /*/ mustache*/
+  / mustache
 
 html
   = htmlMaybeBlock
@@ -27,7 +23,7 @@ htmlMaybeBlock = h:htmlAttributesOnly c:(INDENT content DEDENT)?
 
 htmlAttributesOnly = t:htmlTag _ TERM { t.nodes = []; return t; }  
 
-htmlWithInlineContent = t:htmlTag ws c:htmlInlineContent { t.nodes = c; return t; }  
+htmlWithInlineContent = t:htmlTag ws c:htmlInlineContent TERM { t.nodes = c; return t; }  
 
 mustacheMaybeBlock = t:mustacheContent TERM c:(INDENT content DEDENT)? 
 { 
@@ -37,11 +33,33 @@ mustacheMaybeBlock = t:mustacheContent TERM c:(INDENT content DEDENT)?
 
 forcedMustache = _ e:equalSign c:mustacheMaybeBlock { c.escaped = e; return c; }
 
-mustacheContent = &[A-Za-z] c:(!(TERM/[{}]) c:. {return c; })+ 
+mustacheContent = &[A-Za-z] p:params h:hash 
 {
-  var ret = { type: 'mustache', content: c.join('') };
+  return { type: 'mustache', params:p, hash:h };
+}
+
+params = p:(_ param:param !'=' _ {return param;})+ { return p; }
+param = p:paramChar+ { return p.join(''); }
+paramChar = alpha / '_' / '-' / '.'
+
+hash = h:(_ k:param '=' v:hashValue _ { return { key: k, value: v }; } )*
+{
+  var ret = {};
+  for(var i = 0; i < h.length; ++i) {
+    var pair = h[i];
+    ret[pair.key] = pair.value;
+  }
   return ret;
 }
+
+hashValue = string / param / integer
+integer = s:[0-9]+ { return parseInt(s.join('')); }
+
+string = p:('"' hashDoubleQuoteStringValue '"' / "'" hashSingleQuoteStringValue "'") { return p.join(''); }
+hashDoubleQuoteStringValue = s:[^"}]* { return s.join(''); }
+hashSingleQuoteStringValue = s:[^'}]* { return s.join(''); }
+
+alpha = [A-Za-z]
 
 htmlInlineContent
  = m:forcedMustache  { return [m]; }
@@ -49,18 +67,6 @@ htmlInlineContent
 
 textLine = '|' ' '? nodes:textNodes TERM { return nodes; }
 
-/*
-  textNodes is invoked either after a | at the start of a line, or
-  on the same line as an html element if there's no = sign
-  to trigger mustache.
-  It would just be a single text node, except mustache can
-  be embedded in the text a la:
-    h1 Hello {{name}}, you rule!  [context, mustache, content]
-    p {{salutation}}, douchebag!  [mustache, content]
-    p {{salutation}}, douc<span>h</span>ebag!  [mustache, content]
-  Note that only mustache splits up the otherwise single node array of text.
-  HTML is just treated as part of the text, no need to split into nodes.
-*/
 textNodes = first:preMustacheText? tail:(rawMustache preMustacheText?)* 
 {
   var ret = [];
@@ -77,69 +83,32 @@ rawMustache = rawMustacheEscaped / rawMustacheUnescaped
 rawMustacheUnescaped = '{{' _ m:mustacheContent _ '}}' { return m; }
 rawMustacheEscaped   = '{{{' _ m:mustacheContent _ '}}}' { m.escaped = true; return m; }
 
-preMustacheText
- = a:[^{\uEFFF]+ { return a.join(''); }
-
-textContent
- = c:(!TERM c:. {return c; })+ {return c.join('');}
-
-preTermText
- = c:(!TERM c:. {return c; })+ {return c.join('');}
-
+preMustacheText = a:[^{\uEFFF]+ { return a.join(''); }
 
 equalSign = "==" _ { return true; } / "=" _  { return false; } 
 
-notTerm
-  = c:(!TERM c:. { console.log(c);return c;})* { return c.join(''); }
-
+// TODO: how to DRY this?
 htmlTag
-  = h:htmlTagName t:attrShortcuts { return { type: 'html', tagName: h,    attrs: t  }; }
-  / h:htmlTagName                 { return { type: 'html', tagName: h,    attrs: {} }; }
-  / t:attrShortcuts               { return { type: 'html', tagName: null, attrs: t  }; }
+  = h:htmlTagName t:attrShortcuts? attributes { return { type: 'html', tagName: h,    attrs:(t||{})  }; }
+  / t:attrShortcuts                { return { type: 'html', tagName: null, attrs: t  }; }
 
 attrShortcuts
-  = id:idShortcut classes:classShortcut*  { return { id: id, 'classes': classes }; }
-  / classes:classShortcut+                { return { 'classes': classes }; }
+  = id:idShortcut classes:classShortcut* { return { id: id, 'class': classes.join(' ') }; }
+  / classes:classShortcut+               { return { 'class': classes.join(' ') }; }
 
-idShortcut
-  = '#' t:cssIdentifier { return t;}
-
-classShortcut
-  = '.' c:cssIdentifier { return c; }
+idShortcut = '#' t:cssIdentifier { return t;}
+classShortcut = '.' c:cssIdentifier { return c; }
 
 cssIdentifier = ident
 
-ident
-  = nmstart:nmstart nmchars:nmchar* {
-      return nmstart + nmchars.join("");
-    }
+ident = nmstart:nmstart nmchars:nmchar* { return nmstart + nmchars.join(""); }
 
-genTerminator = ' ' / TERM
+nmchar = [_a-zA-Z0-9-] / nonascii
+nmstart = [_a-zA-Z] / nonascii
+nonascii = [\x80-\xFF]
 
-nmchar
-  = [_a-zA-Z0-9-]
-  / nonascii
-
-
-nonascii
-  = [\x80-\xFF]
-
-nmstart
-  = [_a-zA-Z]
-  / nonascii
-
-indent  = s:" "* {
-  return indent(s) 
-}
-
-text    = c:[^\n]* { 
-  return c.join("")
-}
-
-
-htmlTagName "a valid HTML tag name"
-  =
-t:("figcaption"/"blockquote"/"plaintext"/"textarea"/"progress"/
+htmlTagName "a valid HTML tag name" =
+"figcaption"/"blockquote"/"plaintext"/"textarea"/"progress"/
 "optgroup"/"noscript"/"noframes"/"frameset"/"fieldset"/
 "datalist"/"colgroup"/"basefont"/"summary"/"section"/
 "marquee"/"listing"/"isindex"/"details"/"command"/
@@ -160,17 +129,11 @@ t:("figcaption"/"blockquote"/"plaintext"/"textarea"/"progress"/
 "big"/"bdo"/"bdi"/"ul"/"tt"/"tr"/"th"/"td"/
 "rt"/"rp"/"ol"/"li"/"hr"/"h6"/"h5"/"h4"/
 "h3"/"h2"/"h1"/"em"/"dt"/"dl"/"dd"/"br"/
-"u"/"s"/"q"/"p"/"i"/"b"/"a") {return t;}
+"u"/"s"/"q"/"p"/"i"/"b"/"a"
 
 INDENT "INDENT" = "\uEFEF" { return ''; }
 DEDENT "DEDENT" = "\uEFFE" { return ''; }
 TERM  "TERM" = "\uEFFF" { return ''; }
-
-/*
-INDENT = "INDENT" { return ''; }
-DEDENT = "DEDENT" { return ''; }
-TERM = "TERM" { return ''; }
-*/
 
 __ "required whitespace"
   = whitespace+

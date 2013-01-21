@@ -1,9 +1,0 @@
-.row.container
-
-ul = each things
-  li = title
-
-
-p
-  | Hello and welcome {{{knock}}} to fartville{{stupid}}!
-  | I hope I <span>don't</span> come down {{with}} INSANE AIDS

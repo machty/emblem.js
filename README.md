@@ -32,28 +32,39 @@ Stay the hell tuned.
           p = body
 ```
 
+## TODO
 
+1. Support for stacked-element shorthand, a la Sass: `.navbar .navbar-inner ul.nav` 
+   will nest the three elements inside each other as well as allow 
+   for the following line(s) to be indented as nested content. 
+   Useful for hyper-nested Bootstrap apps.
+1. `bindAttr` and other in-tag handlebars support
+1. Slash comments, both single line and multiline
+1. Support for partials (not a priority since that syntax is never used in Ember)
+1. Intelligent self-closing of tags (presently prints out `<input></input>`)
+1. Intelligent placement of spaces between elements, language support
+   for this
+1. Support for actions.
+1. More tests.
+1. Syntax highlighting (see below)
 
+## Syntax Highlighting
 
+For now, please refer to syntax highlighting solutions for
+[Slim](http://slim-lang.com/), which is not much different
+from Ember's. At some point, we'll have something even more
+custom tailored to Emblem (feel free to take a swing at it
+and send in a PR).
 
-Small examples:
+Vim users with Slim syntax highlighting can set this in
+their `.vimrc`s:
 
 ```
-.container
-
-  .row
-    p Hello
-
-
-p john=frank bob=sally class="gnarly" id="football"
-  data-balls="funbags" shittermetimbers="bloop"
-    span I hope you die
-
+au BufNewFile,BufRead *.emblem set filetype=slim
 ```
 
-[ DOCUMENT,
-  sourceElements: [
-  ]
-]
+## Contribute
 
-
+Please help me make this as pain-free a language as possible. PR's
+and suggestions for language improvements absolute welcome and
+encouraged.

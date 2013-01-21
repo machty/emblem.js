@@ -1,0 +1,28 @@
+  .container
+  .row
+    .span6
+      App.MenuView  
+    .span6
+      h1 = name
+ 
+      / Assume BlurbView has a layout. 
+      App.BlurbView == wysiwyg_description
+ 
+
+
+      if loggedIn
+        p User is logged in!
+      else
+        p User ain't logged in!
+ 
+      h2 Last Post
+      with lastPost
+        h3 = title
+        p = body
+ 
+      / The following syntax is awesome but not a high priority
+      ul#posts = each posts
+        li
+          h4 = title
+          p = body
+

@@ -45,6 +45,10 @@ Small examples:
     p Hello
 
 
+p john=frank bob=sally class="gnarly" id="football"
+  data-balls="funbags" shittermetimbers="bloop"
+    span I hope you die
+
 ```
 
 [ DOCUMENT,

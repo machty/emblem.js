@@ -8,7 +8,7 @@ inspect = (o) -> (require 'util').inspect o, no, 9e9, yes
   INDENT = '\uEFEF'
   DEDENT = '\uEFFE'
   TERM   = '\uEFFF'
-  #INDENT = ' INDENT 
+  #INDENT = ' INDENT '
   #DEDENT = ' DEDENT '
   #TERM   = ' TERM '
 
@@ -73,6 +73,7 @@ inspect = (o) -> (require 'util').inspect o, no, 9e9, yes
           # Check if we're at the beginning of a line, try gobbling
           # any whitespace before beginning of line.
           if @ss.bol() or @discard any_whitespaceFollowedByNewlines_
+            #console.log "OH SHIT: #{}"
 
             # We're at bol, take this opportunity to establish base
             # indentation and present indentation
@@ -134,7 +135,9 @@ inspect = (o) -> (require 'util').inspect o, no, 9e9, yes
           @scan /[^\n\\]+/
 
           @context.observe tok if tok = @discard /\//
-          @p "#{TERM}" if @discard /\n/
+          if @discard /\n/
+            #console.log 'DASRC'
+            @p "#{TERM}" 
           @discard any_whitespaceFollowedByNewlines_
 
         when '/'

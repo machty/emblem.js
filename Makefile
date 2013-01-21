@@ -1,76 +1,47 @@
 default: all
 
 SRC = $(shell find src -name "*.coffee" -type f | sort)
-LIB = $(SRC:src/%.coffee=lib/coffee-script/%.js) lib/coffee-script/parser.js
-BOOTSTRAPS = $(SRC:src/%.coffee=lib/coffee-script/bootstrap/%.js) lib/coffee-script/bootstrap/parser.js
-LIBMIN = $(LIB:lib/coffee-script/%.js=lib/coffee-script/%.min.js)
+
+# LIB is everything is src/*.coffee mapped to to lib/emblem/*.js and parser.js
+LIB = $(SRC:src/%.coffee=lib/emblem/%.js) lib/emblem/parser.js
 ROOT = $(shell pwd)
 
-EMBER_SCRIPT = ./bin/ember-script --js --bare
-COFFEE = node_modules/.bin/coffee --js --bare
+COFFEE = node_modules/.bin/coffee -c --bare
 PEGJS = node_modules/.bin/pegjs --cache --export-var 'module.exports'
 MOCHA = node_modules/.bin/mocha --compilers coffee:. -u tdd
 BROWSERIFY = node_modules/.bin/browserify
 MINIFIER = node_modules/.bin/esmangle
 
-all: $(LIB)
+all: lib/emblem $(LIB)
 build: all
-parser: lib/coffee-script/parser.js
-browser: CoffeeScriptRedux.js
-min: minify
-minify: $(LIBMIN)
-
+parser: lib/emblem lib/emblem/parser.js
 
 lib:
 	mkdir lib/
-lib/coffee-script: lib
-	mkdir -p lib/coffee-script/
-lib/coffee-script/bootstrap: lib/coffee-script
-	mkdir -p lib/coffee-script/bootstrap
+lib/emblem: lib
+	mkdir -p lib/emblem/
 
+dist: $(LIB)
+	mkdir -p dist
+	$(BROWSERIFY) lib/emblem/module.js | $(MINIFIER) > dist/emblem.min.js
 
-lib/coffee-script/parser.js: src/grammar.pegjs bootstraps lib/coffee-script
+lib/emblem/parser.js: src/grammar.pegjs
 	$(PEGJS) <"$<" >"$(@:%=%.tmp)" && mv "$(@:%=%.tmp)" "$@"
-lib/coffee-script/bootstrap/parser.js: src/grammar.pegjs lib/coffee-script/bootstrap
-	$(PEGJS) <"$<" >"$@"
-lib/coffee-script/bootstrap/%.js: src/%.coffee lib/coffee-script/bootstrap
-	$(COFFEE) <"$<" >"$@"
-bootstraps: $(BOOTSTRAPS) lib/coffee-script/bootstrap
-	mv lib/coffee-script/bootstrap/* lib/coffee-script
-	rmdir lib/coffee-script/bootstrap
-lib/coffee-script/%.js: src/%.coffee lib/coffee-script/bootstrap/%.js bootstraps lib/coffee-script
-	$(COFFEE) <"$<" >"$(@:%=%.tmp)" && mv "$(@:%=%.tmp)" "$@"
+
+lib/emblem/%.js: src/%.coffee 
+	$(COFFEE) -c -o lib/emblem/ "$<" #&& mv "$(@:%=%.tmp)" "$@"
 
 
-CoffeeScriptRedux.js: $(LIB)
-	$(BROWSERIFY) lib/coffee-script/module.js | $(MINIFIER) > CoffeeScriptRedux.js
-
-
-lib/coffee-script/%.min.js: lib/coffee-script/%.js lib/coffee-script
-	$(MINIFIER) <"$<" >"$@"
-
-
-.PHONY: test coverage install loc clean
+.PHONY: test install clean
 
 
 test:
 	$(MOCHA) -R dot
 
-coverage:
-	@which jscoverage || (echo "install node-jscoverage"; exit 1)
-	rm -rf instrumented
-	jscoverage -v lib instrumented
-	$(MOCHA) -R dot
-	$(MOCHA) -r instrumented/coffee-script/compiler -R html-cov > coverage.html
-	@xdg-open coverage.html &> /dev/null
-
 install:
-	npm install -g .
-
-loc:
-	wc -l src/*
+	npm install
 
 clean:
 	rm -rf instrumented
 	rm -f coverage.html
-	rm -rf lib/coffee-script
+	rm -rf lib/emblem

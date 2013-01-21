@@ -6,72 +6,48 @@ content = statements
 statements
  = statement*
 
-/*
- NEED TO ADD TEXT NODE
- 
- h1 Hello, {{name}}
-
- HtmlNode h1
-   nodes: [
-     { content: "Hello, " }
-     { mustache: name }
-     { content: "" } ?
-   ]
-  
-  statements can be:
-  preceded by known HTML tag, optional indented block, single line, or empty
-  assumedMustache: looks like html line, but tag isn't recognized HTML element, so assumed HB
-  forcedMustache: uses = or == at beginning of line
-  text
-  post
-
-  htmlInlineContent: 
-    '= ': mustacheContent
-    else if nonempty, assume textNodes
-
-*/
-
 statement
-  = t:htmlTag _ TERM INDENT c:content DEDENT { t.nodes = c; return t; }
-  / t:htmlTag _ TERM { return t; }  
-  / t:htmlTag c:htmlInlineContent TERM { t.nodes = c; return t; }  
-  / textLine
-  / capitalizedMustache
-  / c:mustacheContent { return { type: 'mustache', content: c }; }
+  = html
+  /*/ mustache*/
 
-// Can either be block or some other thing
-capitalizedMustache
-  /* Check for block helper first */
-  = &([A-Z]) blockableMustache { return { capitalized: true }; }
+html
+  = htmlMaybeBlock
+  / htmlWithInlineContent
+  / t:textLine { return t; }
 
-blockableMustache
-  /* Check for block helper first */
-  = mustacheContent _ TERM INDENT c:content DEDENT { t.nodes = c; return t; }
+mustache
+  = f:forcedMustache { return f; }
+  / mustacheMaybeBlock 
 
-  /* Fall back to non-block */
-  / mustacheContent _ TERM
+htmlMaybeBlock = h:htmlAttributesOnly c:(INDENT content DEDENT)? 
+{ 
+  h.nodes = c ? c[1] : [];
+  return h; 
+}
 
-forcedMustache
-  = equalSign c:mustacheContent { return { type: 'mustache', content: c }; }
+htmlAttributesOnly = t:htmlTag _ TERM { t.nodes = []; return t; }  
 
-mustacheContent 
- = mustacheText
+htmlWithInlineContent = t:htmlTag ws c:htmlInlineContent { t.nodes = c; return t; }  
 
-/*
-Single lines are broken into multiple nodes since they can be a mixture
-of text and mustaches.
+mustacheMaybeBlock = t:mustacheContent TERM c:(INDENT content DEDENT)? 
+{ 
+  t.nodes = c ? c[1] : [];
+  return t; 
+}
 
-can be of format:
+forcedMustache = _ e:equalSign c:mustacheMaybeBlock { c.escaped = e; return c; }
 
-= basdoiasd (force mustache)
+mustacheContent = &[A-Za-z] c:(!(TERM/[{}]) c:. {return c; })+ 
+{
+  var ret = { type: 'mustache', content: c.join('') };
+  return ret;
+}
 
-*/
 htmlInlineContent
- = forcedMustache
+ = m:forcedMustache  { return [m]; }
  / textNodes
 
-textLine
-  = '|' ' '? nodes:textNodes { return nodes; }
+textLine = '|' ' '? nodes:textNodes TERM { return nodes; }
 
 /*
   textNodes is invoked either after a | at the start of a line, or
@@ -85,12 +61,24 @@ textLine
   Note that only mustache splits up the otherwise single node array of text.
   HTML is just treated as part of the text, no need to split into nodes.
 */
-textNodes
-  = _ { return []; }
-  / (preMustacheText* '{{' '{'? mustacheContent '}}' '}'?)* post:preMustacheText*
+textNodes = first:preMustacheText? tail:(rawMustache preMustacheText?)* 
+{
+  var ret = [];
+  if(first) { ret.push(first); } 
+  for(var i = 0; i < tail.length; ++i) {
+    var t = tail[i];
+    ret.push(t[0]);
+    if(t[1]) { ret.push(t[1]); }
+  }
+  return ret;
+}
+
+rawMustache = rawMustacheEscaped / rawMustacheUnescaped
+rawMustacheUnescaped = '{{' _ m:mustacheContent _ '}}' { return m; }
+rawMustacheEscaped   = '{{{' _ m:mustacheContent _ '}}}' { m.escaped = true; return m; }
 
 preMustacheText
- = [^{]
+ = a:[^{\uEFFF]+ { return a.join(''); }
 
 textContent
  = c:(!TERM c:. {return c; })+ {return c.join('');}
@@ -98,18 +86,16 @@ textContent
 preTermText
  = c:(!TERM c:. {return c; })+ {return c.join('');}
 
-mustacheText
- = c:(!(TERM/[{}]) c:. {return c; })+ {return c.join('');}
 
-equalSign = "=" _  { return false; } / "==" _ { return true; }
+equalSign = "==" _ { return true; } / "=" _  { return false; } 
 
-notTerm 
-  = (!TERM .)*
+notTerm
+  = c:(!TERM c:. { console.log(c);return c;})* { return c.join(''); }
 
 htmlTag
-  = h:htmlTagName t:attrShortcuts  { return { type: 'html', tagName: h,    attrs: t  }; }
-  / h:htmlTagName                  { return { type: 'html', tagName: h,    attrs: {} }; }
-  / t:attrShortcuts                { return { type: 'html', tagName: null, attrs: t  }; }
+  = h:htmlTagName t:attrShortcuts { return { type: 'html', tagName: h,    attrs: t  }; }
+  / h:htmlTagName                 { return { type: 'html', tagName: h,    attrs: {} }; }
+  / t:attrShortcuts               { return { type: 'html', tagName: null, attrs: t  }; }
 
 attrShortcuts
   = id:idShortcut classes:classShortcut*  { return { id: id, 'classes': classes }; }
@@ -196,3 +182,5 @@ _ "whitespace"
 // conventional definition consistent with ECMA-262, 5th ed.
 whitespace
   = [ \t\n\r]
+
+ws = whitespace

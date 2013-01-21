@@ -16,17 +16,17 @@
   "dependencies": {
     "handlebars": "~1.0",
     "optimist": "~0.3",
-    "uglify-js": "~1.2"
     "StringScanner": "~0.0.3"
   },
   "devDependencies": {
     "benchmark": "~1.0",
+    "esmangle": "~0.0.8",
     "browserify": "~1.16",
-    "pegjs": "git://github.com/dmajda/pegjs.git#bea6b1fde74c8aebf802f9bcc3380c65b241e1b7",
-    "nodeunit": ">=0.5.0",
-  , "coffee-script": "~1.3"
+    "pegjs": "git://github.com/dmajda/pegjs.git#549d052710e7c35ed27a91b9de41a49b56a2afe1",
+		"mocha": "*",
+    "coffee-script": "~1.3"
   },
-  "main": "lib/emblem.js",
+  "main": "lib/emblem/module.js",
   "bin": {
     "handlebars": "bin/emblem"
   },

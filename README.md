@@ -1,6 +1,23 @@
 ## Emblem: Ember.js-infused Markup Language
 
-Stay the hell tuned.
+Emblem.js is an indentation-based templating language that supports
+Ember.js's auto-updating templates and offers lots of Ember-targeting
+syntactic sugar that can be disabled in non-Ember settings.
+
+## Features
+
+1. Indentation-based (inspired by Slim, HAML, Jade, etc), which keeps
+   your code neatly indented and prevents you from having to write
+   closing HTML tags.
+1. Written in JavaScript; templates can be compiled in the browser or in
+   Node. 
+1. Internally compiles to Handlebars, so all of the data-binding,
+   auto-updating functionality that you'd expect out of Ember will work.
+   Note that Handlebars is the only templating language that Ember
+   supports (that is, if you want auto-updating templates, which you
+   do).
+1. Lots of enhancements and shortcuts that favor Ember.js, but can be
+   disabled for use in non-Ember settings.
 
 ## Example
 

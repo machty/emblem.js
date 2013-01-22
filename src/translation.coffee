@@ -1,8 +1,6 @@
 Handlebars = require 'handlebars'
 Emblem     = require './emblem'
-
-"BEGIN BROWSER"
-
+  
 # Simple wrapped around a string. Gets passed around for the purpose
 # of coalescing adjacent content nodes into one
 class ContentStack
@@ -102,7 +100,5 @@ Emblem.parse = (string) ->
 
   new Handlebars.AST.ProgramNode(statements, [])
 
-
-"END BROWSER"
 
 

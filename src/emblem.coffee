@@ -1,10 +1,6 @@
 
-"BEGIN BROWSER"
-
 this.Emblem = {}
 Emblem = this.Emblem
-
-"END BROWSER"
 
 module.exports = Emblem
 

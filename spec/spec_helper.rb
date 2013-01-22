@@ -38,10 +38,8 @@ module Emblem
     end
 
     def self.remove_exports(string)
-      match = string.match(%r{\A(.*?)^"BEGIN BROWSER";\n(.*)\n^"END BROWSER";(.*?)\Z}m)
-      prelines = match ? match[1].count("\n") + 1 : 0
-      ret = match ? match[2] : string
-      ("\n" * prelines) + ret
+      string = string.gsub(/^([^\s].*equire[ (].*)$/, "// \1")
+      string = string.gsub(/^(module\.)/, "// \1")
     end
 
     def self.load_helpers(context)

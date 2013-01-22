@@ -3,8 +3,6 @@ Emblem = require './emblem'
 
 #inspect = (o) -> (require 'util').inspect o, no, 9e9, yes
 
-"BEGIN BROWSER"
-
 Emblem.Preprocessor = class Preprocessor
 
   ws = '\\t\\x0B\\f \\xA0\\u1680\\u180E\\u2000-\\u200A\\u202F\\u205F\\u3000\\uFEFF'
@@ -169,7 +167,5 @@ Emblem.Preprocessor = class Preprocessor
     pre.processData input
     do pre.processEnd
     pre.output
-
-"END BROWSER"
 
 

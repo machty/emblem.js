@@ -1,7 +1,5 @@
 Emblem = require './emblem'
 
-"BEGIN BROWSER"
-
 # This allows you put <script type="text/x-emblem"> tags
 # in your HTML with Emblem code that will be compiled into 
 # handlebars.
@@ -28,6 +26,4 @@ ENV = this.ENV
 ENV.EMBER_LOAD_HOOKS ||= {}
 ENV.EMBER_LOAD_HOOKS.application ||= []
 ENV.EMBER_LOAD_HOOKS.application.push -> Emblem.bootstrap()
-
-"END BROWSER"
 

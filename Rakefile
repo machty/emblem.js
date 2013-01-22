@@ -56,16 +56,22 @@ file "lib/parser.js" => ["src/grammar.pegjs", "src/parser-prefix.js", "src/parse
   end
 end
 
+file "spec/qunit_spec.js" do
+  `coffee -b --compile spec/qunit_spec.coffee`
+end
+
 task :compile => ["lib/parser.js", :coffee]
 
 desc "run the spec suite"
-task :spec => [:release] do
+task :spec => ["spec/qunit_spec.js", :release] do
+  puts "Running RSpec suite"
   rc = system "rspec -cfs spec"
   fail "rspec spec failed with exit code #{$?.exitstatus}" if (rc.nil? || ! rc || $?.exitstatus != 0)
 end
 
 desc "run the npm test suite"
-task :npm_test => [:release] do
+task :npm_test => ["spec/qunit_spec.js", :release] do
+  puts "Running Mocha suite"
   rc = system "npm test"
   fail "npm test failed with exit code #{$?.exitstatus}" if (rc.nil? || ! rc || $?.exitstatus != 0)
 end
@@ -73,8 +79,9 @@ end
 task :default => [:compile, :spec, :npm_test]
 
 def remove_exports(string)
-  match = string.match(%r{^"BEGIN BROWSER";\n(.*)\n^"END BROWSER";}m)
-  match ? match[1] : string
+  # TODO: HACK, this regex might catch some future code. need a better way to strip out requires
+  string = string.gsub(/^([^\s].*equire[ (].*)$/, "// \1")
+  string = string.gsub(/^(module\.)/, "// \1")
 end
 
 minimal_deps = %w(emblem parser compiler preprocessor translation emberties).map do |file|

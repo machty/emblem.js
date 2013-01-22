@@ -1,8 +1,6 @@
 Handlebars = require 'handlebars'
 Emblem = require './emblem'
 
-"BEGIN BROWSER"
-
 Emblem.precompile = (string, options = {}) ->
   if typeof string isnt 'string'
     throw new Handlebars.Exception("You must pass a string to Emblem.precompile. You passed " + string)
@@ -27,6 +25,4 @@ Emblem.compile = (string, options = {}) ->
   (context, options) ->
     compiled = compile() unless compiled
     return compiled.call(this, context, options);
-
-"END BROWSER"
 

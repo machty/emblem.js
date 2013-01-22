@@ -83,6 +83,9 @@ test "with more complex text", ->
 test "with trailing space", ->
   shouldCompileTo("p Hello   ", {}, "<p>Hello   </p>")
 
+test "with trailing space", ->
+  shouldCompileTo("p Hello   ", {}, "<p>Hello   </p>")
+
 suite("html more complex")
 
 test "multiple lines", ->

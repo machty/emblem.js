@@ -117,29 +117,12 @@ file "dist/emblem.js" => minimal_deps do |task|
   build_for_task(task)
 end
 
-task :build => [:compile, "dist/emblem.js"]
+file "dist/emblem.min.js" => ["dist/emblem.js"] do
+  minjs = Uglifier.new.compile(File.read("dist/emblem.js"))
+  File.open("dist/emblem.min.js", 'w') { |f| f.write(minjs) }
+end
+
+task :build => [:compile, "dist/emblem.js", "dist/emblem.min.js"]
 
 desc "build the browser and version of emblem"
 task :release => [:build]
-
-=begin
-directory "vendor"
-desc "benchmark against dust.js and mustache.js"
-task :bench => "vendor" do
-  require "open-uri"
-
-  #if File.directory?("vendor/coffee")
-    #system "cd vendor/coffee && git pull"
-  #else
-    #system "git clone git://github.com/jashkenas/coffee-script.git vendor/coffee"
-  #end
-
-  #if File.directory?("vendor/eco")
-    #system "cd vendor/eco && git pull && npm update"
-  #else
-    #system "git clone git://github.com/sstephenson/eco.git vendor/eco && cd vendor/eco && npm update"
-  #end
-
-  system "node bench/emblem.js"
-end
-=end

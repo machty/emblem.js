@@ -1,3 +1,7 @@
+# NOTE: THIS IS ALL EXTREMELY ALPHA (1/22/13)
+
+About 60% feature complete, but rapidly approaching the finish line.
+
 ## Emblem: Ember.js-infused Markup Language
 
 Emblem.js is an indentation-based templating language that supports

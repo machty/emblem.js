@@ -8,6 +8,8 @@ Emblem.js is an indentation-based templating language that supports
 Ember.js's auto-updating templates and offers lots of Ember-targeting
 syntactic sugar that can be disabled in non-Ember settings.
 
+[See it in action.](http://jsfiddle.net/machty/u6nVt/2/)
+
 ## Features
 
 1. Indentation-based (inspired by Slim, HAML, Jade, etc), which keeps

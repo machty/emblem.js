@@ -19,9 +19,6 @@
     "StringScanner": "~0.0.3"
   },
   "devDependencies": {
-    "benchmark": "~1.0",
-    "esmangle": "~0.0.8",
-    "browserify": "~1.16",
     "pegjs": "git://github.com/dmajda/pegjs.git#549d052710e7c35ed27a91b9de41a49b56a2afe1",
 		"mocha": "*",
     "coffee-script": "~1.3"

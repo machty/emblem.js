@@ -78,6 +78,4 @@ au BufNewFile,BufRead *.emblem set filetype=slim
 
 ## Contribute
 
-Please help me make this as pain-free a language as possible. PR's
-and suggestions for language improvements absolute welcome and
-encouraged.
+I'm not yet ready to accept PR's yet, but stay tuned.

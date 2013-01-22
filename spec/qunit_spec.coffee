@@ -120,6 +120,17 @@ test "multiline with empty first line", ->
   """
   shouldCompileTo emblem, "Good"
 
+test "with mustaches", ->
+  emblem =
+  """
+  | Bork {{foo}} {{{bar}}}!
+  """
+  shouldCompileTo emblem, 
+    { foo: "YEAH", bar: "<span>NO</span>"},
+    'Bork YEAH <span>NO</span>'
+
+
+
 suite "preprocessor"
 
 test "it strips out preceding whitespace", ->
@@ -239,8 +250,6 @@ test "nesting", ->
   shouldCompileTo emblem, '<p class="hello" data-foo="gnarly"><span>Yes</span></p>'
 
 
-
-
 suite "html nested"
 
 test "basic", ->
@@ -275,7 +284,7 @@ test "empty nest w/ attribute shorthand", ->
   shouldCompileTo emblem, '<p class="woo"><span id="yes"><strong class="no yes"><i></i></strong></span></p>'
 
 
-suite "mustache"
+suite "simple mustache"
 
 test "various one-liners", ->
   emblem =
@@ -305,11 +314,187 @@ test "nested combo syntax", ->
   emblem =
   """
   ul = each items
-    = foo
+    li = foo
   """
-  # TODO LEFT OFF HEREREERER
   shouldCompileTo emblem,
-    { foo: '<span>123</span>' },
-    '<span>123</span>&lt;span&gt;123&lt;/span&gt;<p><span>123</span></p>'
+    { items: [ { foo: "YEAH"}, { foo: "BOI" } ] },
+    '<ul><li>YEAH</li><li>BOI</li></ul>'
 
+
+suite "mustache helpers"
+
+Handlebars.registerHelper 'ahelper', (param) ->
+  "HELPED #{param}"
+
+Handlebars.registerHelper 'frank', ->
+  options = arguments[arguments.length - 1]
+  "WOO: #{options.hash.text} #{options.hash.text2}"
+
+test "basic", -> shouldCompileTo 'ahelper foo', {foo: "YES"}, 'HELPED YES'
+
+test "hashed parameters should work", ->
+  shouldCompileTo 'frank text="YES" text2="NO"', 'WOO: YES NO'
+
+
+Handlebars.registerHelper 'view', (param) ->
+  options = arguments[arguments.length - 1]
+  content = param
+  content = options.fn @ if options.fn
+  new Handlebars.SafeString """<view class="#{param}">#{content}</view>'"""
+
+suite "capitalized line-starter"
+
+test "should invoke `view` helper by default", ->
+  emblem =
+  """
+  SomeView
+  """
+  shouldCompileTo emblem, '<view class="SomeView">SomeView</view>'
+
+test "should support block mode", ->
+  emblem =
+  """
+  SomeView
+    p View content
+  """
+  shouldCompileTo emblem, '<view class="SomeView"><p>View content</p></view>'
+
+# TODO test overriding the default helper name (instead of always "view")
+
+
+suite "bang syntax defaults to `unbound` helper syntax"
+
+Handlebars.registerHelper 'unbound', ->
+  options = arguments[arguments.length - 1]
+  params = Array::slice.call arguments, -1
+  stringedParams = params.join(' ')
+  content = if options.fn then options.fn @ else stringedParams
+  new Handlebars.SafeString """<view class="#{stringedParams}">#{content}</view>'"""
+
+test "bang helper defaults to `unbound` invocation", ->
+  emblem =
+  """
+  foo! Yar
+  = foo!
+  """
+  shouldCompileTo emblem, '<unbound class="foo Yar">foo Yar</unbound><unbound class="foo">foo</unbound>'
+
+test "bang helper works with blocks", ->
+  emblem =
+  """
+  hey! you suck
+    = foo!
+  """
+  shouldCompileTo emblem, '<unbound class="hey you suck"><unbound class="foo">foo</unbound></unbound>'
+
+
+# TODO test overriding the default bang helper name (instead of always "unbound")
+
+suite "conditionals"
+
+test "simple if statement", ->
+  emblem =
+  """
+  if foo
+    | Foo
+  if bar
+    | Bar
+  """
+  shouldCompileTo emblem, {foo: true, bar: false}, 'Foo'
+
+test "if else ", ->
+  emblem =
+  """
+  if foo
+    | Foo
+    if bar
+      | Bar
+    else
+      | Woot
+  else
+    | WRONG
+  if bar
+    | WRONG
+  else
+    | Hooray
+  """
+  shouldCompileTo emblem, {foo: true, bar: false}, 'FooWootHooray'
+
+
+Handlebars.registerHelper 'bindAttr', ->
+  options = arguments[arguments.length - 1]
+
+  binding = null
+  for own k, v of options.hash
+    binding = [k,v]
+    break
+  "#{k}BoundTo#{v}"
+
+suite "bindAttr behavior for unquoted attribute values"
+
+test "basic", ->
+  shouldCompileTo 'p class=foo', '<p classBoundTofoo></p>'
+
+test "multiple", ->
+  shouldCompileTo 'p class=foo id="yup" data-thinger=yeah Hooray', 
+                  '<p classBoundTofoo id="yup" data-thingBoundToyeah>Hooray</p>'
+
+test "class bindAttr special syntax", ->
+  shouldCompileTo 'p class=foo:bar:baz', '<p classBoundTofoo:bar:baz></p>'
+
+
+suite "in-tag explicit mustache"
+
+test "basic", ->
+  shouldCompileTo 'p{{bindAttr class="foo"}}', '<p classBoundTofoo></p>'
+
+test "with inline content", ->
+  emblem =
+  """
+  p{{bindAttr class="foo"}} Hello
+  p{{bindAttr class="foo"}} = foo
+  """
+  shouldCompileTo emblem, {foo: "yar"}, 
+    '<p classBoundTofoo>Hello</p><p classBoundTofoo>yar</p>'
+
+test "with nesting", ->
+  emblem =
+  """
+  p{{bindAttr class="foo"}}
+    span Hello
+  """
+  shouldCompileTo emblem, {foo: "yar"}, 
+    '<p classBoundTofoo><span>Hello</span></p>'
+
+test "multiple", ->
+  emblem =
+  """
+  p{{bindAttr class="foo"}}{{bindAttr thing="yar"}} Hello
+  """
+  shouldCompileTo emblem, {foo: "yar"}, 
+    '<p classBoundTofoo thingBoundToyar><span>Hello</span></p>'
+
+suite "actions"
+
+Handlebars.registerHelper 'bindAttr', (actionName) ->
+  options = arguments[arguments.length - 1]
+  params = Array::slice.call arguments, -1
+  onString = options.hash.on
+  targetString = "target=#{options.hash.target || "default"}"
+  "action|#{onString}|#{params[0]}|#{targetString}"
+
+test "basic (click)", ->
+  emblem =
+  """
+  button click="submitComment" Submit Comment
+  """
+  shouldCompileTo emblem, '<button "action|click||target=default">Submit Comment</button>'
+
+test "nested (mouseEnter)", ->
+  emblem =
+  """
+  a mouseEnter='submitComment target="view"'
+    | Submit Comment
+  """
+  shouldCompileTo emblem, '<a "action|mouseEnter||target=view">Submit Comment</a>'
 

@@ -31,6 +31,8 @@ processNodes = (nodes, stack, statements = []) ->
       # TODO defaults
       tagName = node.tagName || 'div'
 
+      # Coalesce attributes
+
       classes = node.attrs.classes || []
       classNames = classes.join ' '
       attributesString = ""
@@ -50,31 +52,47 @@ processNodes = (nodes, stack, statements = []) ->
 
       # Check for uppercase special case.
       firstChar = node.params[0].charAt(0)
-      if firstChar == firstChar.toUpperCase()
+      if !node.forced && firstChar == firstChar.toUpperCase()
         # TODO defaults
         helper = "view"
         node.params.unshift helper
+
+      # The Mustache node expects params as an array of IdNode's
+      params = []
+      for param in node.params
+        # an IdNode has a parts array which includes the period separators
+        # between identifiers, e.g. ['App', '.', 'Whatever']
+        # TODO: clean this up, use grammar parse to do thie splitting
+        ids = param.split('.')
+        result = []
+        for id in ids
+          result.push id
+          result.push '.'
+        result.pop()
+        
+        params.push new Handlebars.AST.IdNode(result)
 
       # Block
       # Need array of hash key value pairs
       pairs = []
       pairs.push [k,v] for own k,v of node.hash
-      hash = new Handlebars.AST.HashNode(pairs)
+      hash = null
+      hash = new Handlebars.AST.HashNode(pairs) if pairs.length
 
       # Determine whether this is just a single mustache
       # or a blockstache.
-      if node.nodes.length
+      if node.nodes && node.nodes.length
 
-        closeId = new Handlebars.AST.IdNode(node.params[0].split('.'))
+        closeId = params[0]
         substatements = processNodes node.nodes, new ContentStack
         statements.push new Handlebars.AST.ProgramNode(substatements, [])
         # TODO handle else substatements
-        openStache = new Handlebars.AST.MustacheNode(node.params, hash, node.escaped) # TODO reverse polarity on `escape`. whoops.
+        openStache = new Handlebars.AST.MustacheNode(params, hash, node.escaped) # TODO reverse polarity on `escape`. whoops.
 
         statements.push new Handlebars.AST.BlockNode(openStache, statements, [], closeId) 
       else
         # Singlestache
-        statements.push new Handlebars.AST.MustacheNode(node.params, hash, node.escaped) # TODO escaped polarity
+        statements.push new Handlebars.AST.MustacheNode(params, hash, node.escaped) # TODO escaped polarity
 
     else if node instanceof Array
       # One liner, could be strings or mustaches

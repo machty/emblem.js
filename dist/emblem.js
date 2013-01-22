@@ -2361,9 +2361,12 @@ Emblem.Parser = (function(){
       function parse_statement() {
         var r0;
         
-        r0 = parse_html();
+        r0 = parse_comment();
         if (r0 === null) {
-          r0 = parse_mustache();
+          r0 = parse_html();
+          if (r0 === null) {
+            r0 = parse_mustache();
+          }
         }
         return r0;
       }
@@ -2403,6 +2406,109 @@ Emblem.Parser = (function(){
         }
         if (r0 === null) {
           r0 = parse_mustacheMaybeBlock();
+        }
+        return r0;
+      }
+      
+      function parse_comment() {
+        var r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12, r13;
+        
+        r1 = pos;
+        r2 = pos;
+        if (input.charCodeAt(pos) === 47) {
+          r3 = "/";
+          pos++;
+        } else {
+          r3 = null;
+          if (reportFailures === 0) {
+            matchFailed("\"/\"");
+          }
+        }
+        if (r3 !== null) {
+          r4 = parse_lineContent();
+          if (r4 !== null) {
+            r5 = parse_TERM();
+            if (r5 !== null) {
+              r7 = pos;
+              r8 = parse_INDENT();
+              if (r8 !== null) {
+                r11 = pos;
+                r12 = parse_lineContent();
+                if (r12 !== null) {
+                  r13 = parse_TERM();
+                  if (r13 !== null) {
+                    r10 = [r12, r13];
+                  } else {
+                    r10 = null;
+                    pos = r11;
+                  }
+                } else {
+                  r10 = null;
+                  pos = r11;
+                }
+                if (r10 !== null) {
+                  r9 = [];
+                  while (r10 !== null) {
+                    r9.push(r10);
+                    r11 = pos;
+                    r12 = parse_lineContent();
+                    if (r12 !== null) {
+                      r13 = parse_TERM();
+                      if (r13 !== null) {
+                        r10 = [r12, r13];
+                      } else {
+                        r10 = null;
+                        pos = r11;
+                      }
+                    } else {
+                      r10 = null;
+                      pos = r11;
+                    }
+                  }
+                } else {
+                  r9 = null;
+                }
+                if (r9 !== null) {
+                  r10 = parse_DEDENT();
+                  if (r10 !== null) {
+                    r6 = [r8, r9, r10];
+                  } else {
+                    r6 = null;
+                    pos = r7;
+                  }
+                } else {
+                  r6 = null;
+                  pos = r7;
+                }
+              } else {
+                r6 = null;
+                pos = r7;
+              }
+              r6 = r6 !== null ? r6 : "";
+              if (r6 !== null) {
+                r0 = [r3, r4, r5, r6];
+              } else {
+                r0 = null;
+                pos = r2;
+              }
+            } else {
+              r0 = null;
+              pos = r2;
+            }
+          } else {
+            r0 = null;
+            pos = r2;
+          }
+        } else {
+          r0 = null;
+          pos = r2;
+        }
+        if (r0 !== null) {
+          reportedPos = r1;
+          r0 = (function() { return ""; })();
+        }
+        if (r0 === null) {
+          pos = r1;
         }
         return r0;
       }
@@ -2615,7 +2721,7 @@ Emblem.Parser = (function(){
         }
         if (r0 !== null) {
           reportedPos = r1;
-          r0 = (function(e, c) { c.escaped = e; return c; })(r4, r5);
+          r0 = (function(e, c) { c.forced = true; c.escaped = e; return c; })(r4, r5);
         }
         if (r0 === null) {
           pos = r1;
@@ -3232,7 +3338,7 @@ Emblem.Parser = (function(){
       }
       
       function parse_textLine() {
-        var r0, r1, r2, r3, r4, r5, r6;
+        var r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12, r13, r14, r15, r16, r17;
         
         r1 = pos;
         r2 = pos;
@@ -3261,7 +3367,174 @@ Emblem.Parser = (function(){
             if (r5 !== null) {
               r6 = parse_TERM();
               if (r6 !== null) {
-                r0 = [r3, r4, r5, r6];
+                r7 = [];
+                r9 = pos;
+                r10 = pos;
+                r11 = parse_INDENT();
+                if (r11 !== null) {
+                  r14 = pos;
+                  r15 = pos;
+                  r16 = parse_textNodes();
+                  if (r16 !== null) {
+                    r17 = parse_TERM();
+                    if (r17 !== null) {
+                      r13 = [r16, r17];
+                    } else {
+                      r13 = null;
+                      pos = r15;
+                    }
+                  } else {
+                    r13 = null;
+                    pos = r15;
+                  }
+                  if (r13 !== null) {
+                    reportedPos = r14;
+                    r13 = (function(n) { return n;})(r16);
+                  }
+                  if (r13 === null) {
+                    pos = r14;
+                  }
+                  if (r13 !== null) {
+                    r12 = [];
+                    while (r13 !== null) {
+                      r12.push(r13);
+                      r14 = pos;
+                      r15 = pos;
+                      r16 = parse_textNodes();
+                      if (r16 !== null) {
+                        r17 = parse_TERM();
+                        if (r17 !== null) {
+                          r13 = [r16, r17];
+                        } else {
+                          r13 = null;
+                          pos = r15;
+                        }
+                      } else {
+                        r13 = null;
+                        pos = r15;
+                      }
+                      if (r13 !== null) {
+                        reportedPos = r14;
+                        r13 = (function(n) { return n;})(r16);
+                      }
+                      if (r13 === null) {
+                        pos = r14;
+                      }
+                    }
+                  } else {
+                    r12 = null;
+                  }
+                  if (r12 !== null) {
+                    r13 = parse_DEDENT();
+                    if (r13 !== null) {
+                      r8 = [r11, r12, r13];
+                    } else {
+                      r8 = null;
+                      pos = r10;
+                    }
+                  } else {
+                    r8 = null;
+                    pos = r10;
+                  }
+                } else {
+                  r8 = null;
+                  pos = r10;
+                }
+                if (r8 !== null) {
+                  reportedPos = r9;
+                  r8 = (function(n) { return n; })(r12);
+                }
+                if (r8 === null) {
+                  pos = r9;
+                }
+                while (r8 !== null) {
+                  r7.push(r8);
+                  r9 = pos;
+                  r10 = pos;
+                  r11 = parse_INDENT();
+                  if (r11 !== null) {
+                    r14 = pos;
+                    r15 = pos;
+                    r16 = parse_textNodes();
+                    if (r16 !== null) {
+                      r17 = parse_TERM();
+                      if (r17 !== null) {
+                        r13 = [r16, r17];
+                      } else {
+                        r13 = null;
+                        pos = r15;
+                      }
+                    } else {
+                      r13 = null;
+                      pos = r15;
+                    }
+                    if (r13 !== null) {
+                      reportedPos = r14;
+                      r13 = (function(n) { return n;})(r16);
+                    }
+                    if (r13 === null) {
+                      pos = r14;
+                    }
+                    if (r13 !== null) {
+                      r12 = [];
+                      while (r13 !== null) {
+                        r12.push(r13);
+                        r14 = pos;
+                        r15 = pos;
+                        r16 = parse_textNodes();
+                        if (r16 !== null) {
+                          r17 = parse_TERM();
+                          if (r17 !== null) {
+                            r13 = [r16, r17];
+                          } else {
+                            r13 = null;
+                            pos = r15;
+                          }
+                        } else {
+                          r13 = null;
+                          pos = r15;
+                        }
+                        if (r13 !== null) {
+                          reportedPos = r14;
+                          r13 = (function(n) { return n;})(r16);
+                        }
+                        if (r13 === null) {
+                          pos = r14;
+                        }
+                      }
+                    } else {
+                      r12 = null;
+                    }
+                    if (r12 !== null) {
+                      r13 = parse_DEDENT();
+                      if (r13 !== null) {
+                        r8 = [r11, r12, r13];
+                      } else {
+                        r8 = null;
+                        pos = r10;
+                      }
+                    } else {
+                      r8 = null;
+                      pos = r10;
+                    }
+                  } else {
+                    r8 = null;
+                    pos = r10;
+                  }
+                  if (r8 !== null) {
+                    reportedPos = r9;
+                    r8 = (function(n) { return n; })(r12);
+                  }
+                  if (r8 === null) {
+                    pos = r9;
+                  }
+                }
+                if (r7 !== null) {
+                  r0 = [r3, r4, r5, r6, r7];
+                } else {
+                  r0 = null;
+                  pos = r2;
+                }
               } else {
                 r0 = null;
                 pos = r2;
@@ -3280,7 +3553,12 @@ Emblem.Parser = (function(){
         }
         if (r0 !== null) {
           reportedPos = r1;
-          r0 = (function(nodes) { return nodes; })(r5);
+          r0 = (function(nodes, indentedNodes) { 
+          if(indentedNodes.length) {
+            nodes = nodes.concat(indentedNodes[0][0]);
+          }
+          return nodes; 
+        })(r5, r7);
         }
         if (r0 === null) {
           pos = r1;
@@ -3423,7 +3701,7 @@ Emblem.Parser = (function(){
         }
         if (r0 !== null) {
           reportedPos = r1;
-          r0 = (function(m) { return m; })(r5);
+          r0 = (function(m) { m.forced = true; return m; })(r5);
         }
         if (r0 === null) {
           pos = r1;
@@ -3485,7 +3763,7 @@ Emblem.Parser = (function(){
         }
         if (r0 !== null) {
           reportedPos = r1;
-          r0 = (function(m) { m.escaped = true; return m; })(r5);
+          r0 = (function(m) { m.forced = true; m.escaped = true; return m; })(r5);
         }
         if (r0 === null) {
           pos = r1;
@@ -3666,7 +3944,14 @@ Emblem.Parser = (function(){
         }
         if (r0 !== null) {
           reportedPos = r1;
-          r0 = (function(id, classes) { return { id: id, 'class': classes.join(' ') }; })(r3, r4);
+          r0 = (function(id, classes) { 
+          var ret = { id: id };
+          var classString = classes.join(' ');
+          if(classString) {
+            ret['class'] = classString;
+          }
+          return ret;
+        })(r3, r4);
         }
         if (r0 === null) {
           pos = r1;
@@ -3685,7 +3970,10 @@ Emblem.Parser = (function(){
           }
           if (r0 !== null) {
             reportedPos = r1;
-            r0 = (function(classes) { return { 'class': classes.join(' ') }; })(r0);
+            r0 = (function(classes) { 
+          
+            return { 'class': classes.join(' ') }; 
+          })(r0);
           }
           if (r0 === null) {
             pos = r1;
@@ -5437,6 +5725,42 @@ Emblem.Parser = (function(){
         return r0;
       }
       
+      function parse_lineContent() {
+        var r0, r1, r2;
+        
+        r1 = pos;
+        r0 = [];
+        if (/^[^\uEFFF\uEFFE\uEFEF]/.test(input.charAt(pos))) {
+          r2 = input.charAt(pos);
+          pos++;
+        } else {
+          r2 = null;
+          if (reportFailures === 0) {
+            matchFailed("[^\\uEFFF\\uEFFE\\uEFEF]");
+          }
+        }
+        while (r2 !== null) {
+          r0.push(r2);
+          if (/^[^\uEFFF\uEFFE\uEFEF]/.test(input.charAt(pos))) {
+            r2 = input.charAt(pos);
+            pos++;
+          } else {
+            r2 = null;
+            if (reportFailures === 0) {
+              matchFailed("[^\\uEFFF\\uEFFE\\uEFEF]");
+            }
+          }
+        }
+        if (r0 !== null) {
+          reportedPos = r1;
+          r0 = (function(a) { return a.join(''); })(r0);
+        }
+        if (r0 === null) {
+          pos = r1;
+        }
+        return r0;
+      }
+      
       
       function cleanupExpected(expected) {
         expected.sort();
@@ -5546,7 +5870,7 @@ var Emblem, Handlebars,
 
 // 
 
-Emblem.precompile = function(string, options) {
+Emblem.precompileRaw = function(string, options) {
   var ast, environment;
   if (options == null) {
     options = {};
@@ -5562,7 +5886,7 @@ Emblem.precompile = function(string, options) {
   return new Handlebars.JavaScriptCompiler().compile(environment, options);
 };
 
-Emblem.compile = function(string, options) {
+Emblem.compileRaw = function(string, options) {
   var compile, compiled;
   if (options == null) {
     options = {};
@@ -5587,6 +5911,41 @@ Emblem.compile = function(string, options) {
     }
     return compiled.call(this, context, options);
   };
+};
+
+Emblem.precompile = Emblem.precompileRaw;
+
+Emblem.compile = Emblem.compileRaw;
+
+Emblem.precompileEmber = function(string) {
+  var ast, environment, options;
+  ast = Emblem.parse(string);
+  options = {
+    knownHelpers: {
+      action: true,
+      unbound: true,
+      bindAttr: true,
+      template: true,
+      view: true,
+      _triageMustache: true
+    },
+    data: true,
+    stringParams: true
+  };
+  environment = new Ember.Handlebars.Compiler().compile(ast, options);
+  return new Ember.Handlebars.JavaScriptCompiler().compile(environment, options, void 0, true);
+};
+
+Emblem.compileEmber = function(string) {
+  var ast, environment, options, templateSpec;
+  ast = Emblem.parse(string);
+  options = {
+    data: true,
+    stringParams: true
+  };
+  environment = new Ember.Handlebars.Compiler().compile(ast, options);
+  templateSpec = new Ember.Handlebars.JavaScriptCompiler().compile(environment, options, void 0, true);
+  return Ember.Handlebars.template(templateSpec);
 };
 ;
 // lib/preprocessor.js
@@ -5682,15 +6041,13 @@ Emblem.Preprocessor = Preprocessor = (function() {
       var b, c, delta, level, lines, message, newLevel, tok;
       if (!isEnd) {
         this.ss.concat(data);
+        this.discard(any_whitespaceFollowedByNewlines_);
       }
       while (!this.ss.eos()) {
         switch (this.context.peek()) {
           case null:
           case INDENT:
             if (this.ss.bol() || this.discard(any_whitespaceFollowedByNewlines_)) {
-              if (!isEnd && ((this.ss.check(RegExp("[" + ws + "\\n]*$"))) != null)) {
-                return;
-              }
               if (this.base != null) {
                 if ((this.discard(this.base)) == null) {
                   throw new Error("inconsistent base indentation");
@@ -5740,6 +6097,30 @@ Emblem.Preprocessor = Preprocessor = (function() {
                 }
               }
             }
+            /*
+                      # Search for context-introducing 
+                      tok = switch @context.peek()
+                        when '['
+                          # safe things, but not closing bracket
+                          @scan /[^\n'"\\\/#`[({\]]+/
+                          @scan /\]/
+                        when '('
+                          # safe things, but not closing paren
+                          @scan /[^\n'"\\\/#`[({)]+/
+                          @scan /\)/
+                        when '#{', '{'
+                          # safe things, but not closing brace
+                          @scan /[^\n'"\\\/#`[({}]+/
+                          @scan /\}/
+                        else
+                          # scan safe characters (anything that doesn't *introduce* context)
+                          @scan /[^\n'"\\\/#`[({]+/
+                          null
+                      if tok
+                        @context.observe tok
+                        continue
+            */
+
             this.scan(/[^\n\\]+/);
             if (tok = this.discard(/\//)) {
               this.context.observe(tok);
@@ -5821,7 +6202,7 @@ ContentStack = (function() {
 })();
 
 processNodes = function(nodes, stack, statements) {
-  var attributesString, c, classNames, classes, closeId, firstChar, hash, helper, k, name, node, openStache, pairs, substatements, tagName, v, value, _i, _len, _ref, _ref1;
+  var attributesString, c, classNames, classes, closeId, firstChar, hash, helper, id, ids, k, name, node, openStache, pairs, param, params, result, substatements, tagName, v, value, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2;
   if (statements == null) {
     statements = [];
   }
@@ -5847,26 +6228,43 @@ processNodes = function(nodes, stack, statements) {
         statements.push(new Handlebars.AST.ContentNode(c));
       }
       firstChar = node.params[0].charAt(0);
-      if (firstChar === firstChar.toUpperCase()) {
+      if (!node.forced && firstChar === firstChar.toUpperCase()) {
         helper = "view";
         node.params.unshift(helper);
       }
+      params = [];
+      _ref1 = node.params;
+      for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+        param = _ref1[_j];
+        ids = param.split('.');
+        result = [];
+        for (_k = 0, _len2 = ids.length; _k < _len2; _k++) {
+          id = ids[_k];
+          result.push(id);
+          result.push('.');
+        }
+        result.pop();
+        params.push(new Handlebars.AST.IdNode(result));
+      }
       pairs = [];
-      _ref1 = node.hash;
-      for (k in _ref1) {
-        if (!__hasProp.call(_ref1, k)) continue;
-        v = _ref1[k];
+      _ref2 = node.hash;
+      for (k in _ref2) {
+        if (!__hasProp.call(_ref2, k)) continue;
+        v = _ref2[k];
         pairs.push([k, v]);
       }
-      hash = new Handlebars.AST.HashNode(pairs);
-      if (node.nodes.length) {
-        closeId = new Handlebars.AST.IdNode(node.params[0].split('.'));
+      hash = null;
+      if (pairs.length) {
+        hash = new Handlebars.AST.HashNode(pairs);
+      }
+      if (node.nodes && node.nodes.length) {
+        closeId = params[0];
         substatements = processNodes(node.nodes, new ContentStack);
         statements.push(new Handlebars.AST.ProgramNode(substatements, []));
-        openStache = new Handlebars.AST.MustacheNode(node.params, hash, node.escaped);
+        openStache = new Handlebars.AST.MustacheNode(params, hash, node.escaped);
         statements.push(new Handlebars.AST.BlockNode(openStache, statements, [], closeId));
       } else {
-        statements.push(new Handlebars.AST.MustacheNode(node.params, hash, node.escaped));
+        statements.push(new Handlebars.AST.MustacheNode(params, hash, node.escaped));
       }
     } else if (node instanceof Array) {
       processNodes(node, stack, statements);
@@ -5900,6 +6298,8 @@ Emblem.bootstrap = function(ctx) {
   if (ctx == null) {
     ctx = Ember.$(document);
   }
+  Emblem.precompile = Emblem.precompileEmber;
+  Emblem.compile = Emblem.compileEmber;
   return Ember.$('script[type="text/x-emblem"]', ctx).each(function() {
     var script, templateName;
     script = Ember.$(this);

@@ -56,11 +56,12 @@ Emblem.Preprocessor = class Preprocessor
   scan: (r) -> @p @ss.scan r
   discard: (r) -> @ss.scan r
 
-
   processInput = (isEnd) -> (data) ->
 
     # Load the scanner with data.
-    @ss.concat data unless isEnd
+    unless isEnd
+      @ss.concat data
+      @discard any_whitespaceFollowedByNewlines_
 
     # Loop til we're at the end of the string.
     until @ss.eos()
@@ -71,19 +72,16 @@ Emblem.Preprocessor = class Preprocessor
         # We're either in initial state, or inside one of these braces.
         when null, INDENT #, '#{', '[', '(', '{'
 
-          # Check if we're at the beginning of a line, try gobbling
-          # any whitespace before beginning of line.
+          # Check if we're at the beginning of a line, or if we can
+          # discard whitespace til a newline.
           if @ss.bol() or @discard any_whitespaceFollowedByNewlines_
 
-            # We're at bol, take this opportunity to establish base
-            # indentation and present indentation
-
-            # oneOrMore(anyWhitespaceFollowedByIHaveNoIdea)
-            # TODO ALEX rewrite. this is screwing up id # shorthand
-            #@scan /// (?: [#{ws}]* (\/[^\n]*)? \n )+ ///
+            # We're at the beginning of a line, 
+            # take this opportunity to establish base
+            # present indentation
 
             # we might require more input to determine indentation
-            return if not isEnd and (@ss.check /// [#{ws}\n]* $ ///)?
+            #return if not isEnd and (@ss.check /// [#{ws}\n]* $ ///)?
 
             # Check if we've established starting indentation yet. This is
             # a nice feature to have particularly for people using emblem
@@ -130,6 +128,33 @@ Emblem.Preprocessor = class Preprocessor
               if @indent = @discard /// [#{ws}]+ ///
                 @context.observe INDENT
                 @p INDENT
+
+
+
+          ###
+          # Search for context-introducing 
+          tok = switch @context.peek()
+            when '['
+              # safe things, but not closing bracket
+              @scan /[^\n'"\\\/#`[({\]]+/
+              @scan /\]/
+            when '('
+              # safe things, but not closing paren
+              @scan /[^\n'"\\\/#`[({)]+/
+              @scan /\)/
+            when '#{', '{'
+              # safe things, but not closing brace
+              @scan /[^\n'"\\\/#`[({}]+/
+              @scan /\}/
+            else
+              # scan safe characters (anything that doesn't *introduce* context)
+              @scan /[^\n'"\\\/#`[({]+/
+              null
+          if tok
+            @context.observe tok
+            continue
+          ###
+
 
           # scan safe characters (anything that doesn't *introduce* context)
           @scan /[^\n\\]+/

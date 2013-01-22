@@ -8,11 +8,15 @@ Emblem = require './emblem'
 # further explanation.
 Emblem.bootstrap = (ctx = Ember.$(document)) ->
 
+  Emblem.precompile = Emblem.precompileEmber
+  Emblem.compile = Emblem.compileEmber
+
   Ember.$('script[type="text/x-emblem"]', ctx).each ->
     script = Ember.$(@)
     templateName = script.attr('data-template-name') || script.attr('id') || 'application'
     Ember.TEMPLATES[templateName] = Emblem.compile(script.html())
     script.remove()
+
 
 # Register hook. If this functionality isn't in the present version of Ember,
 # must mqnually put the following code after Ember has been included:
@@ -26,4 +30,3 @@ ENV = this.ENV
 ENV.EMBER_LOAD_HOOKS ||= {}
 ENV.EMBER_LOAD_HOOKS.application ||= []
 ENV.EMBER_LOAD_HOOKS.application.push -> Emblem.bootstrap()
-

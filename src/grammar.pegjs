@@ -3,7 +3,8 @@ start = content
 content = statement*
 
 statement
-  = html
+  = comment
+  / html
   / mustache
 
 html
@@ -14,6 +15,13 @@ html
 mustache
   = f:forcedMustache { return f; }
   / mustacheMaybeBlock 
+
+comment
+  = '/' lineContent TERM ( INDENT (lineContent TERM)+ DEDENT )? { return ""; }
+
+
+
+
 
 htmlMaybeBlock = h:htmlAttributesOnly c:(INDENT content DEDENT)? 
 { 
@@ -31,7 +39,7 @@ mustacheMaybeBlock = t:mustacheContent TERM c:(INDENT content DEDENT)?
   return t; 
 }
 
-forcedMustache = _ e:equalSign c:mustacheMaybeBlock { c.escaped = e; return c; }
+forcedMustache = _ e:equalSign c:mustacheMaybeBlock { c.forced = true; c.escaped = e; return c; }
 
 mustacheContent = &[A-Za-z] p:params h:hash 
 {
@@ -65,7 +73,13 @@ htmlInlineContent
  = m:forcedMustache  { return [m]; }
  / textNodes
 
-textLine = '|' ' '? nodes:textNodes TERM { return nodes; }
+textLine = '|' ' '? nodes:textNodes TERM indentedNodes:( INDENT n:(n:textNodes TERM { return n;})+ DEDENT { return n; })*
+{ 
+  if(indentedNodes.length) {
+    nodes = nodes.concat(indentedNodes[0][0]);
+  }
+  return nodes; 
+}
 
 textNodes = first:preMustacheText? tail:(rawMustache preMustacheText?)* 
 {
@@ -80,10 +94,11 @@ textNodes = first:preMustacheText? tail:(rawMustache preMustacheText?)*
 }
 
 rawMustache = rawMustacheEscaped / rawMustacheUnescaped
-rawMustacheUnescaped = '{{' _ m:mustacheContent _ '}}' { return m; }
-rawMustacheEscaped   = '{{{' _ m:mustacheContent _ '}}}' { m.escaped = true; return m; }
+rawMustacheUnescaped = '{{' _ m:mustacheContent _ '}}' { m.forced = true; return m; }
+rawMustacheEscaped   = '{{{' _ m:mustacheContent _ '}}}' { m.forced = true; m.escaped = true; return m; }
 
 preMustacheText = a:[^{\uEFFF]+ { return a.join(''); }
+
 
 equalSign = "==" _ { return true; } / "=" _  { return false; } 
 
@@ -93,8 +108,18 @@ htmlTag
   / t:attrShortcuts                { return { type: 'html', tagName: null, attrs: t  }; }
 
 attrShortcuts
-  = id:idShortcut classes:classShortcut* { return { id: id, 'class': classes.join(' ') }; }
-  / classes:classShortcut+               { return { 'class': classes.join(' ') }; }
+= id:idShortcut classes:classShortcut* { 
+  var ret = { id: id };
+  var classString = classes.join(' ');
+  if(classString) {
+    ret['class'] = classString;
+  }
+  return ret;
+}
+/ classes:classShortcut+ { 
+
+  return { 'class': classes.join(' ') }; 
+}
 
 idShortcut = '#' t:cssIdentifier { return t;}
 classShortcut = '.' c:cssIdentifier { return c; }
@@ -148,4 +173,6 @@ whitespace
   = [ \t\n\r]
 
 ws = whitespace
+
+lineContent = a:[^\uEFFF\uEFFE\uEFEF]* { return a.join(''); }
 

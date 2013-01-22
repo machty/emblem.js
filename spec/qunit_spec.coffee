@@ -29,7 +29,7 @@ shouldCompileTo = (string, hashOrArray, expected, message) ->
 
 shouldCompileToWithPartials = (string, hashOrArray, partials, expected, message) ->
   result = compileWithPartials(string, hashOrArray, partials)
-  equal(result, expected, "'" + expected + "' should === '" + result + "': " + message)
+  equal(expected, result, "'" + expected + "' should === '" + result + "': " + message)
 
 compileWithPartials = (string, hashOrArray, partials) ->
   template = CompilerContext.compile(string)
@@ -120,6 +120,17 @@ test "multiline with empty first line", ->
   """
   shouldCompileTo emblem, "Good"
 
+test "with a mustache", ->
+  emblem =
+  """
+  | Bork {{foo}}!
+  """
+  shouldCompileTo emblem, 
+    { foo: "YEAH" },
+    'Bork YEAH!'
+
+
+
 test "with mustaches", ->
   emblem =
   """
@@ -127,9 +138,7 @@ test "with mustaches", ->
   """
   shouldCompileTo emblem, 
     { foo: "YEAH", bar: "<span>NO</span>"},
-    'Bork YEAH <span>NO</span>'
-
-
+    'Bork YEAH <span>NO</span>!'
 
 suite "preprocessor"
 
@@ -152,6 +161,8 @@ test "it handles preceding indentation and newlines", ->
 test "it handles preceding indentation and newlines pt 2", ->
   emblem = "  \n  p Woot\n  p Ha"
   shouldCompileTo emblem, "<p>Woot</p><p>Ha</p>"
+
+suite "comments"
 
 test "it strips out single line '/' comments", ->
   emblem =
@@ -190,8 +201,6 @@ test "it strips out multi-line '/' comments without text on the first line", ->
   h1 How are you?
   """
   shouldCompileTo emblem, "<p>Hello</p><h1>How are you?</h1>"
-
-
 
 
 
@@ -358,6 +367,22 @@ test "should support block mode", ->
     p View content
   """
   shouldCompileTo emblem, '<view class="SomeView"><p>View content</p></view>'
+
+test "should not kick in if preceded by equal sign", ->
+  emblem =
+  """
+  = SomeView
+  """
+  shouldCompileTo emblem, { SomeView: 'erp' }, 'erp'
+
+test "should not kick in explicit {{mustache}}", ->
+  emblem =
+  """
+  p Yeah {{SomeView}}
+  """
+  shouldCompileTo emblem, { SomeView: 'erp' }, '<p>Yeah erp</p>'
+
+
 
 # TODO test overriding the default helper name (instead of always "view")
 

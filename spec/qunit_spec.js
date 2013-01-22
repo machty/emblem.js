@@ -35,7 +35,7 @@ shouldCompileTo = function(string, hashOrArray, expected, message) {
 shouldCompileToWithPartials = function(string, hashOrArray, partials, expected, message) {
   var result;
   result = compileWithPartials(string, hashOrArray, partials);
-  return equal(result, expected, "'" + expected + "' should === '" + result + "': " + message);
+  return equal(expected, result, "'" + expected + "' should === '" + result + "': " + message);
 };
 
 compileWithPartials = function(string, hashOrArray, partials) {
@@ -133,13 +133,21 @@ test("multiline with empty first line", function() {
   return shouldCompileTo(emblem, "Good");
 });
 
+test("with a mustache", function() {
+  var emblem;
+  emblem = "| Bork {{foo}}!";
+  return shouldCompileTo(emblem, {
+    foo: "YEAH"
+  }, 'Bork YEAH!');
+});
+
 test("with mustaches", function() {
   var emblem;
   emblem = "| Bork {{foo}} {{{bar}}}!";
   return shouldCompileTo(emblem, {
     foo: "YEAH",
     bar: "<span>NO</span>"
-  }, 'Bork YEAH <span>NO</span>');
+  }, 'Bork YEAH <span>NO</span>!');
 });
 
 suite("preprocessor");
@@ -167,6 +175,8 @@ test("it handles preceding indentation and newlines pt 2", function() {
   emblem = "  \n  p Woot\n  p Ha";
   return shouldCompileTo(emblem, "<p>Woot</p><p>Ha</p>");
 });
+
+suite("comments");
 
 test("it strips out single line '/' comments", function() {
   var emblem;
@@ -336,6 +346,22 @@ test("should support block mode", function() {
   var emblem;
   emblem = "SomeView\n  p View content";
   return shouldCompileTo(emblem, '<view class="SomeView"><p>View content</p></view>');
+});
+
+test("should not kick in if preceded by equal sign", function() {
+  var emblem;
+  emblem = "= SomeView";
+  return shouldCompileTo(emblem, {
+    SomeView: 'erp'
+  }, 'erp');
+});
+
+test("should not kick in explicit {{mustache}}", function() {
+  var emblem;
+  emblem = "p Yeah {{SomeView}}";
+  return shouldCompileTo(emblem, {
+    SomeView: 'erp'
+  }, '<p>Yeah erp</p>');
 });
 
 suite("bang syntax defaults to `unbound` helper syntax");

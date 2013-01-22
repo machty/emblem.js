@@ -56,7 +56,7 @@ file "lib/parser.js" => ["src/grammar.pegjs", "src/parser-prefix.js", "src/parse
   end
 end
 
-file "spec/qunit_spec.js" do
+file "spec/qunit_spec.js" => ["spec/qunit_spec.coffee"] do
   `coffee -b --compile spec/qunit_spec.coffee`
 end
 

@@ -24,7 +24,10 @@ unless CompilerContext?
       Handlebars.template eval "(#{templateSpec})"  
 
 shouldCompileTo = (string, hashOrArray, expected, message) ->
-  shouldCompileToWithPartials(string, hashOrArray, false, expected, message)
+  if hashOrArray.constructor == String
+    shouldCompileToWithPartials(string, {}, false, hashOrArray, message)
+  else
+    shouldCompileToWithPartials(string, hashOrArray, false, expected, message)
 
 shouldCompileToWithPartials = (string, hashOrArray, partials, expected, message) ->
   result = compileWithPartials(string, hashOrArray, partials)
@@ -72,19 +75,85 @@ shouldThrow = (fn, exception, message) ->
 suite("html one-liners")
 
 test "element only", ->
-  shouldCompileTo("p", {}, "<p></p>")
+  shouldCompileTo("p", "<p></p>")
 
 test "with text", ->
-  shouldCompileTo("p Hello", {}, "<p>Hello</p>")
+  shouldCompileTo("p Hello", "<p>Hello</p>")
 
 test "with more complex text", ->
-  shouldCompileTo("p Hello, how's it going with you today?", {}, "<p>Hello, how's it going with you today?</p>")
+  shouldCompileTo("p Hello, how's it going with you today?", "<p>Hello, how's it going with you today?</p>")
 
 test "with trailing space", ->
-  shouldCompileTo("p Hello   ", {}, "<p>Hello   </p>")
+  shouldCompileTo("p Hello   ", "<p>Hello   </p>")
 
-test "with trailing space", ->
-  shouldCompileTo("p Hello   ", {}, "<p>Hello   </p>")
+suite("text lines")
+
+test "basic", -> shouldCompileTo("| What what", "What what")
+test "with html", -> 
+  shouldCompileTo '| What <span id="woot" data-t="oof" class="f">what</span>!',
+                    'What <span id="woot" data-t="oof" class="f">what</span>!'
+
+suite("preprocessor")
+
+test "it strips out preceding whitespace", ->
+  emblem =
+  """
+
+  p Hello
+  """
+  shouldCompileTo emblem, "<p>Hello</p>"
+
+test "it handles preceding indentation", ->
+  emblem = "  p Woot\n  p Ha"
+  shouldCompileTo emblem, "<p>Woot</p><p>Ha</p>"
+
+test "it handles preceding indentation and newlines", ->
+  emblem = "\n  p Woot\n  p Ha"
+  shouldCompileTo emblem, "<p>Woot</p><p>Ha</p>"
+
+test "it handles preceding indentation and newlines pt 2", ->
+  emblem = "  \n  p Woot\n  p Ha"
+  shouldCompileTo emblem, "<p>Woot</p><p>Ha</p>"
+
+test "it strips out single line '/' comments", ->
+  emblem =
+  """
+  p Hello
+
+  / A comment
+
+  h1 How are you?
+  """
+  shouldCompileTo emblem, "<p>Hello</p><h1>How are you?</h1>"
+
+test "it strips out multi-line '/' comments", ->
+  emblem =
+  """
+  p Hello
+
+  / A comment
+    that goes on to two lines
+    even three!
+
+  h1 How are you?
+  """
+  shouldCompileTo emblem, "<p>Hello</p><h1>How are you?</h1>"
+
+test "it strips out multi-line '/' comments without text on the first line", ->
+  emblem =
+  """
+  p Hello
+
+  / 
+    A comment
+    that goes on to two lines
+    even three!
+
+  h1 How are you?
+  """
+  shouldCompileTo emblem, "<p>Hello</p><h1>How are you?</h1>"
+
+
 
 suite("html more complex")
 
@@ -94,4 +163,4 @@ test "multiple lines", ->
   p Hello
   h1 How are you?
   """
-  shouldCompileTo emblem, {}, "<p>Hello</p><h1>How are you?</h1>"
+  shouldCompileTo emblem, "<p>Hello</p><h1>How are you?</h1>"

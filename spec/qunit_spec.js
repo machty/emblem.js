@@ -26,7 +26,11 @@ if (typeof CompilerContext === "undefined" || CompilerContext === null) {
 }
 
 shouldCompileTo = function(string, hashOrArray, expected, message) {
-  return shouldCompileToWithPartials(string, hashOrArray, false, expected, message);
+  if (hashOrArray.constructor === String) {
+    return shouldCompileToWithPartials(string, {}, false, hashOrArray, message);
+  } else {
+    return shouldCompileToWithPartials(string, hashOrArray, false, expected, message);
+  }
 };
 
 shouldCompileToWithPartials = function(string, hashOrArray, partials, expected, message) {
@@ -83,19 +87,73 @@ shouldThrow = function(fn, exception, message) {
 suite("html one-liners");
 
 test("element only", function() {
-  return shouldCompileTo("p", {}, "<p></p>");
+  return shouldCompileTo("p", "<p></p>");
 });
 
 test("with text", function() {
-  return shouldCompileTo("p Hello", {}, "<p>Hello</p>");
+  return shouldCompileTo("p Hello", "<p>Hello</p>");
 });
 
 test("with more complex text", function() {
-  return shouldCompileTo("p Hello, how's it going with you today?", {}, "<p>Hello, how's it going with you today?</p>");
+  return shouldCompileTo("p Hello, how's it going with you today?", "<p>Hello, how's it going with you today?</p>");
 });
 
 test("with trailing space", function() {
-  return shouldCompileTo("p Hello   ", {}, "<p>Hello   </p>");
+  return shouldCompileTo("p Hello   ", "<p>Hello   </p>");
+});
+
+suite("text lines");
+
+test("basic", function() {
+  return shouldCompileTo("| What what", "What what");
+});
+
+test("with html", function() {
+  return shouldCompileTo('| What <span id="woot" data-t="oof" class="f">what</span>!', 'What <span id="woot" data-t="oof" class="f">what</span>!');
+});
+
+suite("preprocessor");
+
+test("it strips out preceding whitespace", function() {
+  var emblem;
+  emblem = "\np Hello";
+  return shouldCompileTo(emblem, "<p>Hello</p>");
+});
+
+test("it handles preceding indentation", function() {
+  var emblem;
+  emblem = "  p Woot\n  p Ha";
+  return shouldCompileTo(emblem, "<p>Woot</p><p>Ha</p>");
+});
+
+test("it handles preceding indentation and newlines", function() {
+  var emblem;
+  emblem = "\n  p Woot\n  p Ha";
+  return shouldCompileTo(emblem, "<p>Woot</p><p>Ha</p>");
+});
+
+test("it handles preceding indentation and newlines pt 2", function() {
+  var emblem;
+  emblem = "  \n  p Woot\n  p Ha";
+  return shouldCompileTo(emblem, "<p>Woot</p><p>Ha</p>");
+});
+
+test("it strips out single line '/' comments", function() {
+  var emblem;
+  emblem = "p Hello\n\n/ A comment\n\nh1 How are you?";
+  return shouldCompileTo(emblem, "<p>Hello</p><h1>How are you?</h1>");
+});
+
+test("it strips out multi-line '/' comments", function() {
+  var emblem;
+  emblem = "p Hello\n\n/ A comment\n  that goes on to two lines\n  even three!\n\nh1 How are you?";
+  return shouldCompileTo(emblem, "<p>Hello</p><h1>How are you?</h1>");
+});
+
+test("it strips out multi-line '/' comments without text on the first line", function() {
+  var emblem;
+  emblem = "p Hello\n\n/ \n  A comment\n  that goes on to two lines\n  even three!\n\nh1 How are you?";
+  return shouldCompileTo(emblem, "<p>Hello</p><h1>How are you?</h1>");
 });
 
 suite("html more complex");
@@ -103,5 +161,5 @@ suite("html more complex");
 test("multiple lines", function() {
   var emblem;
   emblem = "p Hello\nh1 How are you?";
-  return shouldCompileTo(emblem, {}, "<p>Hello</p><h1>How are you?</h1>");
+  return shouldCompileTo(emblem, "<p>Hello</p><h1>How are you?</h1>");
 });

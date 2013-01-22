@@ -19,6 +19,8 @@ Stay the hell tuned.
         p User is logged in!
       else
         p User ain't logged in!
+
+      | Text without an html element
  
       h2 Last Post
       with lastPost
@@ -31,6 +33,17 @@ Stay the hell tuned.
           h4 = title
           p = body
 ```
+
+# Building Emblem.js
+
+Clone the repo, then run:
+
+```
+bundle
+rake
+```
+
+This will also automatically run the test suite. 
 
 ## TODO
 

@@ -76,7 +76,11 @@ task :npm_test => ["spec/qunit_spec.js", :release] do
   fail "npm test failed with exit code #{$?.exitstatus}" if (rc.nil? || ! rc || $?.exitstatus != 0)
 end
 
-task :default => [:compile, :spec, :npm_test]
+directory "node_modules" do
+  `npm install`
+end
+
+task :default => [:build, :spec, :npm_test]
 
 def remove_exports(string)
   # TODO: HACK, this regex might catch some future code. need a better way to strip out requires
@@ -122,7 +126,7 @@ file "dist/emblem.min.js" => ["dist/emblem.js"] do
   File.open("dist/emblem.min.js", 'w') { |f| f.write(minjs) }
 end
 
-task :build => [:compile, "dist/emblem.js", "dist/emblem.min.js"]
+task :build => ["node_modules", :compile, "dist/emblem.js", "dist/emblem.min.js"]
 
 desc "build the browser and version of emblem"
 task :release => [:build]

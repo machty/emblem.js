@@ -34,7 +34,7 @@ processNodes = (nodes, stack, statements = []) ->
       classes = node.attrs.classes || []
       classNames = classes.join ' '
       attributesString = ""
-      attributesString += ' ' + name + '"' + value + '"' for own name, value of node.attrs || {}
+      attributesString += ' ' + name + '=' + '"' + value + '"' for own name, value of node.attrs || {}
 
       stack.append """<#{tagName}#{attributesString}>"""
 

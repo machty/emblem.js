@@ -5836,7 +5836,7 @@ processNodes = function(nodes, stack, statements) {
       for (name in _ref) {
         if (!__hasProp.call(_ref, name)) continue;
         value = _ref[name];
-        attributesString += ' ' + name + '"' + value + '"';
+        attributesString += ' ' + name + '=' + '"' + value + '"';
       }
       stack.append("<" + tagName + attributesString + ">");
       processNodes(node.nodes || [], stack, statements);

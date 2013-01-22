@@ -26,7 +26,7 @@ class TestContext
 end
 
 test_context = TestContext.new
-js_context = Handlebars::Spec::CONTEXT
+js_context = Emblem::Spec::CONTEXT
 
 Module.new do
   extend Test::Unit::Assertions

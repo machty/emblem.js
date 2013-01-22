@@ -76,7 +76,6 @@ Emblem.Preprocessor = class Preprocessor
           # Check if we're at the beginning of a line, try gobbling
           # any whitespace before beginning of line.
           if @ss.bol() or @discard any_whitespaceFollowedByNewlines_
-            #console.log "OH SHIT: #{}"
 
             # We're at bol, take this opportunity to establish base
             # indentation and present indentation
@@ -139,7 +138,6 @@ Emblem.Preprocessor = class Preprocessor
 
           @context.observe tok if tok = @discard /\//
           if @discard /\n/
-            #console.log 'DASRC'
             @p "#{TERM}" 
           @discard any_whitespaceFollowedByNewlines_
 
@@ -166,6 +164,7 @@ Emblem.Preprocessor = class Preprocessor
   processData: processInput no
   processEnd: processInput yes
   @processSync = (input) ->
+    input += "\n"
     pre = new Preprocessor
     pre.processData input
     do pre.processEnd

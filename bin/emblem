@@ -3,7 +3,7 @@
 // TODO this is all completely unfinished NONSENSE.
 
 var optimist = require('optimist')
-    .usage('Precompile handlebar templates.\nUsage: $0 template...', {
+    .usage('Precompile emblem templates.\nUsage: $0 template...', {
       'f': {
         'type': 'string',
         'description': 'Output File',
@@ -16,14 +16,14 @@ var optimist = require('optimist')
       },
       'c': {
         'type': 'string',
-        'description': 'Exports CommonJS style, path to Handlebars module',
+        'description': 'Exports CommonJS style, path to emblem module',
         'alias': 'commonjs',
         'default': null
       },
       'h': {
         'type': 'string',
-        'description': 'Path to handlebar.js (only valid for amd-style)',
-        'alias': 'handlebarPath',
+        'description': 'Path to emblem.js (only valid for amd-style)',
+        'alias': 'emblemPath',
 		    'default': ''
       },
       'k': {
@@ -45,7 +45,7 @@ var optimist = require('optimist')
         'type': 'string',
         'description': 'Template namespace',
         'alias': 'namespace',
-        'default': 'Handlebars.templates'
+        'default': 'emblem.templates'
       },
       's': {
         'type': 'boolean',
@@ -93,7 +93,7 @@ var optimist = require('optimist')
     });
 
 var fs = require('fs'),
-    handlebars = require('../lib/handlebars'),
+    emblem = require('../lib/emblem'),
     basename = require('path').basename,
     uglify = require('uglify-js');
 
@@ -114,13 +114,13 @@ if (argv.known) {
 var output = [];
 if (!argv.simple) {
   if (argv.amd) {
-    output.push('define([\'' + argv.handlebarPath + 'handlebars\'], function(Handlebars) {\n');
+    output.push('define([\'' + argv.emblemPath + 'emblem\'], function(emblem) {\n');
   } else if (argv.commonjs) {
-    output.push('var Handlebars = require("' + argv.commonjs + '");');
+    output.push('var emblem = require("' + argv.commonjs + '");');
   } else {
     output.push('(function() {\n');
   }
-  output.push('  var template = Handlebars.template, templates = ');
+  output.push('  var template = emblem.template, templates = ');
   output.push(argv.namespace);
   output.push(' = ');
   output.push(argv.namespace);
@@ -133,7 +133,7 @@ function processTemplate(template, root) {
     fs.readdirSync(template).map(function(file) {
       var path = template + '/' + file;
 
-      if (/\.handlebars$/.test(path) || fs.statSync(path).isDirectory()) {
+      if (/\.emblem$/.test(path) || fs.statSync(path).isDirectory()) {
         processTemplate(path, root || template);
       }
     });
@@ -155,14 +155,14 @@ function processTemplate(template, root) {
     } else if (template.indexOf(root) === 0) {
       template = template.substring(root.length+1);
     }
-    template = template.replace(/\.handlebars$/, '');
+    template = template.replace(/\.emblem$/, '');
 
     if (argv.simple) {
-      output.push(handlebars.precompile(data, options) + '\n');
+      output.push(emblem.precompile(data, options) + '\n');
     } else if (argv.partial) {
-      output.push('Handlebars.partials[\'' + template + '\'] = template(' + handlebars.precompile(data, options) + ');\n');
+      output.push('emblem.partials[\'' + template + '\'] = template(' + emblem.precompile(data, options) + ');\n');
     } else {
-      output.push('templates[\'' + template + '\'] = template(' + handlebars.precompile(data, options) + ');\n');
+      output.push('templates[\'' + template + '\'] = template(' + emblem.precompile(data, options) + ');\n');
     }
   }
 }

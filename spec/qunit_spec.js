@@ -1,7 +1,39 @@
-var Handlebars;
-if (!Handlebars) {
+
+var Handlebars, Emblem;
+if (!Handlebars || !Emblem) {
   // Setup for Node package testing
-  Handlebars = require('../lib/handlebars');
+  Emblem = require('../lib/emblem');
+  Handlebars = require('handlebars');
+
+  var assert = require("assert"),
+      equal = assert.equal,
+      equals = assert.equal,
+      ok = assert.ok;
+
+  // Note that this doesn't have the same context separation as the rspec test.
+  // Both should be run for full acceptance of the two libary modes.
+  var CompilerContext = {
+    compile: function(template, options) {
+      var templateSpec = Emblem.precompile(template, options);
+      return Emblem.template(eval('(' + templateSpec + ')'));
+    },
+    compileWithPartial: function(template, options) {
+      return Emblem.compile(template, options);
+    }
+  };
+} else {
+  var _equal = equal;
+  equals = equal = function(a, b, msg) {
+    // Allow exec with missing message params
+    _equal(a, b, msg || '');
+  };
+}
+
+
+var Emblem;
+if (!Emblem) {
+  // Setup for Node package testing
+  Emblem = require('../lib/handlebars');
 
   var assert = require("assert"),
 
@@ -13,11 +45,11 @@ if (!Handlebars) {
   // Both should be run for full acceptance of the two libary modes.
   var CompilerContext = {
     compile: function(template, options) {
-      var templateSpec = Handlebars.precompile(template, options);
-      return Handlebars.template(eval('(' + templateSpec + ')'));
+      var templateSpec = Emblem.precompile(template, options);
+      return Emblem.template(eval('(' + templateSpec + ')'));
     },
     compileWithPartial: function(template, options) {
-      return Handlebars.compile(template, options);
+      return Emblem.compile(template, options);
     }
   };
 } else {

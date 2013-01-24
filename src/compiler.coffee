@@ -1,9 +1,15 @@
 Handlebars = require 'handlebars'
 Emblem = require './emblem'
 
+Emblem.parse = (string) -> 
+  # Pre-process, parse
+  processed = Emblem.Preprocessor.processSync string
+  new Handlebars.AST.ProgramNode(Emblem.Parser.parse(processed), []) 
+
 Emblem.precompileRaw = (string, options = {}) ->
   if typeof string isnt 'string'
     throw new Handlebars.Exception("You must pass a string to Emblem.precompile. You passed " + string)
+  #options.stringParams = true unless 'stringParams' in options
   options.data = true unless 'data' in options
 
   ast = Emblem.parse string
@@ -13,6 +19,7 @@ Emblem.precompileRaw = (string, options = {}) ->
 Emblem.compileRaw = (string, options = {}) ->
   if typeof string isnt 'string'
     throw new Handlebars.Exception("You must pass a string to Emblem.compile. You passed " + string)
+  #options.stringParams = true unless 'stringParams' in options
   options.data = true unless 'data' in options
 
   compiled = null
@@ -28,7 +35,6 @@ Emblem.compileRaw = (string, options = {}) ->
 
 Emblem.precompile = Emblem.precompileRaw
 Emblem.compile = Emblem.compileRaw
-
 
 # See ember-handlebars-compiler code in Ember.js codebase
 # for where the following functions came from

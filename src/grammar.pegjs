@@ -1,87 +1,244 @@
 
-start = content
-content = statement*
+{
+  // Returns a new MustacheNode with a new preceding param (id).
+  function unshiftParam(mustacheNode, helperName, newHashPairs) {
 
+    var hash = mustacheNode.hash;
+
+    // Merge hash.
+    if(newHashPairs) {
+      hash = hash || new Handlebars.AST.HashNode([]);
+
+      for(var i = 0; i < newHashPairs.length; ++i) {
+        hash.pairs.push(newHashPairs[i]);
+      }
+    }
+
+    var params = [mustacheNode.id].concat(mustacheNode.params);
+    params.unshift(new Handlebars.AST.IdNode([helperName]));
+    return new Handlebars.AST.MustacheNode(params, hash, !mustacheNode.escaped);
+  }
+}
+
+start = content
+
+content = statements:statement*
+{
+  // Coalesce all adjacent ContentNodes into one.
+
+  var compressedStatements = [];
+  var buffer = [];
+
+  for(var i = 0; i < statements.length; ++i) {
+    var nodes = statements[i];
+
+    for(var j = 0; j < nodes.length; ++j) {
+      var node = nodes[j]
+      if(node.type === "content") {
+        if(node.string) {
+          // Ignore empty strings (comments).
+          buffer.push(node.string);
+        }
+        continue;
+      } 
+
+      // Flush content if present.
+      if(buffer.length) {
+        compressedStatements.push(new Handlebars.AST.ContentNode(buffer.join('')));
+        buffer = [];
+      }
+      compressedStatements.push(node);
+    }
+  }
+
+  if(buffer.length) { 
+    compressedStatements.push(new Handlebars.AST.ContentNode(buffer.join(''))); 
+  }
+
+  return compressedStatements;
+}
+
+invertibleContent = c:content i:( DEDENT 'else' _ TERM INDENT c:content {return c;})?
+{ 
+  return new Handlebars.AST.ProgramNode(c, i || []);
+}
+
+// A statement is an array of nodes.
+// Often they're single-element arrays, but for things
+// like text lines, there might be multiple elements.
 statement
   = comment
-  / html
+  / htmlElement
+  / textLine
   / mustache
 
-html
-  = htmlMaybeBlock
-  / htmlWithInlineContent
-  / t:textLine { return t; }
+htmlElement
+  = htmlElementMaybeBlock / htmlElementWithInlineContent
 
-mustache
-  = f:forcedMustache { return f; }
-  / mustacheMaybeBlock 
-
-comment
-  = '/' lineContent TERM ( INDENT (lineContent TERM)+ DEDENT )? { return ""; }
-
-
-
-
-
-htmlMaybeBlock = h:htmlAttributesOnly c:(INDENT content DEDENT)? 
+// Returns [MustacheNode] or [BlockNode]
+mustache 
+  = m:(explicitMustache / lineStartingMustache) 
 { 
-  h.nodes = c ? c[1] : [];
-  return h; 
+  return [m]; 
 }
 
-htmlAttributesOnly = t:htmlTag _ TERM { t.nodes = []; return t; }  
+comment 
+  = '/' lineContent TERM ( INDENT (lineContent TERM)+ DEDENT )? { return []; }
 
-htmlWithInlineContent = t:htmlTag ws c:htmlInlineContent TERM { t.nodes = c; return t; }  
+lineStartingMustache 
+  = capitalizedLineStarterMustache / mustacheMaybeBlock
 
-mustacheMaybeBlock = t:mustacheContent TERM c:(INDENT content DEDENT)? 
+capitalizedLineStarterMustache 
+  = &[A-Z] ret:mustacheMaybeBlock
+{
+  // TODO make this configurable
+  var defaultCapitalizedHelper = 'view';
+
+  if(ret.mustache) {
+    // Block. Modify inner MustacheNode and return.
+    ret.mustache = unshiftParam(ret.mustache, defaultCapitalizedHelper);
+    return ret;
+  } else {
+    // ret is the MustacheNode
+    return unshiftParam(ret, defaultCapitalizedHelper);
+  }
+}
+
+htmlElementMaybeBlock 
+  = h:htmlTagAndOptionalAttributes _ TERM c:(INDENT content DEDENT)? 
 { 
-  t.nodes = c ? c[1] : [];
-  return t; 
+  var ret = h[0];
+  if(c) {
+    ret = ret.concat(c[1]);
+  }
+  ret.push(h[1]);
+
+  return ret;
 }
 
-forcedMustache = _ e:equalSign c:mustacheMaybeBlock { c.forced = true; c.escaped = e; return c; }
+htmlElementWithInlineContent 
+  = h:htmlTagAndOptionalAttributes ' ' c:htmlInlineContent
+{ 
+  var ret = h[0];
+  if(c) {
+    ret = ret.concat(c);
+  }
+  ret.push(h[1]);
 
-mustacheContent = &[A-Za-z] p:params h:hash 
-{
-  return { type: 'mustache', params:p, hash:h };
+  return ret;
+}  
+
+mustacheMaybeBlock 
+  = mustacheNode:inMustache _ TERM block:(INDENT invertibleContent DEDENT)? 
+{ 
+  if(!block) return mustacheNode;
+  var programNode = block[1];
+  return new Handlebars.AST.BlockNode(mustacheNode, programNode, programNode.inverse, mustacheNode.id);
 }
 
-params = p:(_ param:param !'=' _ {return param;})+ { return p; }
-param = p:paramChar+ { return p.join(''); }
-paramChar = alpha / '_' / '-' / '.'
-
-hash = h:(_ k:param '=' v:hashValue _ { return { key: k, value: v }; } )*
+explicitMustache 
+  = e:equalSign ret:mustacheMaybeBlock
 {
-  var ret = {};
-  for(var i = 0; i < h.length; ++i) {
-    var pair = h[i];
-    ret[pair.key] = pair.value;
+  var mustache = ret.mustache || ret;
+  mustache.escaped = e;
+  return ret;
+}
+
+inMustache
+  = path:pathIdNode tm:trailingModifier? params:inMustacheParam* hash:hash? 
+{ 
+  params.unshift(path);
+
+  var mustacheNode = new Handlebars.AST.MustacheNode(params, hash); 
+
+  if(tm == '!') {
+    return unshiftParam(mustacheNode, 'unbound');
+  } else if(tm == '?') {
+    return unshiftParam(mustacheNode, 'if');
+  } else if(tm == '^') {
+    return unshiftParam(mustacheNode, 'unless');
+  }
+
+  return  mustacheNode;
+}
+
+// TODO: this
+modifiedParam = p:param m:trailingModifier
+{ 
+  var ret = new String(p);
+  ret.trailingModifier = m;
+  return ret;
+}
+
+inMustacheParam
+  = _ p:param { return p; }
+
+trailingModifier 
+  = [!?*^]
+
+hash 
+  = h:hashSegment+ { return new Handlebars.AST.HashNode(h); }
+
+pathIdent 
+  = '..' / '.' / s:[a-zA-Z0-9_$-]+ !'=' { return s.join(''); }
+
+key 
+  = ident
+
+hashSegment
+  = _ h:( key '=' pathIdNode
+        / key '=' stringNode 
+        / key '=' integerNode 
+        / key '=' booleanNode ) { return [h[0], h[2]]; }
+
+param
+  = pathIdNode
+  / stringNode
+  / integerNode 
+  / booleanNode 
+
+path = first:pathIdent tail:(seperator p:pathIdent { return p; })* 
+{
+  var ret = [first];
+  for(var i = 0; i < tail.length; ++i) {
+    //ret = ret.concat(tail[i]);
+    ret.push(tail[i]);
   }
   return ret;
 }
 
-hashValue = string / param / integer
+seperator = [\/.]
+
+pathIdNode  = v:path    { return new Handlebars.AST.IdNode(v); }
+stringNode  = v:string  { return new Handlebars.AST.StringNode(v); }
+integerNode = v:integer { return new Handlebars.AST.IntegerNode(v); }
+booleanNode = v:boolean { return new Handlebars.AST.BooleanNode(v); }
+
+boolean = 'true' / 'false'
+
 integer = s:[0-9]+ { return parseInt(s.join('')); }
 
-string = p:('"' hashDoubleQuoteStringValue '"' / "'" hashSingleQuoteStringValue "'") { return p.join(''); }
+string = p:('"' hashDoubleQuoteStringValue '"' / "'" hashSingleQuoteStringValue "'") { return p[1]; }
+
 hashDoubleQuoteStringValue = s:[^"}]* { return s.join(''); }
 hashSingleQuoteStringValue = s:[^'}]* { return s.join(''); }
 
 alpha = [A-Za-z]
 
-htmlInlineContent
- = m:forcedMustache  { return [m]; }
- / textNodes
+// returns an array of nodes.
+htmlInlineContent 
+  = m:explicitMustache { return [m]; } 
+  / t:textNodes
 
-textLine = '|' ' '? nodes:textNodes TERM indentedNodes:( INDENT n:(n:textNodes TERM { return n;})+ DEDENT { return n; })*
+textLine = '|' ' '? nodes:textNodes indentedNodes:(INDENT t:textNodes DEDENT { return t; })*
 { 
-  if(indentedNodes.length) {
-    nodes = nodes.concat(indentedNodes[0][0]);
+  for(var i = 0; i < indentedNodes.length; ++i) {
+    nodes = nodes.concat(indentedNodes[i]);
   }
   return nodes; 
 }
 
-textNodes = first:preMustacheText? tail:(rawMustache preMustacheText?)* 
+textNodes = first:preMustacheText? tail:(rawMustache preMustacheText?)* TERM
 {
   var ret = [];
   if(first) { ret.push(first); } 
@@ -93,37 +250,125 @@ textNodes = first:preMustacheText? tail:(rawMustache preMustacheText?)*
   return ret;
 }
 
-rawMustache = rawMustacheEscaped / rawMustacheUnescaped
-rawMustacheUnescaped = '{{' _ m:mustacheContent _ '}}' { m.forced = true; return m; }
-rawMustacheEscaped   = '{{{' _ m:mustacheContent _ '}}}' { m.forced = true; m.escaped = true; return m; }
+rawMustache = rawMustacheUnescaped / rawMustacheEscaped
 
-preMustacheText = a:[^{\uEFFF]+ { return a.join(''); }
+rawMustacheSingle
+ = singleOpen _ m:inMustache _ singleClose { m.escaped = true; return m; }
 
+rawMustacheEscaped   
+ = doubleOpen _ m:inMustache _ doubleClose { m.escaped = true; return m; }
 
-equalSign = "==" _ { return true; } / "=" _  { return false; } 
+rawMustacheUnescaped 
+ = tripleOpen _ m:inMustache _ tripleClose { m.escaped = false; return m; }
 
-// TODO: how to DRY this?
-htmlTag
-  = h:htmlTagName t:attrShortcuts? { return { type: 'html', tagName: h,    attrs:(t||{})  }; }
-  / t:attrShortcuts                { return { type: 'html', tagName: null, attrs: t  }; }
+preMustacheText 
+  = a:[^{\uEFFF]+ { return new Handlebars.AST.ContentNode(a.join('')); }
 
-attrShortcuts
-= id:idShortcut classes:classShortcut* { 
-  var ret = { id: id };
-  var classString = classes.join(' ');
-  if(classString) {
-    ret['class'] = classString;
+// Support for div#id.whatever{ bindAttr whatever="asd" }
+inTagMustache = rawMustacheSingle / rawMustacheUnescaped / rawMustacheEscaped
+
+singleOpen = '{'
+doubleOpen = '{{'
+tripleOpen = '{{{'
+singleClose = '}'
+doubleClose = '}}'
+tripleClose = '}}}'
+
+// Returns whether the mustache should be escaped.
+equalSign = "==" ' '? { return false; } / "=" ' '? { return true; } 
+
+// #div.clasdsd{ bindAttr class="funky" } attr="whatever" Hello
+htmlTagAndOptionalAttributes
+  = h:(h:htmlTagName s:shorthandAttributes? m:inTagMustache* f:fullAttribute* { return [h, s, m, f]; }
+      / s:shorthandAttributes m:inTagMustache* f:fullAttribute* { return [null, s, m, f] } )
+{
+  var tagName = h[0] || 'div',
+      shorthandAttributes = h[1] || [],
+      inTagMustaches = h[2],
+      fullAttributes = h[3],
+      id = shorthandAttributes[0],
+      classes = shorthandAttributes[1];
+
+  var tagOpenContent = [];
+  tagOpenContent.push(new Handlebars.AST.ContentNode('<' + tagName));
+
+  if(id) {
+    tagOpenContent.push(new Handlebars.AST.ContentNode(' id="' + id + '"'));
   }
-  return ret;
+
+  if(classes && classes.length) {
+    tagOpenContent.push(new Handlebars.AST.ContentNode(' class="' + classes.join(' ') + '"'));
+  }
+
+  // Pad in tag mustaches with spaces.
+  for(var i = 0; i < inTagMustaches.length; ++i) {
+    tagOpenContent.push(new Handlebars.AST.ContentNode(' '));
+    tagOpenContent.push(inTagMustaches[i]);
+  }
+
+  for(var i = 0; i < fullAttributes.length; ++i) {
+    tagOpenContent = tagOpenContent.concat(fullAttributes[i]);
+  }
+  tagOpenContent.push(new Handlebars.AST.ContentNode('>'));
+
+  return [tagOpenContent, new Handlebars.AST.ContentNode('</' + tagName + '>')];
 }
-/ classes:classShortcut+ { 
 
-  return { 'class': classes.join(' ') }; 
+shorthandAttributes 
+  = attributesAtLeastID / attributesAtLeastClass
+
+attributesAtLeastID 
+  = id:idShorthand classes:classShorthand* { return [id, classes]; }
+
+attributesAtLeastClass 
+  = classes:classShorthand+ { return [null, classes]; }
+
+fullAttribute
+  = ' '+ a:(actionAttribute / boundAttribute / normalAttribute)  
+{
+  return [new Handlebars.AST.ContentNode(' '), a]; 
 }
 
-idShortcut = '#' t:cssIdentifier { return t;}
-classShortcut = '.' c:cssIdentifier { return c; }
+boundAttributeValueText = s:[A-Za-z.:0-9]+ { return s.join(''); }
 
+// Value of an action can be an unwrapped string, or a single or double quoted string
+actionValue
+  = quotedActionValue
+  / id:pathIdNode { return new Handlebars.AST.MustacheNode([id]); }
+
+quotedActionValue = p:('"' inMustache '"' / "'" inMustache "'") { return p[1]; }
+
+actionAttribute
+  = event:knownEvent '=' mustacheNode:actionValue
+{
+  // Unshift the action helper and augment the hash
+  return unshiftParam(mustacheNode, 'action', [['on', new Handlebars.AST.StringNode(event)]]);
+}
+
+boundAttribute
+  = key:key '=' value:boundAttributeValueText
+{ 
+  var hashNode = new Handlebars.AST.HashNode([[key, new Handlebars.AST.StringNode(value)]]);
+  var params = [new Handlebars.AST.IdNode(['bindAttr'])];
+
+  return new Handlebars.AST.MustacheNode(params, hashNode);
+}
+
+normalAttribute
+  = key:key '=' value:string
+{ 
+  var s = key + '=' + '"' + value + '"';
+  return new Handlebars.AST.ContentNode(s);
+}
+
+attributeName = a:attributeChar* { return a.join(''); } 
+attributeValue = string / param 
+
+
+attributeChar = alpha / [0-9] /'_' / '-'
+
+idShorthand = '#' t:cssIdentifier { return t;}
+classShorthand = '.' c:cssIdentifier { return c; }
 
 cssIdentifier = ident
 
@@ -156,6 +401,15 @@ htmlTagName "a valid HTML tag name" =
 "rt"/"rp"/"ol"/"li"/"hr"/"h6"/"h5"/"h4"/
 "h3"/"h2"/"h1"/"em"/"dt"/"dl"/"dd"/"br"/
 "u"/"s"/"q"/"p"/"i"/"b"/"a"
+
+knownEvent "a JS event" =
+"touchStart"/"touchMove"/"touchEnd"/"touchCancel"/
+"keyDown"/"keyUp"/"keyPress"/"mouseDown"/"mouseUp"/
+"contextMenu"/"click"/"doubleClick"/"mouseMove"/
+"focusIn"/"focusOut"/"mouseEnter"/"mouseLeave"/
+"submit"/"input"/"change"/"dragStart"/
+"drag"/"dragEnter"/"dragLeave"/
+"dragOver"/"drop"/"dragEnd"
 
 INDENT "INDENT" = "\uEFEF" { return ''; }
 DEDENT "DEDENT" = "\uEFFE" { return ''; }

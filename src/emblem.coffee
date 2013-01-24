@@ -8,6 +8,5 @@ require 'handlebars';
 require './parser';
 require './compiler';
 require './preprocessor';
-require './translation';
 require './emberties';
 

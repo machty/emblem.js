@@ -2,23 +2,25 @@ require "rubygems"
 require "bundler/setup"
 require 'find'
 require 'uglifier'
+require 'coffee-script'
 
 SRC_PATH   = './src'        
 BUILD_PATH = './lib' 
 
-COFFEES = %w{ emblem compiler preprocessor translation emberties }
+COFFEES = %w{ emblem compiler preprocessor emberties }
 
 #minimal_deps = %w(base compiler/parser compiler/base compiler/ast utils compiler/compiler runtime).map do |file|
 
 desc 'Compiles and concatenates source coffeescript files'
 task :coffee do
-  files = join_filenames(
-    COFFEES.map { |file| "#{file}.coffee" },
-    SRC_PATH
-  )
  
-  # Compile everything
-  `coffee -b --output #{BUILD_PATH} --compile #{files}`
+  COFFEES.each do |src|
+    File.open("#{BUILD_PATH}/#{src}.js", 'w') do |f| 
+      js = CoffeeScript.compile(File.read("#{SRC_PATH}/#{src}.coffee"), bare: true)
+      f.puts js
+    end
+  end
+
   if $?.to_i == 0
     puts "Compiled successfully."
   else
@@ -88,7 +90,7 @@ def remove_exports(string)
   string = string.gsub(/^(module\.)/, "// \1")
 end
 
-minimal_deps = %w(emblem parser compiler preprocessor translation emberties).map do |file|
+minimal_deps = %w(emblem parser compiler preprocessor emberties).map do |file|
   "lib/#{file}.js"
 end
 

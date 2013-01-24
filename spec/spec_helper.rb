@@ -75,7 +75,6 @@ module Emblem
       Emblem::Spec.js_load(context, 'lib/parser.js')
       Emblem::Spec.js_load(context, 'lib/compiler.js')
       Emblem::Spec.js_load(context, 'lib/preprocessor.js')
-      Emblem::Spec.js_load(context, 'lib/translation.js')
       Emblem::Spec.js_load(context, 'lib/emberties.js')
 
       context["Handlebars"]["logger"]["level"] = ENV["DEBUG_JS"] ? context["Handlebars"]["logger"][ENV["DEBUG_JS"]] : 4

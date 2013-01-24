@@ -1,14 +1,16 @@
-# NOTE: THIS IS ALL EXTREMELY ALPHA (1/22/13)
 
-About 60% feature complete, but rapidly approaching the finish line.
+![Emblem.js](https://s3.amazonaws.com/machty/fireemblem.jpg)
 
-## Emblem: Ember.js-infused Markup Language
+### 1/24/2013: all test cases pass now, baseline features implemented
+
+Please see the TODO section below for how you might help get the ball
+rolling with this language.
+
+## Emblem: The Ember.js-infused Markup Language
 
 Emblem.js is an indentation-based templating language that supports
 Ember.js's auto-updating templates and offers lots of Ember-targeting
 syntactic sugar that can be disabled in non-Ember settings.
-
-[See it in action.](http://jsfiddle.net/machty/u6nVt/2/)
 
 ## Features
 
@@ -27,35 +29,23 @@ syntactic sugar that can be disabled in non-Ember settings.
 
 ## Example
 
-```emblem
-.container
-  .row
-    .span6
-      App.MenuView
-    .span6
-      h1 = name
- 
-      / Assume BlurbView has a layout. 
-      App.BlurbView == wysiwyg_description
- 
-      if loggedIn
-        p User is logged in!
-      else
-        p User ain't logged in!
+[Check out the jsFiddle](http://jsfiddle.net/machty/u6nVt/2/)
 
-      | Text without an html element
- 
-      h2 Last Post
-      with lastPost
-        h3 = title
-        p = body
- 
-      / The following syntax is awesome but not a high priority
-      ul#posts = each posts
-        li
-          h4 = title
-          p = body
-```
+## Using Emblem in your application
+
+The `emblem.js` is essentially a superset drop-in replacement for
+`handlebars.js`. To use it with an Ember project, simply replace
+`handlebars.js` with `emblem.js`, and you're good to go. 
+
+NOTE: Until [this fix](https://github.com/emberjs/ember.js/pull/1861),
+there was no way to Emblem to link into Ember's load hooks, which is
+required for the the `x-emblem` script tags to be compiled at Ember app
+launch.
+
+Once we have the ability to precompile templates, the only JS you'll
+need is `handlebars.runtime.js`; there is no `emblem.runtime.js` because
+there isn't any additional code that Emblem requires once the templates
+are compiled.
 
 # Building Emblem.js
 
@@ -67,22 +57,6 @@ rake
 ```
 
 This will also automatically run the test suite. 
-
-## TODO
-
-1. Support for stacked-element shorthand, a la Sass: `.navbar .navbar-inner ul.nav` 
-   will nest the three elements inside each other as well as allow 
-   for the following line(s) to be indented as nested content. 
-   Useful for hyper-nested Bootstrap apps.
-1. `bindAttr` and other in-tag handlebars support
-1. Slash comments, both single line and multiline
-1. Support for partials (not a priority since that syntax is never used in Ember)
-1. Intelligent self-closing of tags (presently prints out `<input></input>`)
-1. Intelligent placement of spaces between elements, language support
-   for this
-1. Support for actions.
-1. More tests.
-1. Syntax highlighting (see below)
 
 ## Syntax Highlighting
 
@@ -99,6 +73,9 @@ their `.vimrc`s:
 au BufNewFile,BufRead *.emblem set filetype=slim
 ```
 
-## Contribute
+## TODO / Contribute
 
-I'm not yet ready to accept PR's yet, but stay tuned.
+So many things. See the issues section.
+
+PRs are welcome and encouraged!
+

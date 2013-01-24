@@ -1,6 +1,4 @@
 
-![Emblem.js](https://s3.amazonaws.com/machty/fireemblem.jpg)
-
 ### 1/24/2013: all test cases pass now, baseline features implemented
 
 Please see the TODO section below for how you might help get the ball

@@ -24,7 +24,7 @@ var optimist = require('optimist')
         'type': 'string',
         'description': 'Path to emblem.js (only valid for amd-style)',
         'alias': 'emblemPath',
-		    'default': ''
+        'default': ''
       },
       'k': {
         'type': 'string',
@@ -45,7 +45,7 @@ var optimist = require('optimist')
         'type': 'string',
         'description': 'Template namespace',
         'alias': 'namespace',
-        'default': 'emblem.templates'
+        'default': 'Emblem.templates'
       },
       's': {
         'type': 'boolean',
@@ -114,13 +114,13 @@ if (argv.known) {
 var output = [];
 if (!argv.simple) {
   if (argv.amd) {
-    output.push('define([\'' + argv.emblemPath + 'emblem\'], function(emblem) {\n');
+    output.push('define([\'' + argv.emblemPath + 'emblem\'], function(Emblem) {\n');
   } else if (argv.commonjs) {
-    output.push('var emblem = require("' + argv.commonjs + '");');
+    output.push('var Emblem = require("' + argv.commonjs + '");');
   } else {
     output.push('(function() {\n');
   }
-  output.push('  var template = emblem.template, templates = ');
+  output.push('  var template = Emblem.template, templates = ');
   output.push(argv.namespace);
   output.push(' = ');
   output.push(argv.namespace);
@@ -160,7 +160,7 @@ function processTemplate(template, root) {
     if (argv.simple) {
       output.push(emblem.precompile(data, options) + '\n');
     } else if (argv.partial) {
-      output.push('emblem.partials[\'' + template + '\'] = template(' + emblem.precompile(data, options) + ');\n');
+      output.push('Emblem.partials[\'' + template + '\'] = template(' + emblem.precompile(data, options) + ');\n');
     } else {
       output.push('templates[\'' + template + '\'] = template(' + emblem.precompile(data, options) + ');\n');
     }

@@ -691,6 +691,8 @@ test "manual nested", ->
   shouldCompileToString emblem, '<a action submitComment target=view><p>Submit Comment</p></a>'
 
 
+suite "misc."
 
-
+test "Emblem has a VERSION defined", ->
+  ok(Emblem.VERSION, "Emblem.VERSION should be defined")
 

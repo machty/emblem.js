@@ -1,9 +1,17 @@
 #!/usr/bin/env node
 
-// TODO this is all completely unfinished NONSENSE.
-
 var optimist = require('optimist')
     .usage('Precompile emblem templates.\nUsage: $0 template...', {
+      'v': {
+        'type': 'boolean',
+        'description': 'Output File',
+        'alias': 'version'
+      },
+      'i': {
+        'type': 'string',
+        'description': 'Read from STDIN, use argument as template name.',
+        'alias': 'stdin'
+      },
       'f': {
         'type': 'string',
         'description': 'Output File',
@@ -45,7 +53,7 @@ var optimist = require('optimist')
         'type': 'string',
         'description': 'Template namespace',
         'alias': 'namespace',
-        'default': 'Emblem.templates'
+        'default': 'Ember.TEMPLATES'
       },
       's': {
         'type': 'boolean',
@@ -71,6 +79,9 @@ var optimist = require('optimist')
 
     .check(function(argv) {
       var template = [0];
+
+      if(argv.stdin || argv.version) return;
+
       if (!argv._.length) {
         throw 'Must define at least one template or directory.';
       }
@@ -99,6 +110,11 @@ var fs = require('fs'),
 
 var argv = optimist.argv,
     template = argv._[0];
+   
+if(argv.version) {
+  console.log(emblem.VERSION);
+  return;
+}
 
 // Convert the known list into a hash
 var known = {};
@@ -126,6 +142,57 @@ if (!argv.simple) {
   output.push(argv.namespace);
   output.push(' || {};\n');
 }
+
+function processData(data) {
+  var options = {
+    knownHelpers: known,
+    knownHelpersOnly: argv.o
+  };
+
+  if (argv.data) {
+    options.data = true;
+  }
+
+  // Clean the template name
+  if (!root) {
+    template = basename(template);
+  } else if (template.indexOf(root) === 0) {
+    template = template.substring(root.length+1);
+  }
+  template = template.replace(/\.emblem$/, '');
+
+  if (argv.simple) {
+    output.push(emblem.precompile(data, options) + '\n');
+  } else if (argv.partial) {
+    output.push('Emblem.partials[\'' + template + '\'] = template(' + emblem.precompile(data, options) + ');\n');
+  } else {
+    output.push('templates[\'' + template + '\'] = template(' + emblem.precompile(data, options) + ');\n');
+  }
+
+  // Output the content
+  if (!argv.simple) {
+    if (argv.amd) {
+      output.push('});');
+    } else if (!argv.commonjs) {
+      output.push('})();');
+    }
+  }
+  output = output.join('');
+
+  if (argv.min) {
+    var ast = uglify.parser.parse(output);
+    ast = uglify.uglify.ast_mangle(ast);
+    ast = uglify.uglify.ast_squeeze(ast);
+    output = uglify.uglify.gen_code(ast);
+  }
+
+  if (argv.output) {
+    fs.writeFileSync(argv.output, output, 'utf8');
+  } else {
+    console.log(output);
+  }
+}
+
 function processTemplate(template, root) {
   var path = template,
       stat = fs.statSync(path);
@@ -139,58 +206,30 @@ function processTemplate(template, root) {
     });
   } else {
     var data = fs.readFileSync(path, 'utf8');
-
-    var options = {
-      knownHelpers: known,
-      knownHelpersOnly: argv.o
-    };
-
-    if (argv.data) {
-      options.data = true;
-    }
-
-    // Clean the template name
-    if (!root) {
-      template = basename(template);
-    } else if (template.indexOf(root) === 0) {
-      template = template.substring(root.length+1);
-    }
-    template = template.replace(/\.emblem$/, '');
-
-    if (argv.simple) {
-      output.push(emblem.precompile(data, options) + '\n');
-    } else if (argv.partial) {
-      output.push('Emblem.partials[\'' + template + '\'] = template(' + emblem.precompile(data, options) + ');\n');
-    } else {
-      output.push('templates[\'' + template + '\'] = template(' + emblem.precompile(data, options) + ');\n');
-    }
+    processData(data);
   }
 }
 
-argv._.forEach(function(template) {
-  processTemplate(template, argv.root);
-});
+if(argv.stdin) {
+  var input = "";
+ 
+  template = (argv.stdin === true ? 'template' : argv.stdin );
 
-// Output the content
-if (!argv.simple) {
-  if (argv.amd) {
-    output.push('});');
-  } else if (!argv.commonjs) {
-    output.push('})();');
-  }
-}
-output = output.join('');
+  process.stdin.on('data', function(data) {
+    input += data; 
+  });
 
-if (argv.min) {
-  var ast = uglify.parser.parse(output);
-  ast = uglify.uglify.ast_mangle(ast);
-  ast = uglify.uglify.ast_squeeze(ast);
-  output = uglify.uglify.gen_code(ast);
-}
+  process.stdin.on('end', function() {
+    processData(input);
+  });
 
-if (argv.output) {
-  fs.writeFileSync(argv.output, output, 'utf8');
+  process.stdin.setEncoding('utf8');
+  process.stdin.resume();
+
 } else {
-  console.log(output);
+  argv._.forEach(function(template) {
+    processTemplate(template, argv.root);
+  });
 }
+
 

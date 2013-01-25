@@ -662,3 +662,9 @@ test("manual nested", function() {
   emblem = "a{action submitComment target=\"view\"}\n  p Submit Comment";
   return shouldCompileToString(emblem, '<a action submitComment target=view><p>Submit Comment</p></a>');
 });
+
+suite("misc.");
+
+test("Emblem has a VERSION defined", function() {
+  return ok(Emblem.VERSION, "Emblem.VERSION should be defined");
+});

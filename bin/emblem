@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 var optimist = require('optimist')
-    .usage('Precompile emblem templates.\nUsage: $0 template...', {
+    .usage('Precompile Emblem.js templates.\nUsage: $0 template...', {
       'v': {
         'type': 'boolean',
         'description': 'Output File',

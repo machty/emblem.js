@@ -579,7 +579,6 @@ test "should not kick in explicit {{mustache}}", ->
   shouldCompileTo emblem, { SomeView: 'erp' }, '<p>Yeah erp</p>'
 
 
-
 # TODO test overriding the default helper name (instead of always "view")
 
 
@@ -889,6 +888,13 @@ test "line number is provided for preprocessor error", ->
   shouldThrow (-> CompilerContext.compile emblem), /line 3.*indentation/
 
 suite "misc."
+
+test "capitalized view helper should not kick in if suffix modifiers present", ->
+  emblem =
+  """
+  Foo!
+  """
+  shouldCompileToString emblem, '<unbound class="Foo">Foo</unbound>'
 
 test "Emblem has a VERSION defined", ->
   ok(Emblem.VERSION, "Emblem.VERSION should be defined")

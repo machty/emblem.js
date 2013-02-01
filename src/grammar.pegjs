@@ -96,10 +96,19 @@ capitalizedLineStarterMustache
 
   if(ret.mustache) {
     // Block. Modify inner MustacheNode and return.
+
+    // Make sure a suffix modifier hasn't already been applied.
+    var ch = ret.mustache.id.string.charAt(0);
+    if(!ch.match(/[A-Z]/)) return ret;
+
     ret.mustache = unshiftParam(ret.mustache, defaultCapitalizedHelper);
     return ret;
   } else {
-    // ret is the MustacheNode
+
+    // Make sure a suffix modifier hasn't already been applied.
+    var ch = ret.id.string.charAt(0);
+    if(!ch.match(/[A-Z]/)) return ret;
+
     return unshiftParam(ret, defaultCapitalizedHelper);
   }
 }

@@ -815,6 +815,12 @@ test("line number is provided for preprocessor error", function() {
 
 suite("misc.");
 
+test("capitalized view helper should not kick in if suffix modifiers present", function() {
+  var emblem;
+  emblem = "Foo!";
+  return shouldCompileToString(emblem, '<unbound class="Foo">Foo</unbound>');
+});
+
 test("Emblem has a VERSION defined", function() {
   return ok(Emblem.VERSION, "Emblem.VERSION should be defined");
 });

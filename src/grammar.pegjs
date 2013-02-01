@@ -194,7 +194,7 @@ hash
   = h:hashSegment+ { return new Handlebars.AST.HashNode(h); }
 
 pathIdent "PathIdent"
-  = '..' / '.' / s:[a-zA-Z0-9_$-]+ !'=' { return s.join(''); }
+  = '..' / '.' / s:$[a-zA-Z0-9_$-]+ !'=' { return s; }
 
 key "Key"
   = ident
@@ -230,12 +230,12 @@ booleanNode = v:boolean { return new Handlebars.AST.BooleanNode(v); }
 
 boolean "Boolean" = 'true' / 'false'
 
-integer "Integer" = s:[0-9]+ { return parseInt(s.join('')); }
+integer "Integer" = s:$[0-9]+ { return parseInt(s); }
 
 string = p:('"' hashDoubleQuoteStringValue '"' / "'" hashSingleQuoteStringValue "'") { return p[1]; }
 
-hashDoubleQuoteStringValue = s:[^"}]* { return s.join(''); }
-hashSingleQuoteStringValue = s:[^'}]* { return s.join(''); }
+hashDoubleQuoteStringValue = $[^"}]*
+hashSingleQuoteStringValue = $[^'}]*
 
 alpha = [A-Za-z]
 
@@ -244,7 +244,7 @@ htmlInlineContent
   = m:explicitMustache { return [m]; } 
   / t:textNodes
 
-textLine = '|' ' '? nodes:textNodes indentedNodes:(INDENT t:textNodes DEDENT { return t; })*
+textLine = ('|' ' '? / &'<') nodes:textNodes indentedNodes:(INDENT t:textNodes DEDENT { return t; })*
 { 
   for(var i = 0; i < indentedNodes.length; ++i) {
     nodes = nodes.concat(indentedNodes[i]);
@@ -350,7 +350,7 @@ fullAttribute
   return [new Handlebars.AST.ContentNode(' '), a]; 
 }
 
-boundAttributeValueText = s:[A-Za-z.:0-9]+ { return s.join(''); }
+boundAttributeValueText = $[A-Za-z.:0-9]+ 
 
 // Value of an action can be an unwrapped string, or a single or double quoted string
 actionValue
@@ -382,7 +382,7 @@ normalAttribute
   return new Handlebars.AST.ContentNode(s);
 }
 
-attributeName = a:attributeChar* { return a.join(''); } 
+attributeName = $attributeChar*
 attributeValue = string / param 
 
 
@@ -393,7 +393,7 @@ classShorthand = '.' c:cssIdentifier { return c; }
 
 cssIdentifier "CSSIdentifier" = ident
 
-ident = nmstart:nmstart nmchars:nmchar* { return nmstart + nmchars.join(""); }
+ident = nmstart:nmstart nmchars:$nmchar* { return nmstart + nmchars; }
 
 nmchar = [_a-zA-Z0-9-] / nonascii
 nmstart = [_a-zA-Z] / nonascii
@@ -445,5 +445,5 @@ _ "OptionalWhitespace"
 whitespace "InlineWhitespace"
   = [ \t]
 
-lineContent = a:[^\uEFFF\uEFFE\uEFEF\n]* { return a.join(''); }
+lineContent = $[^\uEFFF\uEFFE\uEFEF\n]*
 

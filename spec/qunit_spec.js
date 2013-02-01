@@ -258,6 +258,18 @@ test("with mustaches", function() {
   }, 'Bork YEAH <span>NO</span>!');
 });
 
+test("can start with angle bracket html", function() {
+  var emblem;
+  emblem = "<span>Hello</span>";
+  return shouldCompileTo(emblem, "<span>Hello</span>");
+});
+
+test("can start with angle bracket html and go to multiple lines", function() {
+  var emblem;
+  emblem = "<span>Hello dude, \n      what's up?</span>";
+  return shouldCompileTo(emblem, "<span>Hello dude, what's up?</span>");
+});
+
 suite("preprocessor");
 
 test("it strips out preceding whitespace", function() {

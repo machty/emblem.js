@@ -234,8 +234,8 @@ integer "Integer" = s:$[0-9]+ { return parseInt(s); }
 
 string = p:('"' hashDoubleQuoteStringValue '"' / "'" hashSingleQuoteStringValue "'") { return p[1]; }
 
-hashDoubleQuoteStringValue = $[^"}]*
-hashSingleQuoteStringValue = $[^'}]*
+hashDoubleQuoteStringValue = $[^"}\n\uEFFF]*
+hashSingleQuoteStringValue = $[^'}\n\uEFFF]*
 
 alpha = [A-Za-z]
 

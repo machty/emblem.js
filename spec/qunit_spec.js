@@ -75,32 +75,18 @@ compileWithPartials = function(string, hashOrArray, partials, options) {
   return template.apply(this, ary);
 };
 
-shouldThrow = function(fn, exception, message) {
-  var caught, exMessage, exType;
+shouldThrow = function(fn, exMessage) {
+  var caught;
   caught = false;
-  if (exception instanceof Array) {
-    exType = exception[0];
-    exMessage = exception[1];
-  } else if (typeof exception === 'string') {
-    exType = Error;
-    exMessage = exception;
-  } else {
-    exType = exception;
-  }
   try {
     fn();
   } catch (e) {
-    if (!exType) {
-      caught = true;
-    } else {
-      if (e instanceof exType) {
-        if (!exMessage || e.message.match(exMessage)) {
-          caught = true;
-        }
-      }
+    caught = true;
+    if (exMessage) {
+      ok(e.message.match(exMessage), "exception message matched");
     }
   }
-  return ok(caught, message || null);
+  return ok(caught, "an exception was thrown");
 };
 
 suite("html one-liners");
@@ -807,6 +793,24 @@ test("funky chars", function() {
   return shouldCompileToString(emblem, {
     foo: "Alex"
   }, '<borf:narf></borf:narf><borf:narf>Hello, Alex.</borf:narf><alex>Alex</alex>');
+});
+
+suite("line-based errors");
+
+test("line number is provided for pegjs error", function() {
+  var emblem;
+  emblem = "p Hello\np Hello {{narf}";
+  return shouldThrow((function() {
+    return CompilerContext.compile(emblem);
+  }), "line 2");
+});
+
+test("line number is provided for preprocessor error", function() {
+  var emblem;
+  emblem = "p\n  span Hello\n nope";
+  return shouldThrow((function() {
+    return CompilerContext.compile(emblem);
+  }), /line 3.*indentation/);
 });
 
 suite("misc.");

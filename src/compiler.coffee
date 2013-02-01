@@ -1,10 +1,25 @@
 Handlebars = require 'handlebars'
 Emblem = require './emblem'
 
+Emblem.throwCompileError = (line, msg) ->
+  throw new Error "Emblem syntax error, line #{line}: #{msg}"
+
 Emblem.parse = (string) -> 
   # Pre-process, parse
-  processed = Emblem.Preprocessor.processSync string
-  new Handlebars.AST.ProgramNode(Emblem.Parser.parse(processed), []) 
+  try
+    processed = Emblem.Preprocessor.processSync string
+    new Handlebars.AST.ProgramNode(Emblem.Parser.parse(processed), []) 
+  catch e
+    if e instanceof Emblem.Parser.SyntaxError
+      #Emblem.throwCompileError(msg, code, col, line)
+      lines = string.split("\n")
+      line = lines[e.line - 1]
+      msg = "#{e.message}\n#{line}\n"
+      msg += new Array(e.column).join("-")
+      msg += "^"
+      Emblem.throwCompileError e.line, msg
+    else
+      throw e
 
 Emblem.precompileRaw = (string, options = {}) ->
   if typeof string isnt 'string'

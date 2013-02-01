@@ -20,7 +20,7 @@
     "StringScanner": "~0.0.3"
   },
   "devDependencies": {
-    "pegjs": "git://github.com/dmajda/pegjs.git#549d052710e7c35ed27a91b9de41a49b56a2afe1",
+    "pegjs": "git://github.com/dmajda/pegjs.git#8759d4899e3853689a783258ed6c93ffa1436170",
 		"mocha": "*",
     "coffee-script": "~1.3"
   },

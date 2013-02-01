@@ -116,20 +116,18 @@ Emblem.Preprocessor = class Preprocessor
                 while @indents.length
                   indent = @indents[@indents.length - 1]
 
-                  if @ss.check /// (?:#{indent}) [^#{ws}] ///
-                    @discard /// (?:#{indent}) ///
-                    # Make sure there's no ws
-                    if @discard /// [#{ws}]+ ///
-                      lines = @ss.str.substr(0, @ss.pos).split(/\n/) || ['']
-                      message = "Syntax error on line #{lines.length}: invalid indentation"
-                      throw new SyntaxError "#{message}"
-                    break
+                  break if @discard /// (?:#{indent}) ///
 
                   @context.observe DEDENT
                   @p DEDENT
 
                   @indents.pop()
 
+                # Make sure there's no ws
+                if @ss.check /// [#{ws}]+ ///
+                  lines = @ss.str.substr(0, @ss.pos).split(/\n/) || ['']
+                  message = "Invalid indentation"
+                  Emblem.throwCompileError lines.length, message
 
           # scan safe characters (anything that doesn't *introduce* context)
           @scan /[^\n\\]+/
@@ -140,14 +138,6 @@ Emblem.Preprocessor = class Preprocessor
             @p "#{TERM}" 
 
           @discard any_whitespaceFollowedByNewlines_
-
-        when '/'
-          # Handle EOL \ 
-          if (@discard /.*\n/) then @context.observe '\n'
-
-        when '\\'
-          # Handle EOL \ 
-          if (@scan /[\s\S]/) then @context.observe 'end-\\'
 
     # Done scanning. Check if we're at the end of the file.
     if isEnd

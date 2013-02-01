@@ -61,31 +61,17 @@ compileWithPartials = (string, hashOrArray, partials, options = {}) ->
 
   template.apply(this, ary)
 
-shouldThrow = (fn, exception, message) ->
+shouldThrow = (fn, exMessage) ->
   caught = false
-
-  if exception instanceof Array
-    exType = exception[0] 
-    exMessage = exception[1]
-  else if typeof exception == 'string'
-    exType = Error
-    exMessage = exception
-  else
-    exType = exception
 
   try 
     fn()
   catch e
+    caught = true
+    if exMessage
+      ok e.message.match(exMessage), "exception message matched"
 
-    #}, [Error, "Could not find property 'link_to'"], "Should throw exception");
-    unless exType
-      caught = true
-    else 
-      if e instanceof exType
-        if !exMessage || e.message.match(exMessage)
-          caught = true
-
-  ok(caught, message || null)
+  ok(caught, "an exception was thrown")
 
 suite "html one-liners"
 
@@ -882,6 +868,25 @@ test "funky chars", ->
   shouldCompileToString emblem, 
     { foo: "Alex" }, 
     '<borf:narf></borf:narf><borf:narf>Hello, Alex.</borf:narf><alex>Alex</alex>'
+
+suite "line-based errors"
+
+test "line number is provided for pegjs error", ->
+  emblem =
+  """
+  p Hello
+  p Hello {{narf}
+  """
+  shouldThrow (-> CompilerContext.compile emblem), "line 2"
+
+test "line number is provided for preprocessor error", ->
+  emblem =
+  """
+  p
+    span Hello
+   nope
+  """
+  shouldThrow (-> CompilerContext.compile emblem), /line 3.*indentation/
 
 suite "misc."
 

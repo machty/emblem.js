@@ -789,6 +789,18 @@ test("basic", function() {
   return shouldCompileToString(emblem, '<borf></borf>');
 });
 
+test("nested", function() {
+  var emblem;
+  emblem = "%borf\n    %sporf Hello";
+  return shouldCompileToString(emblem, '<borf><sporf>Hello</sporf></borf>');
+});
+
+test("capitalized", function() {
+  var emblem;
+  emblem = "%Alex alex\n%Alex\n  %Woot";
+  return shouldCompileToString(emblem, '<Alex>alex</Alex><Alex><Woot></Woot></Alex>');
+});
+
 test("funky chars", function() {
   var emblem;
   emblem = "%borf:narf\n%borf:narf Hello, {{foo}}.\n%alex = foo";

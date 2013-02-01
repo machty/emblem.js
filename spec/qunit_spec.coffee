@@ -855,6 +855,23 @@ test "basic", ->
   """
   shouldCompileToString emblem, '<borf></borf>'
 
+test "nested", ->
+  emblem =
+  """
+  %borf
+      %sporf Hello
+  """
+  shouldCompileToString emblem, '<borf><sporf>Hello</sporf></borf>'
+
+test "capitalized", ->
+  emblem =
+  """
+  %Alex alex
+  %Alex
+    %Woot
+  """
+  shouldCompileToString emblem, '<Alex>alex</Alex><Alex><Woot></Woot></Alex>'
+
 test "funky chars", ->
   emblem =
   """

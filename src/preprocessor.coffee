@@ -9,9 +9,6 @@ Emblem.Preprocessor = class Preprocessor
   INDENT = '\uEFEF'
   DEDENT = '\uEFFE'
   TERM   = '\uEFFF'
-  #INDENT = ' INDENT '
-  #DEDENT = ' DEDENT '
-  #TERM   = ' TERM '
 
   # Convenience names for regex's
   anyWhitespaceAndNewlinesTouchingEOF = /// [#{ws}\n]* $ ///
@@ -20,7 +17,8 @@ Emblem.Preprocessor = class Preprocessor
   constructor: ->
     # `base` is either `null` or a regexp that matches the base indentation
     # `indent` is either `null` or the characters that make up one indentation
-    @base = @indent = null
+    @base = null
+    @indents = []
     @context = []
     @context.peek = -> if @length then this[@length - 1] else null
     @context.err = (c) -> throw new Error "Unexpected " + c
@@ -97,71 +95,50 @@ Emblem.Preprocessor = class Preprocessor
               b = @discard /// [#{ws}]* ///
               @base = /// #{b} ///
 
-            # Have we stored current indentation yet?
-            if @indent?
-              level = (0 for c in @context when c is INDENT).length
-              # a single indent
-              if @ss.check /// (?:#{@indent}){#{level + 1}} [^#{ws}#] ///
-                @discard /// (?:#{@indent}){#{level + 1}} ///
-                @context.observe INDENT
-                @p INDENT
-              # one or more dedents
-              else if level > 0 and @ss.check /// (?:#{@indent}){0,#{level - 1}} [^#{ws}] ///
-                newLevel = 0
-                ++newLevel while @discard /// #{@indent} ///
-                delta = level - newLevel
-                while delta--
-                  @context.observe DEDENT
-                  @p "#{DEDENT}"
-              # unchanged indentation level
-              else if @ss.check /// (?:#{@indent}){#{level}} [^#{ws}] ///
-                @discard /// (?:#{@indent}){#{level}} ///
-              else
-                lines = @ss.str.substr(0, @ss.pos).split(/\n/) || ['']
-                message = "Syntax error on line #{lines.length}: invalid indentation"
-                throw new Error "#{message}"
-                #context = pointToErrorLocation @ss.str, lines.length, 1 + (level + 1) * @indent.length
-                #throw new Error "#{message}\n#{context}"
-            else 
+            if @indents.length == 0
               # Haven't established indentation yet. Check if
               # there's whitespace immediately followed by non-(whitespace/comment)
-              if @indent = @discard /// [#{ws}]+ ///
+              if newIndent = @discard /// [#{ws}]+ ///
+                @indents.push newIndent
                 @context.observe INDENT
                 @p INDENT
-
-
-
-          ###
-          # Search for context-introducing 
-          tok = switch @context.peek()
-            when '['
-              # safe things, but not closing bracket
-              @scan /[^\n'"\\\/#`[({\]]+/
-              @scan /\]/
-            when '('
-              # safe things, but not closing paren
-              @scan /[^\n'"\\\/#`[({)]+/
-              @scan /\)/
-            when '#{', '{'
-              # safe things, but not closing brace
-              @scan /[^\n'"\\\/#`[({}]+/
-              @scan /\}/
             else
-              # scan safe characters (anything that doesn't *introduce* context)
-              @scan /[^\n'"\\\/#`[({]+/
-              null
-          if tok
-            @context.observe tok
-            continue
-          ###
+
+              indent = @indents[@indents.length - 1]
+
+              # Check for new indents 
+              if newIndent = @discard /// (#{indent} [#{ws}]+) ///
+                @indents.push newIndent
+                @context.observe INDENT
+                @p INDENT
+              else
+                # We've dedented, walk back through indents.
+                while @indents.length
+                  indent = @indents[@indents.length - 1]
+
+                  if @ss.check /// (?:#{indent}) [^#{ws}] ///
+                    @discard /// (?:#{indent}) ///
+                    # Make sure there's no ws
+                    if @discard /// [#{ws}]+ ///
+                      lines = @ss.str.substr(0, @ss.pos).split(/\n/) || ['']
+                      message = "Syntax error on line #{lines.length}: invalid indentation"
+                      throw new SyntaxError "#{message}"
+                    break
+
+                  @context.observe DEDENT
+                  @p DEDENT
+
+                  @indents.pop()
 
 
           # scan safe characters (anything that doesn't *introduce* context)
           @scan /[^\n\\]+/
 
-          @context.observe tok if tok = @discard /\//
-          if @discard /\n/
+          if tok = @discard /\//
+            @context.observe tok 
+          else if @scan /\n/
             @p "#{TERM}" 
+
           @discard any_whitespaceFollowedByNewlines_
 
         when '/'
@@ -179,7 +156,7 @@ Emblem.Preprocessor = class Preprocessor
       # Unravel indents.
       while @context.length and INDENT is @context.peek()
         @context.observe DEDENT
-        @p "#{DEDENT}"
+        @p DEDENT
         
       # Check if there's still something unclosed.
       throw new Error 'Unclosed ' + (@context.peek()) + ' at EOF' if @context.length

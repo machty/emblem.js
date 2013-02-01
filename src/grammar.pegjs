@@ -117,12 +117,26 @@ htmlElementMaybeBlock
 }
 
 htmlElementWithInlineContent 
-  = h:htmlTagAndOptionalAttributes ' ' c:htmlInlineContent
+  = h:htmlTagAndOptionalAttributes ' ' c:htmlInlineContent multilineContent:(INDENT textNodes+ DEDENT)?
 { 
+  // h is [[open tag content], closing tag ContentNode]
   var ret = h[0];
   if(c) {
     ret = ret.concat(c);
   }
+
+  if(multilineContent) {
+    // Handle multi-line content, e.g.
+    // span Hello, 
+    //      This is valid markup.
+
+    multilineContent = multilineContent[1];
+    for(var i = 0; i < multilineContent.length; ++i) {
+      ret = ret.concat(multilineContent[i]);
+    }
+  }
+
+  // Push the ContentNode
   ret.push(h[1]);
 
   return ret;
@@ -173,16 +187,16 @@ modifiedParam = p:param m:trailingModifier
 inMustacheParam
   = _ p:param { return p; }
 
-trailingModifier 
+trailingModifier "TrailingModifier"
   = [!?*^]
 
 hash 
   = h:hashSegment+ { return new Handlebars.AST.HashNode(h); }
 
-pathIdent 
+pathIdent "PathIdent"
   = '..' / '.' / s:[a-zA-Z0-9_$-]+ !'=' { return s.join(''); }
 
-key 
+key "Key"
   = ident
 
 hashSegment
@@ -207,16 +221,16 @@ path = first:pathIdent tail:(seperator p:pathIdent { return p; })*
   return ret;
 }
 
-seperator = [\/.]
+seperator "PathSeparator" = [\/.]
 
 pathIdNode  = v:path    { return new Handlebars.AST.IdNode(v); }
 stringNode  = v:string  { return new Handlebars.AST.StringNode(v); }
 integerNode = v:integer { return new Handlebars.AST.IntegerNode(v); }
 booleanNode = v:boolean { return new Handlebars.AST.BooleanNode(v); }
 
-boolean = 'true' / 'false'
+boolean "Boolean" = 'true' / 'false'
 
-integer = s:[0-9]+ { return parseInt(s.join('')); }
+integer "Integer" = s:[0-9]+ { return parseInt(s.join('')); }
 
 string = p:('"' hashDoubleQuoteStringValue '"' / "'" hashSingleQuoteStringValue "'") { return p[1]; }
 
@@ -257,22 +271,29 @@ rawMustacheSingle
 
 rawMustacheEscaped   
  = doubleOpen _ m:inMustache _ doubleClose { m.escaped = true; return m; }
+ / hashStacheOpen _ m:inMustache _ hashStacheClose { m.escaped = true; return m; }
 
 rawMustacheUnescaped 
  = tripleOpen _ m:inMustache _ tripleClose { m.escaped = false; return m; }
 
 preMustacheText 
-  = a:[^{\uEFFF]+ { return new Handlebars.AST.ContentNode(a.join('')); }
+  = a:preMustacheUnit+ { return new Handlebars.AST.ContentNode(a.join('')); }
+
+preMustacheUnit
+  = !(tripleOpen / doubleOpen / hashStacheOpen) c:[^\n\uEFFF] { return c; }
 
 // Support for div#id.whatever{ bindAttr whatever="asd" }
 inTagMustache = rawMustacheSingle / rawMustacheUnescaped / rawMustacheEscaped
 
-singleOpen = '{'
-doubleOpen = '{{'
-tripleOpen = '{{{'
-singleClose = '}'
-doubleClose = '}}'
-tripleClose = '}}}'
+singleOpen "SingleMustacheOpen" = '{'
+doubleOpen "DoubleMustacheOpen" = '{{'
+tripleOpen "TripleMustacheOpen" = '{{{'
+singleClose "SingleMustacheClose" = '}'
+doubleClose "DoubleMustacheClose" = '}}'
+tripleClose "TripleMustacheClose" = '}}}'
+
+hashStacheOpen  "InterpolationOpen"  = '#{'
+hashStacheClose "InterpolationClose" = '}'
 
 // Returns whether the mustache should be escaped.
 equalSign = "==" ' '? { return false; } / "=" ' '? { return true; } 
@@ -370,7 +391,7 @@ attributeChar = alpha / [0-9] /'_' / '-'
 idShorthand = '#' t:cssIdentifier { return t;}
 classShorthand = '.' c:cssIdentifier { return c; }
 
-cssIdentifier = ident
+cssIdentifier "CSSIdentifier" = ident
 
 ident = nmstart:nmstart nmchars:nmchar* { return nmstart + nmchars.join(""); }
 
@@ -413,20 +434,16 @@ knownEvent "a JS event" =
 
 INDENT "INDENT" = "\uEFEF" { return ''; }
 DEDENT "DEDENT" = "\uEFFE" { return ''; }
-TERM  "TERM" = "\uEFFF" { return ''; }
+TERM  "LineEnd" = "\n" "\uEFFF"
 
-__ "required whitespace"
+__ "RequiredWhitespace"
   = whitespace+
 
-_ "whitespace"
+_ "OptionalWhitespace"
   = whitespace*
 
-// Whitespace is undefined in the original JSON grammar, so I assume a simple
-// conventional definition consistent with ECMA-262, 5th ed.
-whitespace
-  = [ \t\n\r]
+whitespace "InlineWhitespace"
+  = [ \t]
 
-ws = whitespace
-
-lineContent = a:[^\uEFFF\uEFFE\uEFEF]* { return a.join(''); }
+lineContent = a:[^\uEFFF\uEFFE\uEFEF\n]* { return a.join(''); }
 

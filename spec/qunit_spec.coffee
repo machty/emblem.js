@@ -82,7 +82,7 @@ shouldThrow = (fn, exception, message) ->
       caught = true
     else 
       if e instanceof exType
-        if !exMessage || e.message == exMessage
+        if !exMessage || e.message.match(exMessage)
           caught = true
 
   ok(caught, message || null)
@@ -90,16 +90,129 @@ shouldThrow = (fn, exception, message) ->
 suite "html one-liners"
 
 test "element only", ->
-  shouldCompileTo("p", "<p></p>")
+  shouldCompileTo "p", "<p></p>"
 
 test "with text", ->
-  shouldCompileTo("p Hello", "<p>Hello</p>")
+  shouldCompileTo "p Hello", "<p>Hello</p>"
 
 test "with more complex text", ->
-  shouldCompileTo("p Hello, how's it going with you today?", "<p>Hello, how's it going with you today?</p>")
+  shouldCompileTo "p Hello, how's it going with you today?", "<p>Hello, how's it going with you today?</p>"
 
 test "with trailing space", ->
-  shouldCompileTo("p Hello   ", "<p>Hello   </p>")
+  shouldCompileTo "p Hello   ", "<p>Hello   </p>"
+
+suite "html multi-lines"
+
+test "two lines", ->
+  emblem =
+  """
+  p This is 
+    pretty cool.
+  """
+  shouldCompileTo emblem, "<p>This is pretty cool.</p>"
+
+test "three lines", ->
+  emblem =
+  """
+  p This is 
+    pretty damn 
+    cool.
+  """
+  shouldCompileTo emblem, "<p>This is pretty damn cool.</p>"
+
+test "three lines w/ embedded html", ->
+  emblem =
+  """
+  p This is 
+    pretty <span>damn</span> 
+    cool.
+  """
+  shouldCompileTo emblem, "<p>This is pretty <span>damn</span> cool.</p>"
+
+test "indentation doesn't need to match starting inline content's", ->
+  emblem =
+  """
+  span Hello, 
+    How are you?
+  """
+  shouldCompileTo emblem, "<span>Hello, How are you?</span>"
+
+test "indentation may vary between parent/child, must be consistent within inline-block", ->
+  emblem =
+  """
+  div
+    span Hello, 
+         How are you? 
+         Excellent.
+  """
+  shouldCompileTo emblem, "<div><span>Hello, How are you? Excellent.</span></div>"
+
+  emblem =
+  """
+  div
+    span Hello, 
+         How are you? 
+       Excellent.
+  """
+  shouldThrow -> CompilerContext.compile emblem
+
+test "w/ mustaches", ->
+  emblem =
+  """
+  div
+    span Hello, 
+         {{foo}} are you? 
+         Excellent.
+  """
+  shouldCompileTo emblem, { foo: "YEAH" }, "<div><span>Hello, YEAH are you? Excellent.</span></div>"
+
+suite '#{} syntax'
+  
+test 'acts like {{}}', ->
+  emblem =
+  '''
+  span Yo #{foo}, I herd.
+  '''
+  shouldCompileTo emblem, 
+    { foo: '<span>123</span>' },
+    "<span>Yo &lt;span&gt;123&lt;/span&gt;, I herd.</span>"
+ 
+test 'can start inline content', ->
+  emblem =
+  '''
+  span #{foo}, I herd.
+  '''
+  shouldCompileTo emblem, { foo: "dawg" }, "<span>dawg, I herd.</span>"
+ 
+test 'can end inline content', ->
+  emblem =
+  '''
+  span I herd #{foo}
+  '''
+  shouldCompileTo emblem, { foo: "dawg" }, "<span>I herd dawg</span>"
+
+test "doesn't screw up parsing when # used in text nodes", ->
+  emblem =
+  '''
+  span OMG #YOLO
+  '''
+  shouldCompileTo emblem, "<span>OMG #YOLO</span>"
+
+test "# can be only thing on line", ->
+  emblem =
+  '''
+  span #
+  '''
+  shouldCompileTo emblem, "<span>#</span>"
+
+### TODO: this
+test "can be escaped", ->
+  emblem =
+  '''
+  span #\\{yes}
+  '''
+  shouldCompileTo emblem, '<span>#{yes}</span>'
+###
 
 suite "text lines"
 
@@ -215,17 +328,36 @@ test "it strips out multi-line '/' comments without text on the first line", ->
   shouldCompileTo emblem, "<p>Hello</p><h1>How are you?</h1>"
 
 
+test "mix and match with various indentation", ->
+  emblem =
+  """
+  / A test
+  p Hello
+  
+  span
+    / This is gnarly
+    p Yessir nope.
+
+  / Nothin but comments
+    so many comments.
+
+  /
+    p Should not show up
+  """
+  shouldCompileTo emblem, "<p>Hello</p><span><p>Yessir nope.</p></span>"
 
 
 suite "indentation"
 
-test "it throws when indenting after a line with inline content", ->
+# This test used to make sure the emblem code threw, but now we
+# support multi-line syntax.
+test "it doesn't throw when indenting after a line with inline content", ->
   emblem =
   """
   p Hello
     p invalid
   """
-  shouldThrow -> CompilerContext.compile emblem
+  shouldCompileTo emblem, "<p>Hellop invalid</p>"
 
 test "it throws on half dedent", ->
   emblem =
@@ -236,6 +368,15 @@ test "it throws on half dedent", ->
   """
   shouldThrow -> CompilerContext.compile emblem
 
+test "new indentation levels don't have to match parents'", ->
+  emblem =
+  """
+  p 
+    span
+       div
+        span yes
+  """
+  shouldCompileTo emblem, "<p><span><div><span>yes</span></div></span></p>"
 
 suite "attribute shorthand"
 
@@ -348,7 +489,6 @@ test "nested combo syntax", ->
   shouldCompileTo emblem,
     { items: [ { foo: "YEAH"}, { foo: "BOI" } ] },
     '<ul><li>YEAH</li><li>BOI</li></ul>'
-
 
 suite "mustache helpers"
 
@@ -613,6 +753,9 @@ Handlebars.registerHelper 'insertClass', (p) ->
 test "with singlestache", ->
   shouldCompileTo 'p{insertClass foo} Hello', {foo: "yar"}, '<p class=&quot;yar&quot;>Hello</p>'
 
+test "singlestache can be used in text nodes", ->
+  shouldCompileTo 'p Hello {dork}', '<p>Hello {dork}</p>'
+
 test "with doublestache", ->
   shouldCompileTo 'p{{insertClass foo}} Hello', {foo: "yar"}, '<p class=&quot;yar&quot;>Hello</p>'
 
@@ -689,7 +832,6 @@ test "manual nested", ->
     p Submit Comment
   """
   shouldCompileToString emblem, '<a action submitComment target=view><p>Submit Comment</p></a>'
-
 
 suite "misc."
 

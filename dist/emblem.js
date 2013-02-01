@@ -2768,7 +2768,7 @@ Emblem.Parser = (function(){
       }
       
       function parse_htmlElementWithInlineContent() {
-        var r0, r1, r2, r3, r4, r5;
+        var r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10;
         
         r1 = pos;
         r2 = pos;
@@ -2786,7 +2786,42 @@ Emblem.Parser = (function(){
           if (r4 !== null) {
             r5 = parse_htmlInlineContent();
             if (r5 !== null) {
-              r0 = [r3, r4, r5];
+              r7 = pos;
+              r8 = parse_INDENT();
+              if (r8 !== null) {
+                r10 = parse_textNodes();
+                if (r10 !== null) {
+                  r9 = [];
+                  while (r10 !== null) {
+                    r9.push(r10);
+                    r10 = parse_textNodes();
+                  }
+                } else {
+                  r9 = null;
+                }
+                if (r9 !== null) {
+                  r10 = parse_DEDENT();
+                  if (r10 !== null) {
+                    r6 = [r8, r9, r10];
+                  } else {
+                    r6 = null;
+                    pos = r7;
+                  }
+                } else {
+                  r6 = null;
+                  pos = r7;
+                }
+              } else {
+                r6 = null;
+                pos = r7;
+              }
+              r6 = r6 !== null ? r6 : "";
+              if (r6 !== null) {
+                r0 = [r3, r4, r5, r6];
+              } else {
+                r0 = null;
+                pos = r2;
+              }
             } else {
               r0 = null;
               pos = r2;
@@ -2801,15 +2836,29 @@ Emblem.Parser = (function(){
         }
         if (r0 !== null) {
           reportedPos = r1;
-          r0 = (function(h, c) { 
+          r0 = (function(h, c, multilineContent) { 
+          // h is [[open tag content], closing tag ContentNode]
           var ret = h[0];
           if(c) {
             ret = ret.concat(c);
           }
+        
+          if(multilineContent) {
+            // Handle multi-line content, e.g.
+            // span Hello, 
+            //      This is valid markup.
+        
+            multilineContent = multilineContent[1];
+            for(var i = 0; i < multilineContent.length; ++i) {
+              ret = ret.concat(multilineContent[i]);
+            }
+          }
+        
+          // Push the ContentNode
           ret.push(h[1]);
         
           return ret;
-        })(r3, r5);
+        })(r3, r5, r6);
         }
         if (r0 === null) {
           pos = r1;
@@ -3037,6 +3086,7 @@ Emblem.Parser = (function(){
       function parse_trailingModifier() {
         var r0;
         
+        reportFailures++;
         if (/^[!?*\^]/.test(input.charAt(pos))) {
           r0 = input.charAt(pos);
           pos++;
@@ -3045,6 +3095,10 @@ Emblem.Parser = (function(){
           if (reportFailures === 0) {
             matchFailed("[!?*\\^]");
           }
+        }
+        reportFailures--;
+        if (reportFailures === 0 && r0 === null) {
+          matchFailed("TrailingModifier");
         }
         return r0;
       }
@@ -3076,6 +3130,7 @@ Emblem.Parser = (function(){
       function parse_pathIdent() {
         var r0, r1, r2, r3, r4, r5;
         
+        reportFailures++;
         if (input.substr(pos, 2) === "..") {
           r0 = "..";
           pos += 2;
@@ -3162,6 +3217,22 @@ Emblem.Parser = (function(){
             }
           }
         }
+        reportFailures--;
+        if (reportFailures === 0 && r0 === null) {
+          matchFailed("PathIdent");
+        }
+        return r0;
+      }
+      
+      function parse_key() {
+        var r0;
+        
+        reportFailures++;
+        r0 = parse_ident();
+        reportFailures--;
+        if (reportFailures === 0 && r0 === null) {
+          matchFailed("Key");
+        }
         return r0;
       }
       
@@ -3173,7 +3244,7 @@ Emblem.Parser = (function(){
         r3 = parse__();
         if (r3 !== null) {
           r5 = pos;
-          r6 = parse_ident();
+          r6 = parse_key();
           if (r6 !== null) {
             if (input.charCodeAt(pos) === 61) {
               r7 = "=";
@@ -3202,7 +3273,7 @@ Emblem.Parser = (function(){
           }
           if (r4 === null) {
             r5 = pos;
-            r6 = parse_ident();
+            r6 = parse_key();
             if (r6 !== null) {
               if (input.charCodeAt(pos) === 61) {
                 r7 = "=";
@@ -3231,7 +3302,7 @@ Emblem.Parser = (function(){
             }
             if (r4 === null) {
               r5 = pos;
-              r6 = parse_ident();
+              r6 = parse_key();
               if (r6 !== null) {
                 if (input.charCodeAt(pos) === 61) {
                   r7 = "=";
@@ -3260,7 +3331,7 @@ Emblem.Parser = (function(){
               }
               if (r4 === null) {
                 r5 = pos;
-                r6 = parse_ident();
+                r6 = parse_key();
                 if (r6 !== null) {
                   if (input.charCodeAt(pos) === 61) {
                     r7 = "=";
@@ -3411,6 +3482,7 @@ Emblem.Parser = (function(){
       function parse_seperator() {
         var r0;
         
+        reportFailures++;
         if (/^[\/.]/.test(input.charAt(pos))) {
           r0 = input.charAt(pos);
           pos++;
@@ -3419,6 +3491,10 @@ Emblem.Parser = (function(){
           if (reportFailures === 0) {
             matchFailed("[\\/.]");
           }
+        }
+        reportFailures--;
+        if (reportFailures === 0 && r0 === null) {
+          matchFailed("PathSeparator");
         }
         return r0;
       }
@@ -3486,6 +3562,7 @@ Emblem.Parser = (function(){
       function parse_boolean() {
         var r0;
         
+        reportFailures++;
         if (input.substr(pos, 4) === "true") {
           r0 = "true";
           pos += 4;
@@ -3506,12 +3583,17 @@ Emblem.Parser = (function(){
             }
           }
         }
+        reportFailures--;
+        if (reportFailures === 0 && r0 === null) {
+          matchFailed("Boolean");
+        }
         return r0;
       }
       
       function parse_integer() {
         var r0, r1, r2;
         
+        reportFailures++;
         r1 = pos;
         if (/^[0-9]/.test(input.charAt(pos))) {
           r2 = input.charAt(pos);
@@ -3545,6 +3627,10 @@ Emblem.Parser = (function(){
         }
         if (r0 === null) {
           pos = r1;
+        }
+        reportFailures--;
+        if (reportFailures === 0 && r0 === null) {
+          matchFailed("Integer");
         }
         return r0;
       }
@@ -4039,6 +4125,48 @@ Emblem.Parser = (function(){
         if (r0 === null) {
           pos = r1;
         }
+        if (r0 === null) {
+          r1 = pos;
+          r2 = pos;
+          r3 = parse_hashStacheOpen();
+          if (r3 !== null) {
+            r4 = parse__();
+            if (r4 !== null) {
+              r5 = parse_inMustache();
+              if (r5 !== null) {
+                r6 = parse__();
+                if (r6 !== null) {
+                  r7 = parse_hashStacheClose();
+                  if (r7 !== null) {
+                    r0 = [r3, r4, r5, r6, r7];
+                  } else {
+                    r0 = null;
+                    pos = r2;
+                  }
+                } else {
+                  r0 = null;
+                  pos = r2;
+                }
+              } else {
+                r0 = null;
+                pos = r2;
+              }
+            } else {
+              r0 = null;
+              pos = r2;
+            }
+          } else {
+            r0 = null;
+            pos = r2;
+          }
+          if (r0 !== null) {
+            reportedPos = r1;
+            r0 = (function(m) { m.escaped = true; return m; })(r5);
+          }
+          if (r0 === null) {
+            pos = r1;
+          }
+        }
         return r0;
       }
       
@@ -4092,28 +4220,12 @@ Emblem.Parser = (function(){
         var r0, r1, r2;
         
         r1 = pos;
-        if (/^[^{\uEFFF]/.test(input.charAt(pos))) {
-          r2 = input.charAt(pos);
-          pos++;
-        } else {
-          r2 = null;
-          if (reportFailures === 0) {
-            matchFailed("[^{\\uEFFF]");
-          }
-        }
+        r2 = parse_preMustacheUnit();
         if (r2 !== null) {
           r0 = [];
           while (r2 !== null) {
             r0.push(r2);
-            if (/^[^{\uEFFF]/.test(input.charAt(pos))) {
-              r2 = input.charAt(pos);
-              pos++;
-            } else {
-              r2 = null;
-              if (reportFailures === 0) {
-                matchFailed("[^{\\uEFFF]");
-              }
-            }
+            r2 = parse_preMustacheUnit();
           }
         } else {
           r0 = null;
@@ -4121,6 +4233,57 @@ Emblem.Parser = (function(){
         if (r0 !== null) {
           reportedPos = r1;
           r0 = (function(a) { return new Handlebars.AST.ContentNode(a.join('')); })(r0);
+        }
+        if (r0 === null) {
+          pos = r1;
+        }
+        return r0;
+      }
+      
+      function parse_preMustacheUnit() {
+        var r0, r1, r2, r3, r4;
+        
+        r1 = pos;
+        r2 = pos;
+        r4 = pos;
+        reportFailures++;
+        r3 = parse_tripleOpen();
+        if (r3 === null) {
+          r3 = parse_doubleOpen();
+          if (r3 === null) {
+            r3 = parse_hashStacheOpen();
+          }
+        }
+        reportFailures--;
+        if (r3 === null) {
+          r3 = "";
+        } else {
+          r3 = null;
+          pos = r4;
+        }
+        if (r3 !== null) {
+          if (/^[^\n\uEFFF]/.test(input.charAt(pos))) {
+            r4 = input.charAt(pos);
+            pos++;
+          } else {
+            r4 = null;
+            if (reportFailures === 0) {
+              matchFailed("[^\\n\\uEFFF]");
+            }
+          }
+          if (r4 !== null) {
+            r0 = [r3, r4];
+          } else {
+            r0 = null;
+            pos = r2;
+          }
+        } else {
+          r0 = null;
+          pos = r2;
+        }
+        if (r0 !== null) {
+          reportedPos = r1;
+          r0 = (function(c) { return c; })(r4);
         }
         if (r0 === null) {
           pos = r1;
@@ -4144,6 +4307,7 @@ Emblem.Parser = (function(){
       function parse_singleOpen() {
         var r0;
         
+        reportFailures++;
         if (input.charCodeAt(pos) === 123) {
           r0 = "{";
           pos++;
@@ -4153,12 +4317,17 @@ Emblem.Parser = (function(){
             matchFailed("\"{\"");
           }
         }
+        reportFailures--;
+        if (reportFailures === 0 && r0 === null) {
+          matchFailed("SingleMustacheOpen");
+        }
         return r0;
       }
       
       function parse_doubleOpen() {
         var r0;
         
+        reportFailures++;
         if (input.substr(pos, 2) === "{{") {
           r0 = "{{";
           pos += 2;
@@ -4168,12 +4337,17 @@ Emblem.Parser = (function(){
             matchFailed("\"{{\"");
           }
         }
+        reportFailures--;
+        if (reportFailures === 0 && r0 === null) {
+          matchFailed("DoubleMustacheOpen");
+        }
         return r0;
       }
       
       function parse_tripleOpen() {
         var r0;
         
+        reportFailures++;
         if (input.substr(pos, 3) === "{{{") {
           r0 = "{{{";
           pos += 3;
@@ -4183,12 +4357,17 @@ Emblem.Parser = (function(){
             matchFailed("\"{{{\"");
           }
         }
+        reportFailures--;
+        if (reportFailures === 0 && r0 === null) {
+          matchFailed("TripleMustacheOpen");
+        }
         return r0;
       }
       
       function parse_singleClose() {
         var r0;
         
+        reportFailures++;
         if (input.charCodeAt(pos) === 125) {
           r0 = "}";
           pos++;
@@ -4198,12 +4377,17 @@ Emblem.Parser = (function(){
             matchFailed("\"}\"");
           }
         }
+        reportFailures--;
+        if (reportFailures === 0 && r0 === null) {
+          matchFailed("SingleMustacheClose");
+        }
         return r0;
       }
       
       function parse_doubleClose() {
         var r0;
         
+        reportFailures++;
         if (input.substr(pos, 2) === "}}") {
           r0 = "}}";
           pos += 2;
@@ -4213,12 +4397,17 @@ Emblem.Parser = (function(){
             matchFailed("\"}}\"");
           }
         }
+        reportFailures--;
+        if (reportFailures === 0 && r0 === null) {
+          matchFailed("DoubleMustacheClose");
+        }
         return r0;
       }
       
       function parse_tripleClose() {
         var r0;
         
+        reportFailures++;
         if (input.substr(pos, 3) === "}}}") {
           r0 = "}}}";
           pos += 3;
@@ -4227,6 +4416,50 @@ Emblem.Parser = (function(){
           if (reportFailures === 0) {
             matchFailed("\"}}}\"");
           }
+        }
+        reportFailures--;
+        if (reportFailures === 0 && r0 === null) {
+          matchFailed("TripleMustacheClose");
+        }
+        return r0;
+      }
+      
+      function parse_hashStacheOpen() {
+        var r0;
+        
+        reportFailures++;
+        if (input.substr(pos, 2) === "#{") {
+          r0 = "#{";
+          pos += 2;
+        } else {
+          r0 = null;
+          if (reportFailures === 0) {
+            matchFailed("\"#{\"");
+          }
+        }
+        reportFailures--;
+        if (reportFailures === 0 && r0 === null) {
+          matchFailed("InterpolationOpen");
+        }
+        return r0;
+      }
+      
+      function parse_hashStacheClose() {
+        var r0;
+        
+        reportFailures++;
+        if (input.charCodeAt(pos) === 125) {
+          r0 = "}";
+          pos++;
+        } else {
+          r0 = null;
+          if (reportFailures === 0) {
+            matchFailed("\"}\"");
+          }
+        }
+        reportFailures--;
+        if (reportFailures === 0 && r0 === null) {
+          matchFailed("InterpolationClose");
         }
         return r0;
       }
@@ -4771,7 +5004,7 @@ Emblem.Parser = (function(){
         
         r1 = pos;
         r2 = pos;
-        r3 = parse_ident();
+        r3 = parse_key();
         if (r3 !== null) {
           if (input.charCodeAt(pos) === 61) {
             r4 = "=";
@@ -4818,7 +5051,7 @@ Emblem.Parser = (function(){
         
         r1 = pos;
         r2 = pos;
-        r3 = parse_ident();
+        r3 = parse_key();
         if (r3 !== null) {
           if (input.charCodeAt(pos) === 61) {
             r4 = "=";
@@ -4943,7 +5176,7 @@ Emblem.Parser = (function(){
           }
         }
         if (r3 !== null) {
-          r4 = parse_ident();
+          r4 = parse_cssIdentifier();
           if (r4 !== null) {
             r0 = [r3, r4];
           } else {
@@ -4979,7 +5212,7 @@ Emblem.Parser = (function(){
           }
         }
         if (r3 !== null) {
-          r4 = parse_ident();
+          r4 = parse_cssIdentifier();
           if (r4 !== null) {
             r0 = [r3, r4];
           } else {
@@ -4996,6 +5229,18 @@ Emblem.Parser = (function(){
         }
         if (r0 === null) {
           pos = r1;
+        }
+        return r0;
+      }
+      
+      function parse_cssIdentifier() {
+        var r0;
+        
+        reportFailures++;
+        r0 = parse_ident();
+        reportFailures--;
+        if (reportFailures === 0 && r0 === null) {
+          matchFailed("CSSIdentifier");
         }
         return r0;
       }
@@ -6897,29 +7142,42 @@ Emblem.Parser = (function(){
       }
       
       function parse_TERM() {
-        var r0, r1;
+        var r0, r1, r2, r3;
         
         reportFailures++;
         r1 = pos;
-        if (input.charCodeAt(pos) === 61439) {
-          r0 = "\uEFFF";
+        if (input.charCodeAt(pos) === 10) {
+          r2 = "\n";
           pos++;
         } else {
-          r0 = null;
+          r2 = null;
           if (reportFailures === 0) {
-            matchFailed("\"\\uEFFF\"");
+            matchFailed("\"\\n\"");
           }
         }
-        if (r0 !== null) {
-          reportedPos = r1;
-          r0 = (function() { return ''; })();
-        }
-        if (r0 === null) {
+        if (r2 !== null) {
+          if (input.charCodeAt(pos) === 61439) {
+            r3 = "\uEFFF";
+            pos++;
+          } else {
+            r3 = null;
+            if (reportFailures === 0) {
+              matchFailed("\"\\uEFFF\"");
+            }
+          }
+          if (r3 !== null) {
+            r0 = [r2, r3];
+          } else {
+            r0 = null;
+            pos = r1;
+          }
+        } else {
+          r0 = null;
           pos = r1;
         }
         reportFailures--;
         if (reportFailures === 0 && r0 === null) {
-          matchFailed("TERM");
+          matchFailed("LineEnd");
         }
         return r0;
       }
@@ -6940,7 +7198,7 @@ Emblem.Parser = (function(){
         }
         reportFailures--;
         if (reportFailures === 0 && r0 === null) {
-          matchFailed("required whitespace");
+          matchFailed("RequiredWhitespace");
         }
         return r0;
       }
@@ -6957,7 +7215,7 @@ Emblem.Parser = (function(){
         }
         reportFailures--;
         if (reportFailures === 0 && r0 === null) {
-          matchFailed("whitespace");
+          matchFailed("OptionalWhitespace");
         }
         return r0;
       }
@@ -6965,14 +7223,19 @@ Emblem.Parser = (function(){
       function parse_whitespace() {
         var r0;
         
-        if (/^[ \t\n\r]/.test(input.charAt(pos))) {
+        reportFailures++;
+        if (/^[ \t]/.test(input.charAt(pos))) {
           r0 = input.charAt(pos);
           pos++;
         } else {
           r0 = null;
           if (reportFailures === 0) {
-            matchFailed("[ \\t\\n\\r]");
+            matchFailed("[ \\t]");
           }
+        }
+        reportFailures--;
+        if (reportFailures === 0 && r0 === null) {
+          matchFailed("InlineWhitespace");
         }
         return r0;
       }
@@ -6982,24 +7245,24 @@ Emblem.Parser = (function(){
         
         r1 = pos;
         r0 = [];
-        if (/^[^\uEFFF\uEFFE\uEFEF]/.test(input.charAt(pos))) {
+        if (/^[^\uEFFF\uEFFE\uEFEF\n]/.test(input.charAt(pos))) {
           r2 = input.charAt(pos);
           pos++;
         } else {
           r2 = null;
           if (reportFailures === 0) {
-            matchFailed("[^\\uEFFF\\uEFFE\\uEFEF]");
+            matchFailed("[^\\uEFFF\\uEFFE\\uEFEF\\n]");
           }
         }
         while (r2 !== null) {
           r0.push(r2);
-          if (/^[^\uEFFF\uEFFE\uEFEF]/.test(input.charAt(pos))) {
+          if (/^[^\uEFFF\uEFFE\uEFEF\n]/.test(input.charAt(pos))) {
             r2 = input.charAt(pos);
             pos++;
           } else {
             r2 = null;
             if (reportFailures === 0) {
-              matchFailed("[^\\uEFFF\\uEFFE\\uEFEF]");
+              matchFailed("[^\\uEFFF\\uEFFE\\uEFEF\\n]");
             }
           }
         }
@@ -7248,7 +7511,8 @@ Emblem.Preprocessor = Preprocessor = (function() {
   any_whitespaceFollowedByNewlines_ = RegExp("(?:[" + ws + "]*\\n)+");
 
   function Preprocessor() {
-    this.base = this.indent = null;
+    this.base = null;
+    this.indents = [];
     this.context = [];
     this.context.peek = function() {
       if (this.length) {
@@ -7314,7 +7578,7 @@ Emblem.Preprocessor = Preprocessor = (function() {
 
   processInput = function(isEnd) {
     return function(data) {
-      var b, c, delta, level, lines, message, newLevel, tok;
+      var b, indent, lines, message, newIndent, tok;
       if (!isEnd) {
         this.ss.concat(data);
         this.discard(any_whitespaceFollowedByNewlines_);
@@ -7332,76 +7596,41 @@ Emblem.Preprocessor = Preprocessor = (function() {
                 b = this.discard(RegExp("[" + ws + "]*"));
                 this.base = RegExp("" + b);
               }
-              if (this.indent != null) {
-                level = ((function() {
-                  var _i, _len, _ref, _results;
-                  _ref = this.context;
-                  _results = [];
-                  for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-                    c = _ref[_i];
-                    if (c === INDENT) {
-                      _results.push(0);
-                    }
-                  }
-                  return _results;
-                }).call(this)).length;
-                if (this.ss.check(RegExp("(?:" + this.indent + "){" + (level + 1) + "}[^" + ws + "#]"))) {
-                  this.discard(RegExp("(?:" + this.indent + "){" + (level + 1) + "}"));
+              if (this.indents.length === 0) {
+                if (newIndent = this.discard(RegExp("[" + ws + "]+"))) {
+                  this.indents.push(newIndent);
                   this.context.observe(INDENT);
                   this.p(INDENT);
-                } else if (level > 0 && this.ss.check(RegExp("(?:" + this.indent + "){0," + (level - 1) + "}[^" + ws + "]"))) {
-                  newLevel = 0;
-                  while (this.discard(RegExp("" + this.indent))) {
-                    ++newLevel;
-                  }
-                  delta = level - newLevel;
-                  while (delta--) {
-                    this.context.observe(DEDENT);
-                    this.p("" + DEDENT);
-                  }
-                } else if (this.ss.check(RegExp("(?:" + this.indent + "){" + level + "}[^" + ws + "]"))) {
-                  this.discard(RegExp("(?:" + this.indent + "){" + level + "}"));
-                } else {
-                  lines = this.ss.str.substr(0, this.ss.pos).split(/\n/) || [''];
-                  message = "Syntax error on line " + lines.length + ": invalid indentation";
-                  throw new Error("" + message);
                 }
               } else {
-                if (this.indent = this.discard(RegExp("[" + ws + "]+"))) {
+                indent = this.indents[this.indents.length - 1];
+                if (newIndent = this.discard(RegExp("(" + indent + "[" + ws + "]+)"))) {
+                  this.indents.push(newIndent);
                   this.context.observe(INDENT);
                   this.p(INDENT);
+                } else {
+                  while (this.indents.length) {
+                    indent = this.indents[this.indents.length - 1];
+                    if (this.ss.check(RegExp("(?:" + indent + ")[^" + ws + "]"))) {
+                      this.discard(RegExp("(?:" + indent + ")"));
+                      if (this.discard(RegExp("[" + ws + "]+"))) {
+                        lines = this.ss.str.substr(0, this.ss.pos).split(/\n/) || [''];
+                        message = "Syntax error on line " + lines.length + ": invalid indentation";
+                        throw new SyntaxError("" + message);
+                      }
+                      break;
+                    }
+                    this.context.observe(DEDENT);
+                    this.p(DEDENT);
+                    this.indents.pop();
+                  }
                 }
               }
             }
-            /*
-                      # Search for context-introducing 
-                      tok = switch @context.peek()
-                        when '['
-                          # safe things, but not closing bracket
-                          @scan /[^\n'"\\\/#`[({\]]+/
-                          @scan /\]/
-                        when '('
-                          # safe things, but not closing paren
-                          @scan /[^\n'"\\\/#`[({)]+/
-                          @scan /\)/
-                        when '#{', '{'
-                          # safe things, but not closing brace
-                          @scan /[^\n'"\\\/#`[({}]+/
-                          @scan /\}/
-                        else
-                          # scan safe characters (anything that doesn't *introduce* context)
-                          @scan /[^\n'"\\\/#`[({]+/
-                          null
-                      if tok
-                        @context.observe tok
-                        continue
-            */
-
             this.scan(/[^\n\\]+/);
             if (tok = this.discard(/\//)) {
               this.context.observe(tok);
-            }
-            if (this.discard(/\n/)) {
+            } else if (this.scan(/\n/)) {
               this.p("" + TERM);
             }
             this.discard(any_whitespaceFollowedByNewlines_);
@@ -7421,7 +7650,7 @@ Emblem.Preprocessor = Preprocessor = (function() {
         this.scan(anyWhitespaceAndNewlinesTouchingEOF);
         while (this.context.length && INDENT === this.context.peek()) {
           this.context.observe(DEDENT);
-          this.p("" + DEDENT);
+          this.p(DEDENT);
         }
         if (this.context.length) {
           throw new Error('Unclosed ' + (this.context.peek()) + ' at EOF');

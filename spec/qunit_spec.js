@@ -94,7 +94,7 @@ shouldThrow = function(fn, exception, message) {
       caught = true;
     } else {
       if (e instanceof exType) {
-        if (!exMessage || e.message === exMessage) {
+        if (!exMessage || e.message.match(exMessage)) {
           caught = true;
         }
       }
@@ -120,6 +120,98 @@ test("with more complex text", function() {
 test("with trailing space", function() {
   return shouldCompileTo("p Hello   ", "<p>Hello   </p>");
 });
+
+suite("html multi-lines");
+
+test("two lines", function() {
+  var emblem;
+  emblem = "p This is \n  pretty cool.";
+  return shouldCompileTo(emblem, "<p>This is pretty cool.</p>");
+});
+
+test("three lines", function() {
+  var emblem;
+  emblem = "p This is \n  pretty damn \n  cool.";
+  return shouldCompileTo(emblem, "<p>This is pretty damn cool.</p>");
+});
+
+test("three lines w/ embedded html", function() {
+  var emblem;
+  emblem = "p This is \n  pretty <span>damn</span> \n  cool.";
+  return shouldCompileTo(emblem, "<p>This is pretty <span>damn</span> cool.</p>");
+});
+
+test("indentation doesn't need to match starting inline content's", function() {
+  var emblem;
+  emblem = "span Hello, \n  How are you?";
+  return shouldCompileTo(emblem, "<span>Hello, How are you?</span>");
+});
+
+test("indentation may vary between parent/child, must be consistent within inline-block", function() {
+  var emblem;
+  emblem = "div\n  span Hello, \n       How are you? \n       Excellent.";
+  shouldCompileTo(emblem, "<div><span>Hello, How are you? Excellent.</span></div>");
+  emblem = "div\n  span Hello, \n       How are you? \n     Excellent.";
+  return shouldThrow(function() {
+    return CompilerContext.compile(emblem);
+  });
+});
+
+test("w/ mustaches", function() {
+  var emblem;
+  emblem = "div\n  span Hello, \n       {{foo}} are you? \n       Excellent.";
+  return shouldCompileTo(emblem, {
+    foo: "YEAH"
+  }, "<div><span>Hello, YEAH are you? Excellent.</span></div>");
+});
+
+suite('#{} syntax');
+
+test('acts like {{}}', function() {
+  var emblem;
+  emblem = 'span Yo #{foo}, I herd.';
+  return shouldCompileTo(emblem, {
+    foo: '<span>123</span>'
+  }, "<span>Yo &lt;span&gt;123&lt;/span&gt;, I herd.</span>");
+});
+
+test('can start inline content', function() {
+  var emblem;
+  emblem = 'span #{foo}, I herd.';
+  return shouldCompileTo(emblem, {
+    foo: "dawg"
+  }, "<span>dawg, I herd.</span>");
+});
+
+test('can end inline content', function() {
+  var emblem;
+  emblem = 'span I herd #{foo}';
+  return shouldCompileTo(emblem, {
+    foo: "dawg"
+  }, "<span>I herd dawg</span>");
+});
+
+test("doesn't screw up parsing when # used in text nodes", function() {
+  var emblem;
+  emblem = 'span OMG #YOLO';
+  return shouldCompileTo(emblem, "<span>OMG #YOLO</span>");
+});
+
+test("# can be only thing on line", function() {
+  var emblem;
+  emblem = 'span #';
+  return shouldCompileTo(emblem, "<span>#</span>");
+});
+
+/* TODO: this
+test "can be escaped", ->
+  emblem =
+  '''
+  span #\\{yes}
+  '''
+  shouldCompileTo emblem, '<span>#{yes}</span>'
+*/
+
 
 suite("text lines");
 
@@ -212,14 +304,18 @@ test("it strips out multi-line '/' comments without text on the first line", fun
   return shouldCompileTo(emblem, "<p>Hello</p><h1>How are you?</h1>");
 });
 
+test("mix and match with various indentation", function() {
+  var emblem;
+  emblem = "/ A test\np Hello\n\nspan\n  / This is gnarly\n  p Yessir nope.\n\n/ Nothin but comments\n  so many comments.\n\n/\n  p Should not show up";
+  return shouldCompileTo(emblem, "<p>Hello</p><span><p>Yessir nope.</p></span>");
+});
+
 suite("indentation");
 
-test("it throws when indenting after a line with inline content", function() {
+test("it doesn't throw when indenting after a line with inline content", function() {
   var emblem;
   emblem = "p Hello\n  p invalid";
-  return shouldThrow(function() {
-    return CompilerContext.compile(emblem);
-  });
+  return shouldCompileTo(emblem, "<p>Hellop invalid</p>");
 });
 
 test("it throws on half dedent", function() {
@@ -228,6 +324,12 @@ test("it throws on half dedent", function() {
   return shouldThrow(function() {
     return CompilerContext.compile(emblem);
   });
+});
+
+test("new indentation levels don't have to match parents'", function() {
+  var emblem;
+  emblem = "p \n  span\n     div\n      span yes";
+  return shouldCompileTo(emblem, "<p><span><div><span>yes</span></div></span></p>");
 });
 
 suite("attribute shorthand");
@@ -584,6 +686,10 @@ test("with singlestache", function() {
   return shouldCompileTo('p{insertClass foo} Hello', {
     foo: "yar"
   }, '<p class=&quot;yar&quot;>Hello</p>');
+});
+
+test("singlestache can be used in text nodes", function() {
+  return shouldCompileTo('p Hello {dork}', '<p>Hello {dork}</p>');
 });
 
 test("with doublestache", function() {

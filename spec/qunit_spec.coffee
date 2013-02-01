@@ -254,8 +254,6 @@ test "with a mustache", ->
     { foo: "YEAH" },
     'Bork YEAH!'
 
-
-
 test "with mustaches", ->
   emblem =
   """
@@ -264,6 +262,21 @@ test "with mustaches", ->
   shouldCompileTo emblem, 
     { foo: "YEAH", bar: "<span>NO</span>"},
     'Bork YEAH <span>NO</span>!'
+
+test "can start with angle bracket html", ->
+  emblem =
+  """
+  <span>Hello</span>
+  """
+  shouldCompileTo emblem, "<span>Hello</span>"
+
+test "can start with angle bracket html and go to multiple lines", ->
+  emblem =
+  """
+  <span>Hello dude, 
+        what's up?</span>
+  """
+  shouldCompileTo emblem, "<span>Hello dude, what's up?</span>"
 
 suite "preprocessor"
 

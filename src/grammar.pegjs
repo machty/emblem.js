@@ -399,7 +399,13 @@ nmchar = [_a-zA-Z0-9-] / nonascii
 nmstart = [_a-zA-Z] / nonascii
 nonascii = [\x80-\xFF]
 
-htmlTagName "a valid HTML tag name" =
+htmlTagName "KnownHTMLTagName"
+  = '%' c:$tagChar+ { return c; }
+  / knownTagName
+
+tagChar = [:_a-zA-Z0-9-]
+
+knownTagName "KnownHTMLTagName" =
 "figcaption"/"blockquote"/"plaintext"/"textarea"/"progress"/
 "optgroup"/"noscript"/"noframes"/"frameset"/"fieldset"/
 "datalist"/"colgroup"/"basefont"/"summary"/"section"/

@@ -781,6 +781,22 @@ test("manual nested", function() {
   return shouldCompileToString(emblem, '<a action submitComment target=view><p>Submit Comment</p></a>');
 });
 
+suite("haml style");
+
+test("basic", function() {
+  var emblem;
+  emblem = "%borf";
+  return shouldCompileToString(emblem, '<borf></borf>');
+});
+
+test("funky chars", function() {
+  var emblem;
+  emblem = "%borf:narf\n%borf:narf Hello, {{foo}}.\n%alex = foo";
+  return shouldCompileToString(emblem, {
+    foo: "Alex"
+  }, '<borf:narf></borf:narf><borf:narf>Hello, Alex.</borf:narf><alex>Alex</alex>');
+});
+
 suite("misc.");
 
 test("Emblem has a VERSION defined", function() {

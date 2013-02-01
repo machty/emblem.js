@@ -846,6 +846,26 @@ test "manual nested", ->
   """
   shouldCompileToString emblem, '<a action submitComment target=view><p>Submit Comment</p></a>'
 
+suite "haml style"
+
+test "basic", ->
+  emblem =
+  """
+  %borf
+  """
+  shouldCompileToString emblem, '<borf></borf>'
+
+test "funky chars", ->
+  emblem =
+  """
+  %borf:narf
+  %borf:narf Hello, {{foo}}.
+  %alex = foo
+  """
+  shouldCompileToString emblem, 
+    { foo: "Alex" }, 
+    '<borf:narf></borf:narf><borf:narf>Hello, Alex.</borf:narf><alex>Alex</alex>'
+
 suite "misc."
 
 test "Emblem has a VERSION defined", ->

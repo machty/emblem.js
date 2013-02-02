@@ -813,6 +813,24 @@ test("line number is provided for preprocessor error", function() {
   }), /line 3.*indentation/);
 });
 
+test("single quote test", function() {
+  var emblem;
+  emblem = "button click='p' Frank\n      \n/ form s='d target=\"App\"'\n  label I'm a label!";
+  return shouldCompileToString(emblem, '<button action p on=click>Frank</button>');
+});
+
+test("double quote test", function() {
+  var emblem;
+  emblem = "button click=\"p\" Frank\n      \n/ form s='d target=\"App\"'\n  label I'm a label!";
+  return shouldCompileToString(emblem, '<button action p on=click>Frank</button>');
+});
+
+test("no quote test", function() {
+  var emblem;
+  emblem = "button click=p Frank\n      \n/ form s='d target=\"App\"'\n  label I'm a label!";
+  return shouldCompileToString(emblem, '<button action p on=click>Frank</button>');
+});
+
 suite("misc.");
 
 test("capitalized view helper should not kick in if suffix modifiers present", function() {

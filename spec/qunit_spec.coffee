@@ -887,6 +887,37 @@ test "line number is provided for preprocessor error", ->
   """
   shouldThrow (-> CompilerContext.compile emblem), /line 3.*indentation/
 
+# https://github.com/machty/emblem.js/issues/6
+test "single quote test", ->
+  emblem =
+  """
+  button click='p' Frank
+        
+  / form s='d target="App"'
+    label I'm a label!
+  """
+  shouldCompileToString emblem, '<button action p on=click>Frank</button>'
+
+test "double quote test", ->
+  emblem =
+  """
+  button click="p" Frank
+        
+  / form s='d target="App"'
+    label I'm a label!
+  """
+  shouldCompileToString emblem, '<button action p on=click>Frank</button>'
+
+test "no quote test", ->
+  emblem =
+  """
+  button click=p Frank
+        
+  / form s='d target="App"'
+    label I'm a label!
+  """
+  shouldCompileToString emblem, '<button action p on=click>Frank</button>'
+
 suite "misc."
 
 test "capitalized view helper should not kick in if suffix modifiers present", ->

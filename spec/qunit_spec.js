@@ -151,6 +151,12 @@ test("w/ mustaches", function() {
   }, "<div><span>Hello, YEAH are you? Excellent.</span></div>");
 });
 
+test("with followup", function() {
+  var emblem;
+  emblem = "p This is \n  pretty cool.\np Hello.";
+  return shouldCompileTo(emblem, "<p>This is pretty cool.</p><p>Hello.</p>");
+});
+
 suite('#{} syntax');
 
 test('acts like {{}}', function() {

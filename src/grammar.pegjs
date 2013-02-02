@@ -243,8 +243,8 @@ integer "Integer" = s:$[0-9]+ { return parseInt(s); }
 
 string = p:('"' hashDoubleQuoteStringValue '"' / "'" hashSingleQuoteStringValue "'") { return p[1]; }
 
-hashDoubleQuoteStringValue = $[^"}\n\uEFFF]*
-hashSingleQuoteStringValue = $[^'}\n\uEFFF]*
+hashDoubleQuoteStringValue = $(!(TERM) [^"}])*
+hashSingleQuoteStringValue = $(!(TERM) [^'}])*
 
 alpha = [A-Za-z]
 
@@ -289,7 +289,7 @@ preMustacheText
   = a:preMustacheUnit+ { return new Handlebars.AST.ContentNode(a.join('')); }
 
 preMustacheUnit
-  = !(tripleOpen / doubleOpen / hashStacheOpen) c:[^\n\uEFFF] { return c; }
+  = !(tripleOpen / doubleOpen / hashStacheOpen / DEDENT / TERM) c:. { return c; }
 
 // Support for div#id.whatever{ bindAttr whatever="asd" }
 inTagMustache = rawMustacheSingle / rawMustacheUnescaped / rawMustacheEscaped
@@ -460,5 +460,6 @@ _ "OptionalWhitespace"
 whitespace "InlineWhitespace"
   = [ \t]
 
-lineContent = $[^\uEFFF\uEFFE\uEFEF\n]*
+lineChar = !(INDENT / DEDENT / TERM) c:. { return c; }
+lineContent = $lineChar*
 

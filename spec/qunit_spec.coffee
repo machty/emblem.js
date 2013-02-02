@@ -152,6 +152,18 @@ test "w/ mustaches", ->
   """
   shouldCompileTo emblem, { foo: "YEAH" }, "<div><span>Hello, YEAH are you? Excellent.</span></div>"
 
+
+test "with followup", ->
+  emblem =
+  """
+  p This is 
+    pretty cool.
+  p Hello.
+  """
+  shouldCompileTo emblem, "<p>This is pretty cool.</p><p>Hello.</p>"
+
+
+
 suite '#{} syntax'
   
 test 'acts like {{}}', ->

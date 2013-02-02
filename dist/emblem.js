@@ -2170,7 +2170,7 @@ this.Emblem = {};
 
 Emblem = this.Emblem;
 
-Emblem.VERSION = "0.0.1";
+Emblem.VERSION = "0.0.2";
 
 // exports = Emblem;
 

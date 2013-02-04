@@ -27,7 +27,7 @@ syntactic sugar that can be disabled in non-Ember settings.
 
 ## Example
 
-[Check out this JSBin.](http://jsbin.com/ulegec/17/edit)
+[Check out this JSBin.](http://jsbin.com/ulegec/40/edit)
 
 ## Using Emblem in your application
 

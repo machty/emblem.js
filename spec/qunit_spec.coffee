@@ -1004,6 +1004,32 @@ test "mixture of all`", ->
   """
   shouldCompileToString emblem, '<App.FunView funbags=yeah tagName=alex elementId=hell class=bork snork>App.FunView</App.FunView>'
 
+suite "self-closing html tags"
+
+test "br", ->
+  emblem =
+  """
+  br
+  """
+  shouldCompileToString emblem, '<br />'
+
+test "br paragraph example", ->
+  emblem =
+  """
+  p
+    | LOL!
+    br
+    | BORF!
+  """
+  shouldCompileToString emblem, '<p>LOL!<br />BORF!</p>'
+
+test "input", ->
+  emblem =
+  """
+  input type="text"
+  """
+  shouldCompileToString emblem, '<input type="text" />'
+
 suite "misc."
 
 test "capitalized view helper should not kick in if suffix modifiers present", ->

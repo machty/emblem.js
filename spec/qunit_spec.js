@@ -903,6 +903,26 @@ test("mixture of all`", function() {
   return shouldCompileToString(emblem, '<App.FunView funbags=yeah tagName=alex elementId=hell class=bork snork>App.FunView</App.FunView>');
 });
 
+suite("self-closing html tags");
+
+test("br", function() {
+  var emblem;
+  emblem = "br";
+  return shouldCompileToString(emblem, '<br />');
+});
+
+test("br paragraph example", function() {
+  var emblem;
+  emblem = "p\n  | LOL!\n  br\n  | BORF!";
+  return shouldCompileToString(emblem, '<p>LOL!<br />BORF!</p>');
+});
+
+test("input", function() {
+  var emblem;
+  emblem = "input type=\"text\"";
+  return shouldCompileToString(emblem, '<input type="text" />');
+});
+
 suite("misc.");
 
 test("capitalized view helper should not kick in if suffix modifiers present", function() {

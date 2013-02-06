@@ -1,5 +1,24 @@
 
 {
+  var SELF_CLOSING_TAG = {
+    area: true,
+    base: true,
+    br: true,
+    col: true,
+    command: true,
+    embed: true,
+    hr: true,
+    img: true,
+    input: true,
+    keygen: true,
+    link: true,
+    meta: true,
+    param: true,
+    source: true,
+    track: true,
+    wbr: true
+  };
+
   // Returns a new MustacheNode with a new preceding param (id).
   function unshiftParam(mustacheNode, helperName, newHashPairs) {
 
@@ -120,7 +139,11 @@ htmlElementMaybeBlock
   if(c) {
     ret = ret.concat(c[1]);
   }
-  ret.push(h[1]);
+
+  // Push the closing tag ContentNode if it exists (self-closing if not)
+  if(h[1]) {
+    ret.push(h[1]);
+  }
 
   return ret;
 }
@@ -145,8 +168,10 @@ htmlElementWithInlineContent
     }
   }
 
-  // Push the ContentNode
-  ret.push(h[1]);
+  // Push the closing tag ContentNode if it exists (self-closing if not)
+  if(h[1]) {
+    ret.push(h[1]);
+  }
 
   return ret;
 }  
@@ -383,9 +408,14 @@ htmlTagAndOptionalAttributes
   for(var i = 0; i < fullAttributes.length; ++i) {
     tagOpenContent = tagOpenContent.concat(fullAttributes[i]);
   }
-  tagOpenContent.push(new Handlebars.AST.ContentNode('>'));
 
-  return [tagOpenContent, new Handlebars.AST.ContentNode('</' + tagName + '>')];
+  if(SELF_CLOSING_TAG[tagName]) {
+    tagOpenContent.push(new Handlebars.AST.ContentNode(' />'));
+    return [tagOpenContent];
+  } else {
+    tagOpenContent.push(new Handlebars.AST.ContentNode('>'));
+    return [tagOpenContent, new Handlebars.AST.ContentNode('</' + tagName + '>')];
+  }
 }
 
 shorthandAttributes 

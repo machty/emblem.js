@@ -7,4 +7,4 @@ node_modules
 lib/coffee-script/bootstrap
 lib/coffee-script/*.tmp
 
-*gemspec
+*gem

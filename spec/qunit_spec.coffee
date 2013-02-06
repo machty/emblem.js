@@ -1,7 +1,8 @@
 
 unless Handlebars? && Emblem?
   # Setup for Node package testing
-  Emblem = require('../lib/emblem')
+  #Emblem = 
+  require('../dist/emblem')
   Handlebars = require('handlebars')
 
   assert = require("assert")

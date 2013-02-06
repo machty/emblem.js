@@ -45,7 +45,12 @@ Emblem.Preprocessor = class Preprocessor
           do @pop
         else throw new Error "undefined token observed: " + c
       this
-    @ss = new StringScanner ''
+    if this.StringScanner
+      @ss = new this.StringScanner ''
+    else if Emblem.StringScanner
+      @ss = new Emblem.StringScanner ''
+    else
+      @ss = new StringScanner ''
 
   p: (s) ->
     @output += s if s

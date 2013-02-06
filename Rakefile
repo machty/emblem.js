@@ -86,8 +86,8 @@ task :default => [:build, :spec, :npm_test]
 
 def remove_exports(string)
   # TODO: HACK, this regex might catch some future code. need a better way to strip out requires
-  string = string.gsub(/^([^\s].*equire[ (].*)$/, "// \1")
-  string = string.gsub(/^(module\.)/, "// \1")
+  string = string.gsub(/^([^\s].*equire[ (].*)$/, "//")
+  string = string.gsub(/^(module\.)/, "//")
 end
 
 minimal_deps = %w(emblem parser compiler preprocessor emberties).map do |file|
@@ -105,8 +105,23 @@ def build_for_task(task)
   contents = []
 
   # Prepend the HB lib on to everything.
+=begin
+  contents << <<-EOS
+(function(root) {
+  var Handlebars = {};
+
+  #{ File.read('./node_modules/handlebars/dist/handlebars.js') }
+
+  for(var i in Handlebars) {
+    this.Handlebars[i] = Handlebars[i];
+  }
+})(this);
+var Handlebars = this.Handlebars;
+  EOS
+=end
+
+  contents << File.read('./vendor/handlebars.js')
   contents << File.read('./vendor/StringScanner.js')
-  contents << File.read('./node_modules/handlebars/dist/handlebars.js')
 
   task.prerequisites.each do |filename|
     next if filename == "dist"
@@ -114,8 +129,19 @@ def build_for_task(task)
     contents << "// #{filename}\n" + remove_exports(File.read(filename)) + ";"
   end
 
+  contents = <<-EOS
+  (function(root) {
+
+    #{contents.join("\n")}
+
+    root.Handlebars = Handlebars;
+    root.Emblem = Emblem;
+
+  }(this));
+  EOS
+
   File.open(task.name, "w") do |file|
-    file.puts contents.join("\n")
+    file.puts contents
   end
 end
 
@@ -132,3 +158,58 @@ task :build => ["node_modules", :compile, "dist/emblem.js", "dist/emblem.min.js"
 
 desc "build the browser and version of emblem"
 task :release => [:build]
+
+desc "Build emblem-source gem"
+task :gem do
+  require 'rubygems'
+  require 'rubygems/package'
+  require 'json'
+
+  gemspec = Gem::Specification.new do |s|
+    s.name      = 'emblem-source'
+    s.version   = JSON.parse(File.read('package.json'))["version"]
+    s.date      = Time.now.strftime("%Y-%m-%d")
+
+    s.homepage    = "http://www.emblemjs.com"
+    s.summary     = "The Emblem.js Compiler"
+    s.description = <<-EOS
+      Emblem.js is an indentation-based syntax language that internally compiles
+      to Handlebars and offers full support for Ember.js.
+    EOS
+
+    s.files = [
+      'lib/emblem/emblem.js',
+      'lib/emblem/source.rb'
+    ]
+
+    s.authors           = ['Alex Matchneer']
+    s.email             = 'machty@gmail.com'
+    s.rubyforge_project = 'emblem-source'
+    s.license           = "MIT"
+  end
+
+  file = File.open("emblem-source.gem", "w")
+  Gem::Package.open(file, 'w') do |pkg|
+    pkg.metadata = gemspec.to_yaml
+
+    path = "lib/emblem/source.rb"
+    contents = <<-ERUBY
+module Emblem
+  module Source
+    def self.bundled_path
+      File.expand_path("../emblem.js", __FILE__)
+    end
+  end
+end
+    ERUBY
+    pkg.add_file_simple(path, 0644, contents.size) do |tar_io|
+      tar_io.write(contents)
+    end
+
+    contents = File.read("dist/emblem.min.js")
+    path = "lib/emblem/emblem.js"
+    pkg.add_file_simple(path, 0644, contents.size) do |tar_io|
+      tar_io.write(contents)
+    end
+  end
+end

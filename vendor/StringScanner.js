@@ -1,5 +1,5 @@
 
-this.StringScanner = (function() {
+(function(root) {
   var StringScanner;
   StringScanner = (function() {
     function StringScanner(str) {
@@ -163,9 +163,8 @@ this.StringScanner = (function() {
   StringScanner.prototype.getChar = StringScanner.prototype.getch;
   StringScanner.prototype.position = StringScanner.prototype.pointer;
   StringScanner.StringScanner = StringScanner;
-  //module.exports = StringScanner;
-  return StringScanner;
-}).call(this);
+  this.StringScanner = StringScanner;
+})(this);
 
-
+var StringScanner = this.StringScanner;
 

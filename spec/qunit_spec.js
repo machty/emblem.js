@@ -221,6 +221,12 @@ test("multiline", function() {
   return shouldCompileTo(emblem, "BlorkSnork");
 });
 
+test("triple multiline", function() {
+  var emblem;
+  emblem = "| Blork\n  Snork\n  Bork";
+  return shouldCompileTo(emblem, "BlorkSnorkBork");
+});
+
 test("multiline w/ trailing whitespace", function() {
   var emblem;
   emblem = "| Blork \n  Snork";
@@ -498,13 +504,23 @@ test("recursive nesting pt 2", function() {
 });
 
 Handlebars.registerHelper('view', function(param, a, b, c) {
-  var content, options;
+  var content, hashString, k, options, v, _ref;
   options = arguments[arguments.length - 1];
   content = param;
   if (options.fn) {
     content = options.fn(this);
   }
-  return new Handlebars.SafeString("<view class=\"" + param + "\">" + content + "</view>");
+  hashString = "";
+  _ref = options.hash;
+  for (k in _ref) {
+    if (!__hasProp.call(_ref, k)) continue;
+    v = _ref[k];
+    hashString += " " + k + "=" + v;
+  }
+  if (!hashString) {
+    hashString = " nohash";
+  }
+  return new Handlebars.SafeString("<" + param + hashString + ">" + content + "</" + param + ">");
 });
 
 suite("capitalized line-starter");
@@ -512,13 +528,13 @@ suite("capitalized line-starter");
 test("should invoke `view` helper by default", function() {
   var emblem;
   emblem = "SomeView";
-  return shouldCompileToString(emblem, '<view class="SomeView">SomeView</view>');
+  return shouldCompileToString(emblem, '<SomeView nohash>SomeView</SomeView>');
 });
 
 test("should support block mode", function() {
   var emblem;
   emblem = "SomeView\n  p View content";
-  return shouldCompileToString(emblem, '<view class="SomeView"><p>View content</p></view>');
+  return shouldCompileToString(emblem, '<SomeView nohash><p>View content</p></SomeView>');
 });
 
 test("should not kick in if preceded by equal sign", function() {
@@ -835,6 +851,56 @@ test("no quote test", function() {
   var emblem;
   emblem = "button click=p Frank\n      \n/ form s='d target=\"App\"'\n  label I'm a label!";
   return shouldCompileToString(emblem, '<button action p on=click>Frank</button>');
+});
+
+suite("mustache DOM attribute shorthand");
+
+test("tagName w/o space", function() {
+  var emblem;
+  emblem = "App.FunView%span";
+  return shouldCompileToString(emblem, '<App.FunView tagName=span>App.FunView</App.FunView>');
+});
+
+test("tagName w/ space", function() {
+  var emblem;
+  emblem = "App.FunView %span";
+  return shouldCompileToString(emblem, '<App.FunView tagName=span>App.FunView</App.FunView>');
+});
+
+test("tagName block", function() {
+  var emblem;
+  emblem = "App.FunView%span\n  p Hello";
+  return shouldCompileToString(emblem, '<App.FunView tagName=span><p>Hello</p></App.FunView>');
+});
+
+test("class w/ space (needs space)", function() {
+  var emblem;
+  emblem = "App.FunView .bork";
+  return shouldCompileToString(emblem, '<App.FunView class=bork>App.FunView</App.FunView>');
+});
+
+test("multiple classes", function() {
+  var emblem;
+  emblem = "App.FunView .bork.snork";
+  return shouldCompileToString(emblem, '<App.FunView class=bork snork>App.FunView</App.FunView>');
+});
+
+test("elementId", function() {
+  var emblem;
+  emblem = "App.FunView#ohno";
+  return shouldCompileToString(emblem, '<App.FunView elementId=ohno>App.FunView</App.FunView>');
+});
+
+test("mixed w/ hash`", function() {
+  var emblem;
+  emblem = "App.FunView .bork.snork funbags=\"yeah\"";
+  return shouldCompileToString(emblem, '<App.FunView funbags=yeah class=bork snork>App.FunView</App.FunView>');
+});
+
+test("mixture of all`", function() {
+  var emblem;
+  emblem = "App.FunView%alex#hell.bork.snork funbags=\"yeah\"";
+  return shouldCompileToString(emblem, '<App.FunView funbags=yeah tagName=alex elementId=hell class=bork snork>App.FunView</App.FunView>');
 });
 
 suite("misc.");

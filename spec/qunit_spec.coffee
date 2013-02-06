@@ -227,6 +227,16 @@ test "multiline", ->
   """
   shouldCompileTo emblem, "BlorkSnork"
 
+test "triple multiline", ->
+  emblem =
+  """
+  | Blork
+    Snork
+    Bork
+  """
+  shouldCompileTo emblem, "BlorkSnorkBork"
+
+
 test "multiline w/ trailing whitespace", ->
   emblem =
   """
@@ -552,12 +562,17 @@ test "recursive nesting pt 2", ->
   """
   shouldCompileTo emblem, { thing: "woot" }, '<sally class="none"><sally class="woot"><p>Hello</p></sally></sally>'
 
+
 Handlebars.registerHelper 'view', (param, a, b, c) ->
   options = arguments[arguments.length - 1]
   content = param
   content = options.fn @ if options.fn
-  #Handlebars.logger.log 9, ""
-  new Handlebars.SafeString """<view class="#{param}">#{content}</view>"""
+  hashString = ""
+  for own k,v of options.hash
+    hashString += " #{k}=#{v}"
+  hashString = " nohash" unless hashString
+
+  new Handlebars.SafeString """<#{param}#{hashString}>#{content}</#{param}>"""
 
 suite "capitalized line-starter"
 
@@ -566,7 +581,7 @@ test "should invoke `view` helper by default", ->
   """
   SomeView
   """
-  shouldCompileToString emblem, '<view class="SomeView">SomeView</view>'
+  shouldCompileToString emblem, '<SomeView nohash>SomeView</SomeView>'
 
 test "should support block mode", ->
   emblem =
@@ -574,7 +589,7 @@ test "should support block mode", ->
   SomeView
     p View content
   """
-  shouldCompileToString emblem, '<view class="SomeView"><p>View content</p></view>'
+  shouldCompileToString emblem, '<SomeView nohash><p>View content</p></SomeView>'
 
 test "should not kick in if preceded by equal sign", ->
   emblem =
@@ -929,6 +944,65 @@ test "no quote test", ->
     label I'm a label!
   """
   shouldCompileToString emblem, '<button action p on=click>Frank</button>'
+
+suite "mustache DOM attribute shorthand"
+
+test "tagName w/o space", ->
+  emblem =
+  """
+  App.FunView%span
+  """
+  shouldCompileToString emblem, '<App.FunView tagName=span>App.FunView</App.FunView>'
+
+test "tagName w/ space", ->
+  emblem =
+  """
+  App.FunView %span
+  """
+  shouldCompileToString emblem, '<App.FunView tagName=span>App.FunView</App.FunView>'
+
+test "tagName block", ->
+  emblem =
+  """
+  App.FunView%span
+    p Hello
+  """
+  shouldCompileToString emblem, '<App.FunView tagName=span><p>Hello</p></App.FunView>'
+
+test "class w/ space (needs space)", ->
+  emblem =
+  """
+  App.FunView .bork
+  """
+  shouldCompileToString emblem, '<App.FunView class=bork>App.FunView</App.FunView>'
+
+test "multiple classes", ->
+  emblem =
+  """
+  App.FunView .bork.snork
+  """
+  shouldCompileToString emblem, '<App.FunView class=bork snork>App.FunView</App.FunView>'
+
+test "elementId", ->
+  emblem =
+  """
+  App.FunView#ohno
+  """
+  shouldCompileToString emblem, '<App.FunView elementId=ohno>App.FunView</App.FunView>'
+
+test "mixed w/ hash`", ->
+  emblem =
+  """
+  App.FunView .bork.snork funbags="yeah"
+  """
+  shouldCompileToString emblem, '<App.FunView funbags=yeah class=bork snork>App.FunView</App.FunView>'
+
+test "mixture of all`", ->
+  emblem =
+  """
+  App.FunView%alex#hell.bork.snork funbags="yeah"
+  """
+  shouldCompileToString emblem, '<App.FunView funbags=yeah tagName=alex elementId=hell class=bork snork>App.FunView</App.FunView>'
 
 suite "misc."
 

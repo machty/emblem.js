@@ -170,9 +170,34 @@ explicitMustache
 inMustache
   = path:pathIdNode tm:trailingModifier? params:inMustacheParam* hash:hash? 
 { 
-  params.unshift(path);
+  var actualParams = [];
+  var attrs = {};
+  var hasAttrs = false;
 
-  var mustacheNode = new Handlebars.AST.MustacheNode(params, hash); 
+  // Convert shorthand html attributes (e.g. % = tagName, . = class, etc)
+  for(var i = 0; i < params.length; ++i) {
+    var p = params[i];
+    var attrKey = p[0];
+    if(attrKey == 'tagName' || attrKey == 'elementId' || attrKey == 'class') {
+      hasAttrs = true;
+      attrs[attrKey] = attrs[attrKey] || [];
+      attrs[attrKey].push(p[1]);
+    } else {
+      actualParams.push(p);
+    }
+  }
+
+  if(hasAttrs) {
+    hash = hash || new Handlebars.AST.HashNode([]);
+    for(var k in attrs) {
+      if(!attrs.hasOwnProperty(k)) continue;
+      hash.pairs.push([k, new Handlebars.AST.StringNode(attrs[k].join(' '))]);
+    }
+  }
+
+  actualParams.unshift(path);
+
+  var mustacheNode = new Handlebars.AST.MustacheNode(actualParams, hash); 
 
   if(tm == '!') {
     return unshiftParam(mustacheNode, 'unbound');
@@ -182,7 +207,7 @@ inMustache
     return unshiftParam(mustacheNode, 'unless');
   }
 
-  return  mustacheNode;
+  return mustacheNode;
 }
 
 // TODO: this
@@ -193,8 +218,24 @@ modifiedParam = p:param m:trailingModifier
   return ret;
 }
 
+// %div converts to tagName="div", .foo.thing converts to class="foo thing", #id converst to id="id"
+htmlMustacheAttribute
+  = t:tagNameShorthand  { return ['tagName', t]; }
+  / i:idShorthand       { return ['elementId', i]; }
+  / c:classShorthand    { return ['class', c]; }
+
+
+shorthandAttributes 
+  = attributesAtLeastID / attributesAtLeastClass
+
+attributesAtLeastID 
+  = id:idShorthand classes:classShorthand* { return [id, classes]; }
+
+attributesAtLeastClass 
+  = classes:classShorthand+ { return [null, classes]; }
+
 inMustacheParam
-  = _ p:param { return p; }
+  = _ h:(htmlMustacheAttribute / param) { return h; }
 
 trailingModifier "TrailingModifier"
   = [!?*^]
@@ -253,10 +294,13 @@ htmlInlineContent
   = m:explicitMustache { return [m]; } 
   / t:textNodes
 
-textLine = ('|' ' '? / &'<') nodes:textNodes indentedNodes:(INDENT t:textNodes DEDENT { return t; })*
+textLine = ('|' ' '? / &'<') nodes:textNodes indentedNodes:(INDENT textNodes* DEDENT)?
 { 
-  for(var i = 0; i < indentedNodes.length; ++i) {
-    nodes = nodes.concat(indentedNodes[i]);
+  if(indentedNodes) {
+    indentedNodes = indentedNodes[1];
+    for(var i = 0; i < indentedNodes.length; ++i) {
+      nodes = nodes.concat(indentedNodes[i]);
+    }
   }
   return nodes; 
 }
@@ -397,7 +441,8 @@ attributeValue = string / param
 
 attributeChar = alpha / [0-9] /'_' / '-'
 
-idShorthand = '#' t:cssIdentifier { return t;}
+tagNameShorthand = '%' c:cssIdentifier { return c; }
+idShorthand = '#' c:cssIdentifier { return c;}
 classShorthand = '.' c:cssIdentifier { return c; }
 
 cssIdentifier "CSSIdentifier" = ident

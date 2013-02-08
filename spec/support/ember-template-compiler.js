@@ -1,11 +1,38 @@
+(function() {
+var Ember = { assert: function() {} };
+// Version: v1.0.0-pre.4-183-gef9fff2
+// Last commit: ef9fff2 (2013-02-08 04:26:29 -0500)
+
+
+(function() {
+/*
+
+Copyright (C) 2011 by Yehuda Katz
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+*/
+
 // lib/handlebars/base.js
 
-
-(function(root) {
-
 /*jshint eqnull:true*/
-var Handlebars;
-Handlebars = this.Handlebars = {};
+this.Handlebars = {};
 
 (function(Handlebars) {
 
@@ -534,7 +561,7 @@ pushState:function begin(condition) {
 lexer.options = {};
 lexer.performAction = function anonymous(yy,yy_,$avoiding_name_collisions,YY_START) {
 
-var YYSTATE=YY_START
+var YYSTATE=YY_START;
 switch($avoiding_name_collisions) {
 case 0:
                                    if(yy_.yytext.slice(-1) !== "\\") this.begin("mu");
@@ -614,7 +641,7 @@ break;
 };
 lexer.rules = [/^(?:[^\x00]*?(?=(\{\{)))/,/^(?:[^\x00]+)/,/^(?:[^\x00]{2,}?(?=(\{\{|$)))/,/^(?:[\s\S]*?--\}\})/,/^(?:\{\{>)/,/^(?:\{\{#)/,/^(?:\{\{\/)/,/^(?:\{\{\^)/,/^(?:\{\{\s*else\b)/,/^(?:\{\{\{)/,/^(?:\{\{&)/,/^(?:\{\{!--)/,/^(?:\{\{![\s\S]*?\}\})/,/^(?:\{\{)/,/^(?:=)/,/^(?:\.(?=[} ]))/,/^(?:\.\.)/,/^(?:[\/.])/,/^(?:\s+)/,/^(?:\}\}\})/,/^(?:\}\})/,/^(?:"(\\["]|[^"])*")/,/^(?:'(\\[']|[^'])*')/,/^(?:@[a-zA-Z]+)/,/^(?:true(?=[}\s]))/,/^(?:false(?=[}\s]))/,/^(?:[0-9]+(?=[}\s]))/,/^(?:[a-zA-Z0-9_$-]+(?=[=}\s\/.]))/,/^(?:\[[^\]]*\])/,/^(?:.)/,/^(?:\s+)/,/^(?:[a-zA-Z0-9_$-/]+)/,/^(?:$)/];
 lexer.conditions = {"mu":{"rules":[4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,32],"inclusive":false},"emu":{"rules":[2],"inclusive":false},"com":{"rules":[3],"inclusive":false},"par":{"rules":[30,31],"inclusive":false},"INITIAL":{"rules":[0,1,32],"inclusive":true}};
-return lexer;})()
+return lexer;})();
 parser.lexer = lexer;
 function Parser () { this.yy = {}; }Parser.prototype = parser;parser.Parser = Parser;
 return new Parser;
@@ -622,9 +649,13 @@ return new Parser;
 // lib/handlebars/compiler/base.js
 Handlebars.Parser = handlebars;
 
-Handlebars.parse = function(string) {
+Handlebars.parse = function(input) {
+
+  // Just return if an already-compile AST was passed in.
+  if(input.constructor === Handlebars.AST.ProgramNode) { return input; }
+
   Handlebars.Parser.yy = Handlebars.AST;
-  return Handlebars.Parser.parse(string);
+  return Handlebars.Parser.parse(input);
 };
 
 Handlebars.print = function(ast) {
@@ -706,8 +737,11 @@ Handlebars.print = function(ast) {
     for(var i=0,l=parts.length; i<l; i++) {
       var part = parts[i];
 
-      if(part === "..") { depth++; }
-      else if(part === "." || part === "this") { this.isScoped = true; }
+      if (part === ".." || part === "." || part === "this") {
+        if (dig.length > 0) { throw new Handlebars.Exception("Invalid path: " + this.original); }
+        else if (part === "..") { depth++; }
+        else { this.isScoped = true; }
+      }
       else { dig.push(part); }
     }
 
@@ -857,6 +891,26 @@ Handlebars.JavaScriptCompiler = function() {};
 
       return out.join("\n");
     },
+    equals: function(other) {
+      var len = this.opcodes.length;
+      if (other.opcodes.length !== len) {
+        return false;
+      }
+
+      for (var i = 0; i < len; i++) {
+        var opcode = this.opcodes[i],
+            otherOpcode = other.opcodes[i];
+        if (opcode.opcode !== otherOpcode.opcode || opcode.args.length !== otherOpcode.args.length) {
+          return false;
+        }
+        for (var j = 0; j < opcode.args.length; j++) {
+          if (opcode.args[j] !== otherOpcode.args[j]) {
+            return false;
+          }
+        }
+      }
+      return true;
+    },
 
     guid: 0,
 
@@ -948,7 +1002,7 @@ Handlebars.JavaScriptCompiler = function() {};
         // evaluate it by executing `blockHelperMissing`
         this.opcode('pushProgram', program);
         this.opcode('pushProgram', inverse);
-        this.opcode('pushHash');
+        this.opcode('emptyHash');
         this.opcode('blockValue');
       } else {
         this.ambiguousMustache(mustache, program, inverse);
@@ -957,7 +1011,7 @@ Handlebars.JavaScriptCompiler = function() {};
         // evaluate it by executing `blockHelperMissing`
         this.opcode('pushProgram', program);
         this.opcode('pushProgram', inverse);
-        this.opcode('pushHash');
+        this.opcode('emptyHash');
         this.opcode('ambiguousBlockValue');
       }
 
@@ -981,6 +1035,7 @@ Handlebars.JavaScriptCompiler = function() {};
 
         this.opcode('assignToHash', pair[0]);
       }
+      this.opcode('popHash');
     },
 
     partial: function(partial) {
@@ -1021,17 +1076,19 @@ Handlebars.JavaScriptCompiler = function() {};
     },
 
     ambiguousMustache: function(mustache, program, inverse) {
-      var id = mustache.id, name = id.parts[0];
+      var id = mustache.id,
+          name = id.parts[0],
+          isBlock = program != null || inverse != null;
 
       this.opcode('getContext', id.depth);
 
       this.opcode('pushProgram', program);
       this.opcode('pushProgram', inverse);
 
-      this.opcode('invokeAmbiguous', name);
+      this.opcode('invokeAmbiguous', name, isBlock);
     },
 
-    simpleMustache: function(mustache, program, inverse) {
+    simpleMustache: function(mustache) {
       var id = mustache.id;
 
       if (id.type === 'DATA') {
@@ -1162,7 +1219,7 @@ Handlebars.JavaScriptCompiler = function() {};
       if(mustache.hash) {
         this.hash(mustache.hash);
       } else {
-        this.opcode('pushHash');
+        this.opcode('emptyHash');
       }
 
       return params;
@@ -1179,7 +1236,7 @@ Handlebars.JavaScriptCompiler = function() {};
       if(mustache.hash) {
         this.hash(mustache.hash);
       } else {
-        this.opcode('pushHash');
+        this.opcode('emptyHash');
       }
 
       return params;
@@ -1193,7 +1250,7 @@ Handlebars.JavaScriptCompiler = function() {};
   JavaScriptCompiler.prototype = {
     // PUBLIC API: You can override these methods in a subclass to provide
     // alternative compiled forms for name lookup and buffering semantics
-    nameLookup: function(parent, name, type) {
+    nameLookup: function(parent, name /* , type*/) {
       if (/^[0-9]+$/.test(name)) {
         return parent + "[" + name + "]";
       } else if (JavaScriptCompiler.isValidJavaScriptVariableName(name)) {
@@ -1208,7 +1265,11 @@ Handlebars.JavaScriptCompiler = function() {};
       if (this.environment.isSimple) {
         return "return " + string + ";";
       } else {
-        return "buffer += " + string + ";";
+        return {
+          appendToBuffer: true,
+          content: string,
+          toString: function() { return "buffer += " + string + ";"; }
+        };
       }
     },
 
@@ -1229,6 +1290,7 @@ Handlebars.JavaScriptCompiler = function() {};
       this.isChild = !!context;
       this.context = context || {
         programs: [],
+        environments: [],
         aliases: { }
       };
 
@@ -1238,6 +1300,7 @@ Handlebars.JavaScriptCompiler = function() {};
       this.stackVars = [];
       this.registers = { list: [] };
       this.compileStack = [];
+      this.inlineStack = [];
 
       this.compileChildren(environment, options);
 
@@ -1259,11 +1322,11 @@ Handlebars.JavaScriptCompiler = function() {};
     },
 
     nextOpcode: function() {
-      var opcodes = this.environment.opcodes, opcode = opcodes[this.i + 1];
+      var opcodes = this.environment.opcodes;
       return opcodes[this.i + 1];
     },
 
-    eat: function(opcode) {
+    eat: function() {
       this.i = this.i + 1;
     },
 
@@ -1301,7 +1364,6 @@ Handlebars.JavaScriptCompiler = function() {};
 
       // Generate minimizer alias mappings
       if (!this.isChild) {
-        var aliases = [];
         for (var alias in this.context.aliases) {
           this.source[1] = this.source[1] + ', ' + alias + '=' + this.context.aliases[alias];
         }
@@ -1326,15 +1388,45 @@ Handlebars.JavaScriptCompiler = function() {};
         params.push("depth" + this.environment.depths.list[i]);
       }
 
+      // Perform a second pass over the output to merge content when possible
+      var source = this.mergeSource();
+
+      if (!this.isChild) {
+        source = "this.compiledVersion = '"+Handlebars.VERSION+"';\n"+source;
+      }
+
       if (asObject) {
-        params.push(this.source.join("\n  "));
+        params.push(source);
 
         return Function.apply(this, params);
       } else {
-        var functionSource = 'function ' + (this.name || '') + '(' + params.join(',') + ') {\n  ' + this.source.join("\n  ") + '}';
+        var functionSource = 'function ' + (this.name || '') + '(' + params.join(',') + ') {\n  ' + source + '}';
         Handlebars.log(Handlebars.logger.DEBUG, functionSource + "\n\n");
         return functionSource;
       }
+    },
+    mergeSource: function() {
+      // WARN: We are not handling the case where buffer is still populated as the source should
+      // not have buffer append operations as their final action.
+      var source = '',
+          buffer;
+      for (var i = 0, len = this.source.length; i < len; i++) {
+        var line = this.source[i];
+        if (line.appendToBuffer) {
+          if (buffer) {
+            buffer = buffer + '\n    + ' + line.content;
+          } else {
+            buffer = line.content;
+          }
+        } else {
+          if (buffer) {
+            source += 'buffer += ' + buffer + ';\n  ';
+            buffer = undefined;
+          }
+          source += line + '\n  ';
+        }
+      }
+      return source;
     },
 
     // [blockValue]
@@ -1373,6 +1465,9 @@ Handlebars.JavaScriptCompiler = function() {};
       var current = this.topStack();
       params.splice(1, 0, current);
 
+      // Use the options value generated from the invocation
+      params[params.length-1] = 'options';
+
       this.source.push("if (!" + this.lastHelper + ") { " + current + " = blockHelperMissing.call(" + params.join(", ") + "); }");
     },
 
@@ -1396,6 +1491,9 @@ Handlebars.JavaScriptCompiler = function() {};
     // If `value` is truthy, or 0, it is coerced into a string and appended
     // Otherwise, the empty string is appended
     append: function() {
+      // Force anything that is inlined onto the stack so we don't have duplication
+      // when we examine local
+      this.flushInline();
       var local = this.popStack();
       this.source.push("if(" + local + " || " + local + " === 0) { " + this.appendToBuffer(local) + " }");
       if (this.environment.isSimple) {
@@ -1410,15 +1508,9 @@ Handlebars.JavaScriptCompiler = function() {};
     //
     // Escape `value` and append it to the buffer
     appendEscaped: function() {
-      var opcode = this.nextOpcode(), extra = "";
       this.context.aliases.escapeExpression = 'this.escapeExpression';
 
-      if(opcode && opcode.opcode === 'appendContent') {
-        extra = " + " + this.quotedString(opcode.args[0]);
-        this.eat(opcode);
-      }
-
-      this.source.push(this.appendToBuffer("escapeExpression(" + this.popStack() + ")" + extra));
+      this.source.push(this.appendToBuffer("escapeExpression(" + this.popStack() + ")"));
     },
 
     // [getContext]
@@ -1442,7 +1534,7 @@ Handlebars.JavaScriptCompiler = function() {};
     // Looks up the value of `name` on the current context and pushes
     // it onto the stack.
     lookupOnContext: function(name) {
-      this.pushStack(this.nameLookup('depth' + this.lastContext, name, 'context'));
+      this.push(this.nameLookup('depth' + this.lastContext, name, 'context'));
     },
 
     // [pushContext]
@@ -1490,7 +1582,7 @@ Handlebars.JavaScriptCompiler = function() {};
     //
     // Push the result of looking up `id` on the current data
     lookupData: function(id) {
-      this.pushStack(this.nameLookup('data', id, 'data'));
+      this.push(this.nameLookup('data', id, 'data'));
     },
 
     // [pushStringParam]
@@ -1513,12 +1605,24 @@ Handlebars.JavaScriptCompiler = function() {};
       }
     },
 
-    pushHash: function() {
-      this.push('{}');
+    emptyHash: function() {
+      this.pushStackLiteral('{}');
 
       if (this.options.stringParams) {
         this.register('hashTypes', '{}');
       }
+    },
+    pushHash: function() {
+      this.hash = {values: [], types: []};
+    },
+    popHash: function() {
+      var hash = this.hash;
+      this.hash = undefined;
+
+      if (this.options.stringParams) {
+        this.register('hashTypes', '{' + hash.types.join(',') + '}');
+      }
+      this.push('{\n    ' + hash.values.join(',\n    ') + '\n  }');
     },
 
     // [pushString]
@@ -1538,7 +1642,8 @@ Handlebars.JavaScriptCompiler = function() {};
     //
     // Push an expression onto the stack
     push: function(expr) {
-      this.pushStack(expr);
+      this.inlineStack.push(expr);
+      return expr;
     },
 
     // [pushLiteral]
@@ -1581,12 +1686,14 @@ Handlebars.JavaScriptCompiler = function() {};
     invokeHelper: function(paramSize, name) {
       this.context.aliases.helperMissing = 'helpers.helperMissing';
 
-      var helper = this.lastHelper = this.setupHelper(paramSize, name);
-      this.register('foundHelper', helper.name);
+      var helper = this.lastHelper = this.setupHelper(paramSize, name, true);
 
-      this.pushStack("foundHelper ? foundHelper.call(" +
-        helper.callParams + ") " + ": helperMissing.call(" +
-        helper.helperMissingParams + ")");
+      this.push(helper.name);
+      this.replaceStack(function(name) {
+        return name + ' ? ' + name + '.call(' +
+            helper.callParams + ") " + ": helperMissing.call(" +
+            helper.helperMissingParams + ")";
+      });
     },
 
     // [invokeKnownHelper]
@@ -1598,7 +1705,7 @@ Handlebars.JavaScriptCompiler = function() {};
     // so a `helperMissing` fallback is not required.
     invokeKnownHelper: function(paramSize, name) {
       var helper = this.setupHelper(paramSize, name);
-      this.pushStack(helper.name + ".call(" + helper.callParams + ")");
+      this.push(helper.name + ".call(" + helper.callParams + ")");
     },
 
     // [invokeAmbiguous]
@@ -1613,19 +1720,18 @@ Handlebars.JavaScriptCompiler = function() {};
     // This operation emits more code than the other options,
     // and can be avoided by passing the `knownHelpers` and
     // `knownHelpersOnly` flags at compile-time.
-    invokeAmbiguous: function(name) {
+    invokeAmbiguous: function(name, helperCall) {
       this.context.aliases.functionType = '"function"';
 
-      this.pushStackLiteral('{}');
-      var helper = this.setupHelper(0, name);
+      this.pushStackLiteral('{}');    // Hash value
+      var helper = this.setupHelper(0, name, helperCall);
 
       var helperName = this.lastHelper = this.nameLookup('helpers', name, 'helper');
-      this.register('foundHelper', helperName);
 
       var nonHelper = this.nameLookup('depth' + this.lastContext, name, 'context');
       var nextStack = this.nextStack();
 
-      this.source.push('if (foundHelper) { ' + nextStack + ' = foundHelper.call(' + helper.callParams + '); }');
+      this.source.push('if (' + nextStack + ' = ' + helperName + ') { ' + nextStack + ' = ' + nextStack + '.call(' + helper.callParams + '); }');
       this.source.push('else { ' + nextStack + ' = ' + nonHelper + '; ' + nextStack + ' = typeof ' + nextStack + ' === functionType ? ' + nextStack + '.apply(depth0) : ' + nextStack + '; }');
     },
 
@@ -1644,7 +1750,7 @@ Handlebars.JavaScriptCompiler = function() {};
       }
 
       this.context.aliases.self = "this";
-      this.pushStack("self.invokePartial(" + params.join(", ") + ")");
+      this.push("self.invokePartial(" + params.join(", ") + ")");
     },
 
     // [assignToHash]
@@ -1655,17 +1761,19 @@ Handlebars.JavaScriptCompiler = function() {};
     // Pops a value and hash off the stack, assigns `hash[key] = value`
     // and pushes the hash back onto the stack.
     assignToHash: function(key) {
-      var value = this.popStack();
+      var value = this.popStack(),
+          type;
 
       if (this.options.stringParams) {
-        var type = this.popStack();
+        type = this.popStack();
         this.popStack();
-        this.source.push("hashTypes['" + key + "'] = " + type + ";");
       }
 
-      var hash = this.topStack();
-
-      this.source.push(hash + "['" + key + "'] = " + value + ";");
+      var hash = this.hash;
+      if (type) {
+        hash.types.push("'" + key + "': " + type);
+      }
+      hash.values.push("'" + key + "': (" + value + ")");
     },
 
     // HELPERS
@@ -1679,11 +1787,27 @@ Handlebars.JavaScriptCompiler = function() {};
         child = children[i];
         compiler = new this.compiler();
 
-        this.context.programs.push('');     // Placeholder to prevent name conflicts for nested children
-        var index = this.context.programs.length;
-        child.index = index;
-        child.name = 'program' + index;
-        this.context.programs[index] = compiler.compile(child, options, this.context);
+        var index = this.matchExistingProgram(child);
+
+        if (index == null) {
+          this.context.programs.push('');     // Placeholder to prevent name conflicts for nested children
+          index = this.context.programs.length;
+          child.index = index;
+          child.name = 'program' + index;
+          this.context.programs[index] = compiler.compile(child, options, this.context);
+          this.context.environments[index] = child;
+        } else {
+          child.index = index;
+          child.name = 'program' + index;
+        }
+      }
+    },
+    matchExistingProgram: function(child) {
+      for (var i = 0, len = this.context.environments.length; i < len; i++) {
+        var environment = this.context.environments[i];
+        if (environment && environment.equals(child)) {
+          return i;
+        }
       }
     },
 
@@ -1727,57 +1851,111 @@ Handlebars.JavaScriptCompiler = function() {};
     },
 
     pushStackLiteral: function(item) {
-      this.compileStack.push(new Literal(item));
-      return item;
+      return this.push(new Literal(item));
     },
 
     pushStack: function(item) {
+      this.flushInline();
+
       var stack = this.incrStack();
-      this.source.push(stack + " = " + item + ";");
+      if (item) {
+        this.source.push(stack + " = " + item + ";");
+      }
       this.compileStack.push(stack);
       return stack;
     },
 
     replaceStack: function(callback) {
-      var stack = this.topStack(),
-          item = callback.call(this, stack);
+      var prefix = '',
+          inline = this.isInline(),
+          stack;
 
-      // Prevent modification of the context depth variable. Through replaceStack
-      if (/^depth/.test(stack)) {
-        stack = this.nextStack();
+      // If we are currently inline then we want to merge the inline statement into the
+      // replacement statement via ','
+      if (inline) {
+        var top = this.popStack(true);
+
+        if (top instanceof Literal) {
+          // Literals do not need to be inlined
+          stack = top.value;
+        } else {
+          // Get or create the current stack name for use by the inline
+          var name = this.stackSlot ? this.topStackName() : this.incrStack();
+
+          prefix = '(' + this.push(name) + ' = ' + top + '),';
+          stack = this.topStack();
+        }
+      } else {
+        stack = this.topStack();
       }
 
-      this.source.push(stack + " = " + item + ";");
+      var item = callback.call(this, stack);
+
+      if (inline) {
+        if (this.inlineStack.length || this.compileStack.length) {
+          this.popStack();
+        }
+        this.push('(' + prefix + item + ')');
+      } else {
+        // Prevent modification of the context depth variable. Through replaceStack
+        if (!/^stack/.test(stack)) {
+          stack = this.nextStack();
+        }
+
+        this.source.push(stack + " = (" + prefix + item + ");");
+      }
       return stack;
     },
 
-    nextStack: function(skipCompileStack) {
-      var name = this.incrStack();
-      this.compileStack.push(name);
-      return name;
+    nextStack: function() {
+      return this.pushStack();
     },
 
     incrStack: function() {
       this.stackSlot++;
       if(this.stackSlot > this.stackVars.length) { this.stackVars.push("stack" + this.stackSlot); }
+      return this.topStackName();
+    },
+    topStackName: function() {
       return "stack" + this.stackSlot;
     },
+    flushInline: function() {
+      var inlineStack = this.inlineStack;
+      if (inlineStack.length) {
+        this.inlineStack = [];
+        for (var i = 0, len = inlineStack.length; i < len; i++) {
+          var entry = inlineStack[i];
+          if (entry instanceof Literal) {
+            this.compileStack.push(entry);
+          } else {
+            this.pushStack(entry);
+          }
+        }
+      }
+    },
+    isInline: function() {
+      return this.inlineStack.length;
+    },
 
-    popStack: function() {
-      var item = this.compileStack.pop();
+    popStack: function(wrapped) {
+      var inline = this.isInline(),
+          item = (inline ? this.inlineStack : this.compileStack).pop();
 
-      if (item instanceof Literal) {
+      if (!wrapped && (item instanceof Literal)) {
         return item.value;
       } else {
-        this.stackSlot--;
+        if (!inline) {
+          this.stackSlot--;
+        }
         return item;
       }
     },
 
-    topStack: function() {
-      var item = this.compileStack[this.compileStack.length - 1];
+    topStack: function(wrapped) {
+      var stack = (this.isInline() ? this.inlineStack : this.compileStack),
+          item = stack[stack.length - 1];
 
-      if (item instanceof Literal) {
+      if (!wrapped && (item instanceof Literal)) {
         return item.value;
       } else {
         return item;
@@ -1792,22 +1970,22 @@ Handlebars.JavaScriptCompiler = function() {};
         .replace(/\r/g, '\\r') + '"';
     },
 
-    setupHelper: function(paramSize, name) {
+    setupHelper: function(paramSize, name, missingParams) {
       var params = [];
-      this.setupParams(paramSize, params);
+      this.setupParams(paramSize, params, missingParams);
       var foundHelper = this.nameLookup('helpers', name, 'helper');
 
       return {
         params: params,
         name: foundHelper,
         callParams: ["depth0"].concat(params).join(", "),
-        helperMissingParams: ["depth0", this.quotedString(name)].concat(params).join(", ")
+        helperMissingParams: missingParams && ["depth0", this.quotedString(name)].concat(params).join(", ")
       };
     },
 
     // the params and contexts arguments are passed in arrays
     // to fill in
-    setupParams: function(paramSize, params) {
+    setupParams: function(paramSize, params, useRegister) {
       var options = [], contexts = [], types = [], param, inverse, program;
 
       options.push("hash:" + this.popStack());
@@ -1852,7 +2030,13 @@ Handlebars.JavaScriptCompiler = function() {};
         options.push("data:data");
       }
 
-      params.push("{" + options.join(",") + "}");
+      options = "{" + options.join(",") + "}";
+      if (useRegister) {
+        this.register('options', options);
+        params.push('options');
+      } else {
+        params.push(options);
+      }
       return params.join(", ");
     }
   };
@@ -1890,23 +2074,23 @@ Handlebars.JavaScriptCompiler = function() {};
 
 })(Handlebars.Compiler, Handlebars.JavaScriptCompiler);
 
-Handlebars.precompile = function(string, options) {
-  if (typeof string !== 'string') {
-    throw new Handlebars.Exception("You must pass a string to Handlebars.compile. You passed " + string);
+Handlebars.precompile = function(input, options) {
+  if (!input || (typeof input !== 'string' && input.constructor !== Handlebars.AST.ProgramNode)) {
+    throw new Handlebars.Exception("You must pass a string or Handlebars AST to Handlebars.compile. You passed " + input);
   }
 
   options = options || {};
   if (!('data' in options)) {
     options.data = true;
   }
-  var ast = Handlebars.parse(string);
+  var ast = Handlebars.parse(input);
   var environment = new Handlebars.Compiler().compile(ast, options);
   return new Handlebars.JavaScriptCompiler().compile(environment, options);
 };
 
-Handlebars.compile = function(string, options) {
-  if (typeof string !== 'string') {
-    throw new Handlebars.Exception("You must pass a string to Handlebars.compile. You passed " + string);
+Handlebars.compile = function(input, options) {
+  if (!input || (typeof input !== 'string' && input.constructor !== Handlebars.AST.ProgramNode)) {
+    throw new Handlebars.Exception("You must pass a string or Handlebars AST to Handlebars.compile. You passed " + input);
   }
 
   options = options || {};
@@ -1915,7 +2099,7 @@ Handlebars.compile = function(string, options) {
   }
   var compiled;
   function compile() {
-    var ast = Handlebars.parse(string);
+    var ast = Handlebars.parse(input);
     var environment = new Handlebars.Compiler().compile(ast, options);
     var templateSpec = new Handlebars.JavaScriptCompiler().compile(environment, options, undefined, true);
     return Handlebars.template(templateSpec);
@@ -1950,12 +2134,17 @@ Handlebars.VM = {
         }
       },
       programWithDepth: Handlebars.VM.programWithDepth,
-      noop: Handlebars.VM.noop
+      noop: Handlebars.VM.noop,
+      compiledVersion: null
     };
 
     return function(context, options) {
       options = options || {};
-      return templateSpec.call(container, Handlebars, context, options.helpers, options.partials, options.data);
+      var result = templateSpec.call(container, Handlebars, context, options.helpers, options.partials, options.data);
+      if (container.compiledVersion !== Handlebars.VERSION) {
+        throw "Template was compiled with "+(container.compiledVersion || 'unknown version')+", but runtime is "+Handlebars.VERSION;
+      }
+      return result;
     };
   },
 
@@ -1995,9 +2184,190 @@ Handlebars.VM = {
 Handlebars.template = Handlebars.VM.template;
 ;
 
-for(var i in Handlebars) {
-  this.Handlebars[i] = Handlebars[i];
-}
-})(this);
-var Handlebars = this.Handlebars;
+})();
 
+(function() {
+/**
+@module ember
+@submodule ember-handlebars
+*/
+
+// Eliminate dependency on any Ember to simplify precompilation workflow
+var objectCreate = Object.create || function(parent) {
+  function F() {}
+  F.prototype = parent;
+  return new F();
+};
+
+var Handlebars = this.Handlebars || Ember.imports.Handlebars;
+Ember.assert("Ember Handlebars requires Handlebars 1.0.rc.2 or greater", Handlebars && Handlebars.VERSION.match(/^1\.0\.rc\.[23456789]+/));
+
+/**
+  Prepares the Handlebars templating library for use inside Ember's view
+  system.
+
+  The `Ember.Handlebars` object is the standard Handlebars library, extended to
+  use Ember's `get()` method instead of direct property access, which allows
+  computed properties to be used inside templates.
+
+  To create an `Ember.Handlebars` template, call `Ember.Handlebars.compile()`.
+  This will return a function that can be used by `Ember.View` for rendering.
+
+  @class Handlebars
+  @namespace Ember
+*/
+Ember.Handlebars = objectCreate(Handlebars);
+
+/**
+@class helpers
+@namespace Ember.Handlebars
+*/
+Ember.Handlebars.helpers = objectCreate(Handlebars.helpers);
+
+/**
+  Override the the opcode compiler and JavaScript compiler for Handlebars.
+
+  @class Compiler
+  @namespace Ember.Handlebars
+  @private
+  @constructor
+*/
+Ember.Handlebars.Compiler = function() {};
+
+// Handlebars.Compiler doesn't exist in runtime-only
+if (Handlebars.Compiler) {
+  Ember.Handlebars.Compiler.prototype = objectCreate(Handlebars.Compiler.prototype);
+}
+
+Ember.Handlebars.Compiler.prototype.compiler = Ember.Handlebars.Compiler;
+
+/**
+  @class JavaScriptCompiler
+  @namespace Ember.Handlebars
+  @private
+  @constructor
+*/
+Ember.Handlebars.JavaScriptCompiler = function() {};
+
+// Handlebars.JavaScriptCompiler doesn't exist in runtime-only
+if (Handlebars.JavaScriptCompiler) {
+  Ember.Handlebars.JavaScriptCompiler.prototype = objectCreate(Handlebars.JavaScriptCompiler.prototype);
+  Ember.Handlebars.JavaScriptCompiler.prototype.compiler = Ember.Handlebars.JavaScriptCompiler;
+}
+
+
+Ember.Handlebars.JavaScriptCompiler.prototype.namespace = "Ember.Handlebars";
+
+
+Ember.Handlebars.JavaScriptCompiler.prototype.initializeBuffer = function() {
+  return "''";
+};
+
+/**
+  @private
+
+  Override the default buffer for Ember Handlebars. By default, Handlebars
+  creates an empty String at the beginning of each invocation and appends to
+  it. Ember's Handlebars overrides this to append to a single shared buffer.
+
+  @method appendToBuffer
+  @param string {String}
+*/
+Ember.Handlebars.JavaScriptCompiler.prototype.appendToBuffer = function(string) {
+  return "data.buffer.push("+string+");";
+};
+
+var prefix = "ember" + (+new Date()), incr = 1;
+
+/**
+  @private
+
+  Rewrite simple mustaches from `{{foo}}` to `{{bind "foo"}}`. This means that
+  all simple mustaches in Ember's Handlebars will also set up an observer to
+  keep the DOM up to date when the underlying property changes.
+
+  @method mustache
+  @for Ember.Handlebars.Compiler
+  @param mustache
+*/
+Ember.Handlebars.Compiler.prototype.mustache = function(mustache) {
+  if (mustache.isHelper && mustache.id.string === 'control') {
+    mustache.hash = mustache.hash || new Handlebars.AST.HashNode([]);
+    mustache.hash.pairs.push(["controlID", new Handlebars.AST.StringNode(prefix + incr++)]);
+  } else if (mustache.params.length || mustache.hash) {
+    // no changes required
+  } else {
+    var id = new Handlebars.AST.IdNode(['_triageMustache']);
+
+    // Update the mustache node to include a hash value indicating whether the original node
+    // was escaped. This will allow us to properly escape values when the underlying value
+    // changes and we need to re-render the value.
+    if(!mustache.escaped) {
+      mustache.hash = mustache.hash || new Handlebars.AST.HashNode([]);
+      mustache.hash.pairs.push(["unescaped", new Handlebars.AST.StringNode("true")]);
+    }
+    mustache = new Handlebars.AST.MustacheNode([id].concat([mustache.id]), mustache.hash, !mustache.escaped);
+  }
+
+  return Handlebars.Compiler.prototype.mustache.call(this, mustache);
+};
+
+/**
+  Used for precompilation of Ember Handlebars templates. This will not be used
+  during normal app execution.
+
+  @method precompile
+  @for Ember.Handlebars
+  @static
+  @param {String} string The template to precompile
+*/
+Ember.Handlebars.precompile = function(string) {
+  var ast = Handlebars.parse(string);
+
+  var options = {
+    knownHelpers: {
+      action: true,
+      unbound: true,
+      bindAttr: true,
+      template: true,
+      view: true,
+      _triageMustache: true
+    },
+    data: true,
+    stringParams: true
+  };
+
+  var environment = new Ember.Handlebars.Compiler().compile(ast, options);
+  return new Ember.Handlebars.JavaScriptCompiler().compile(environment, options, undefined, true);
+};
+
+// We don't support this for Handlebars runtime-only
+if (Handlebars.compile) {
+  /**
+    The entry point for Ember Handlebars. This replaces the default
+    `Handlebars.compile` and turns on template-local data and String
+    parameters.
+
+    @method compile
+    @for Ember.Handlebars
+    @static
+    @param {String} string The template to compile
+    @return {Function}
+  */
+  Ember.Handlebars.compile = function(string) {
+    var ast = Handlebars.parse(string);
+    var options = { data: true, stringParams: true };
+    var environment = new Ember.Handlebars.Compiler().compile(ast, options);
+    var templateSpec = new Ember.Handlebars.JavaScriptCompiler().compile(environment, options, undefined, true);
+
+    return Ember.Handlebars.template(templateSpec);
+  };
+}
+
+
+})();
+
+
+exports.emberHandlebars = Ember.Handlebars;
+exports.precompile = Ember.Handlebars.precompile;
+})()

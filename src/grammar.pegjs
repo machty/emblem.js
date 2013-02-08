@@ -1,5 +1,9 @@
 
 {
+  var handlebarsVariant = Emblem.handlebarsVariant;
+  var IS_EMBER = handlebarsVariant.JavaScriptCompiler.prototype.namespace === "Ember.Handlebars";
+  var AST = handlebarsVariant.AST;
+
   var SELF_CLOSING_TAG = {
     area: true,
     base: true,
@@ -26,7 +30,7 @@
 
     // Merge hash.
     if(newHashPairs) {
-      hash = hash || new Handlebars.AST.HashNode([]);
+      hash = hash || new AST.HashNode([]);
 
       for(var i = 0; i < newHashPairs.length; ++i) {
         hash.pairs.push(newHashPairs[i]);
@@ -34,12 +38,17 @@
     }
 
     var params = [mustacheNode.id].concat(mustacheNode.params);
-    params.unshift(new Handlebars.AST.IdNode([helperName]));
-    return new Handlebars.AST.MustacheNode(params, hash, !mustacheNode.escaped);
+    params.unshift(new AST.IdNode([helperName]));
+    return new AST.MustacheNode(params, hash, !mustacheNode.escaped);
   }
 }
 
-start = content
+start = invertibleContent
+
+invertibleContent = c:content i:( DEDENT 'else' _ TERM INDENT c:content {return c;})?
+{ 
+  return new AST.ProgramNode(c, i || []);
+}
 
 content = statements:statement*
 {
@@ -63,7 +72,7 @@ content = statements:statement*
 
       // Flush content if present.
       if(buffer.length) {
-        compressedStatements.push(new Handlebars.AST.ContentNode(buffer.join('')));
+        compressedStatements.push(new AST.ContentNode(buffer.join('')));
         buffer = [];
       }
       compressedStatements.push(node);
@@ -71,15 +80,10 @@ content = statements:statement*
   }
 
   if(buffer.length) { 
-    compressedStatements.push(new Handlebars.AST.ContentNode(buffer.join(''))); 
+    compressedStatements.push(new AST.ContentNode(buffer.join(''))); 
   }
 
   return compressedStatements;
-}
-
-invertibleContent = c:content i:( DEDENT 'else' _ TERM INDENT c:content {return c;})?
-{ 
-  return new Handlebars.AST.ProgramNode(c, i || []);
 }
 
 // A statement is an array of nodes.
@@ -87,9 +91,17 @@ invertibleContent = c:content i:( DEDENT 'else' _ TERM INDENT c:content {return 
 // like text lines, there might be multiple elements.
 statement
   = comment
+  / legacyPartialInvocation
   / htmlElement
   / textLine
   / mustache
+
+legacyPartialInvocation
+  = '>' _ n:legacyPartialName _ p:path? _ TERM { return new AST.PartialNode(n, p); }
+
+legacyPartialName
+  = s:$[a-zA-Z0-9_$-/]+ { return new AST.PartialNameNode(s); }
+
 
 htmlElement
   = htmlElementMaybeBlock / htmlElementWithInlineContent
@@ -181,7 +193,7 @@ mustacheMaybeBlock
 { 
   if(!block) return mustacheNode;
   var programNode = block[1];
-  return new Handlebars.AST.BlockNode(mustacheNode, programNode, programNode.inverse, mustacheNode.id);
+  return new AST.BlockNode(mustacheNode, programNode, programNode.inverse, mustacheNode.id);
 }
 
 explicitMustache 
@@ -213,16 +225,16 @@ inMustache
   }
 
   if(hasAttrs) {
-    hash = hash || new Handlebars.AST.HashNode([]);
+    hash = hash || new AST.HashNode([]);
     for(var k in attrs) {
       if(!attrs.hasOwnProperty(k)) continue;
-      hash.pairs.push([k, new Handlebars.AST.StringNode(attrs[k].join(' '))]);
+      hash.pairs.push([k, new AST.StringNode(attrs[k].join(' '))]);
     }
   }
 
   actualParams.unshift(path);
 
-  var mustacheNode = new Handlebars.AST.MustacheNode(actualParams, hash); 
+  var mustacheNode = new AST.MustacheNode(actualParams, hash); 
 
   if(tm == '!') {
     return unshiftParam(mustacheNode, 'unbound');
@@ -266,7 +278,7 @@ trailingModifier "TrailingModifier"
   = [!?*^]
 
 hash 
-  = h:hashSegment+ { return new Handlebars.AST.HashNode(h); }
+  = h:hashSegment+ { return new AST.HashNode(h); }
 
 pathIdent "PathIdent"
   = '..' / '.' / s:$[a-zA-Z0-9_$-]+ !'=' { return s; }
@@ -298,10 +310,10 @@ path = first:pathIdent tail:(seperator p:pathIdent { return p; })*
 
 seperator "PathSeparator" = [\/.]
 
-pathIdNode  = v:path    { return new Handlebars.AST.IdNode(v); }
-stringNode  = v:string  { return new Handlebars.AST.StringNode(v); }
-integerNode = v:integer { return new Handlebars.AST.IntegerNode(v); }
-booleanNode = v:boolean { return new Handlebars.AST.BooleanNode(v); }
+pathIdNode  = v:path    { return new AST.IdNode(v); }
+stringNode  = v:string  { return new AST.StringNode(v); }
+integerNode = v:integer { return new AST.IntegerNode(v); }
+booleanNode = v:boolean { return new AST.BooleanNode(v); }
 
 boolean "Boolean" = 'true' / 'false'
 
@@ -355,7 +367,7 @@ rawMustacheUnescaped
  = tripleOpen _ m:inMustache _ tripleClose { m.escaped = false; return m; }
 
 preMustacheText 
-  = a:preMustacheUnit+ { return new Handlebars.AST.ContentNode(a.join('')); }
+  = a:preMustacheUnit+ { return new AST.ContentNode(a.join('')); }
 
 preMustacheUnit
   = !(tripleOpen / doubleOpen / hashStacheOpen / DEDENT / TERM) c:. { return c; }
@@ -389,19 +401,19 @@ htmlTagAndOptionalAttributes
       classes = shorthandAttributes[1];
 
   var tagOpenContent = [];
-  tagOpenContent.push(new Handlebars.AST.ContentNode('<' + tagName));
+  tagOpenContent.push(new AST.ContentNode('<' + tagName));
 
   if(id) {
-    tagOpenContent.push(new Handlebars.AST.ContentNode(' id="' + id + '"'));
+    tagOpenContent.push(new AST.ContentNode(' id="' + id + '"'));
   }
 
   if(classes && classes.length) {
-    tagOpenContent.push(new Handlebars.AST.ContentNode(' class="' + classes.join(' ') + '"'));
+    tagOpenContent.push(new AST.ContentNode(' class="' + classes.join(' ') + '"'));
   }
 
   // Pad in tag mustaches with spaces.
   for(var i = 0; i < inTagMustaches.length; ++i) {
-    tagOpenContent.push(new Handlebars.AST.ContentNode(' '));
+    tagOpenContent.push(new AST.ContentNode(' '));
     tagOpenContent.push(inTagMustaches[i]);
   }
 
@@ -410,11 +422,11 @@ htmlTagAndOptionalAttributes
   }
 
   if(SELF_CLOSING_TAG[tagName]) {
-    tagOpenContent.push(new Handlebars.AST.ContentNode(' />'));
+    tagOpenContent.push(new AST.ContentNode(' />'));
     return [tagOpenContent];
   } else {
-    tagOpenContent.push(new Handlebars.AST.ContentNode('>'));
-    return [tagOpenContent, new Handlebars.AST.ContentNode('</' + tagName + '>')];
+    tagOpenContent.push(new AST.ContentNode('>'));
+    return [tagOpenContent, new AST.ContentNode('</' + tagName + '>')];
   }
 }
 
@@ -430,7 +442,7 @@ attributesAtLeastClass
 fullAttribute
   = ' '+ a:(actionAttribute / boundAttribute / normalAttribute)  
 {
-  return [new Handlebars.AST.ContentNode(' '), a]; 
+  return [new AST.ContentNode(' '), a]; 
 }
 
 boundAttributeValueText = $[A-Za-z.:0-9]+ 
@@ -438,7 +450,7 @@ boundAttributeValueText = $[A-Za-z.:0-9]+
 // Value of an action can be an unwrapped string, or a single or double quoted string
 actionValue
   = quotedActionValue
-  / id:pathIdNode { return new Handlebars.AST.MustacheNode([id]); }
+  / id:pathIdNode { return new AST.MustacheNode([id]); }
 
 quotedActionValue = p:('"' inMustache '"' / "'" inMustache "'") { return p[1]; }
 
@@ -446,23 +458,23 @@ actionAttribute
   = event:knownEvent '=' mustacheNode:actionValue
 {
   // Unshift the action helper and augment the hash
-  return unshiftParam(mustacheNode, 'action', [['on', new Handlebars.AST.StringNode(event)]]);
+  return unshiftParam(mustacheNode, 'action', [['on', new AST.StringNode(event)]]);
 }
 
 boundAttribute
   = key:key '=' value:boundAttributeValueText
 { 
-  var hashNode = new Handlebars.AST.HashNode([[key, new Handlebars.AST.StringNode(value)]]);
-  var params = [new Handlebars.AST.IdNode(['bindAttr'])];
+  var hashNode = new AST.HashNode([[key, new AST.StringNode(value)]]);
+  var params = [new AST.IdNode(['bindAttr'])];
 
-  return new Handlebars.AST.MustacheNode(params, hashNode);
+  return new AST.MustacheNode(params, hashNode);
 }
 
 normalAttribute
   = key:key '=' value:string
 { 
   var s = key + '=' + '"' + value + '"';
-  return new Handlebars.AST.ContentNode(s);
+  return new AST.ContentNode(s);
 }
 
 attributeName = $attributeChar*

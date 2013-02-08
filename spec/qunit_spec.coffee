@@ -1,9 +1,9 @@
 
-unless Handlebars? && Emblem?
+unless Emblem?
   # Setup for Node package testing
-  #Emblem = 
-  require('../dist/emblem')
   Handlebars = require('handlebars')
+  EmberHandlebars = require('./support/ember-template-compiler.js').emberHandlebars
+  Emblem = require('../lib/emblem')
 
   assert = require("assert")
   {equal, equals, ok, throws} = assert
@@ -19,8 +19,10 @@ unless CompilerContext?
   # Both should be run for full acceptance of the two libary modes.
   CompilerContext = 
     compile: (template, options) ->
-      templateSpec = Emblem.precompile(template, options)
-      Handlebars.template eval "(#{templateSpec})"  
+      Emblem.compile(Handlebars, template, options)
+      #templateSpec = Emblem.precompile(Handlebars, template, options)
+      #Handlebars.template eval "(#{templateSpec})"  
+      #compileWithPartial: (template, options) ->
 
 shouldCompileToString = (string, hashOrArray, expected) ->
 
@@ -683,12 +685,6 @@ test "compound", ->
   """
   shouldCompileTo emblem, { foo: true, bar: "borf", baz: "narsty" }, '<p>borf</p>'
 
-
-
-
-
-
-
 suite "conditionals"
 
 test "simple if statement", ->
@@ -1030,6 +1026,66 @@ test "input", ->
   input type="text"
   """
   shouldCompileToString emblem, '<input type="text" />'
+
+suite "ember."
+
+test "should precompile with EmberHandlebars", ->
+  emblem =
+  """
+  input type="text"
+  """
+  result = Emblem.precompile(EmberHandlebars, 'p Hello').toString()
+  ok result.match '<p>Hello</p>'
+
+suite "old school handlebars"
+
+test "array", ->
+  emblem =
+  '''
+  goodbyes
+    | #{text}! 
+  | cruel #{world}!
+  '''
+  hash = {goodbyes: [{text: "goodbye"}, {text: "Goodbye"}, {text: "GOODBYE"}], world: "world"}
+  shouldCompileToString emblem, hash, "goodbye! Goodbye! GOODBYE! cruel world!"
+
+  hash = {goodbyes: [], world: "world"}
+  shouldCompileToString emblem, hash, "cruel world!"
+
+
+#Handlebars.registerPartial('link', '<a href="/people/{{id}}">{{name}}</a>')
+
+###
+test "partial", ->
+  emblem =
+  """
+  > link
+  """
+  shouldCompileToString emblem, [{ id: 666, name: "Death" }], '<a href="/people/666">Death</a>'
+###
+
+test "block as #each", ->
+  emblem =
+  '''
+  thangs
+    p Woot #{yeah}
+  '''
+  shouldCompileToString emblem, { thangs: [{yeah: 123}, {yeah:456}] }, '<p>Woot 123</p><p>Woot 456</p>'
+
+###
+test "partial in block", ->
+  emblem =
+  """
+  ul = people
+    > link
+  """
+  data = 
+    people: [
+      { "name": "Alan", "id": 1 }
+      { "name": "Yehuda", "id": 2 }
+    ]
+  shouldCompileToString emblem, data, '<ul><a href="/people/1">Alan</a><a href="/people/2">Yehuda</a><ul>'
+###
 
 suite "misc."
 

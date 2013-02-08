@@ -86,8 +86,8 @@ task :default => [:build, :spec, :npm_test]
 
 def remove_exports(string)
   # TODO: HACK, this regex might catch some future code. need a better way to strip out requires
-  string = string.gsub(/^([^\s].*equire[ (].*)$/, "//")
-  string = string.gsub(/^(module\.)/, "//")
+  string = string.gsub(/^[^\s].*equire[ (].*$/, "")
+  string = string.gsub(/^module\..*$/, "")
 end
 
 minimal_deps = %w(emblem parser compiler preprocessor emberties).map do |file|
@@ -103,24 +103,6 @@ def build_for_task(task)
   FileUtils.mkdir_p("dist")
 
   contents = []
-
-  # Prepend the HB lib on to everything.
-=begin
-  contents << <<-EOS
-(function(root) {
-  var Handlebars = {};
-
-  #{ File.read('./node_modules/handlebars/dist/handlebars.js') }
-
-  for(var i in Handlebars) {
-    this.Handlebars[i] = Handlebars[i];
-  }
-})(this);
-var Handlebars = this.Handlebars;
-  EOS
-=end
-
-  contents << File.read('./vendor/handlebars.js')
   contents << File.read('./vendor/StringScanner.js')
 
   task.prerequisites.each do |filename|
@@ -134,11 +116,11 @@ var Handlebars = this.Handlebars;
 
     #{contents.join("\n")}
 
-    root.Handlebars = Handlebars;
     root.Emblem = Emblem;
 
   }(this));
   EOS
+  #contents = contents.join("\n")
 
   File.open(task.name, "w") do |file|
     file.puts contents
@@ -158,3 +140,4 @@ task :build => ["node_modules", :compile, "dist/emblem.js", "dist/emblem.min.js"
 
 desc "build the browser and version of emblem"
 task :release => [:build]
+

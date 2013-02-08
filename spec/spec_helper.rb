@@ -37,11 +37,6 @@ module Emblem
       end
     end
 
-    def self.remove_exports(string)
-      string = string.gsub(/^([^\s].*equire[ (].*)$/, "// \1")
-      string = string.gsub(/^(module\.)/, "// \1")
-    end
-
     def self.load_helpers(context)
       context["exports"] = nil
 
@@ -60,22 +55,15 @@ module Emblem
       end
     end
 
-    def self.js_load(context, file)
-      str = File.read(file)
-      context.eval(remove_exports(str), file)
-    end
-
     CONTEXT = V8::Context.new
     CONTEXT.instance_eval do |context|
       Emblem::Spec.load_helpers(context);
 
-      Emblem::Spec.js_load(context, './node_modules/handlebars/dist/handlebars.js')
-      Emblem::Spec.js_load(context, 'vendor/StringScanner.js')
-      Emblem::Spec.js_load(context, 'lib/emblem.js')
-      Emblem::Spec.js_load(context, 'lib/parser.js')
-      Emblem::Spec.js_load(context, 'lib/compiler.js')
-      Emblem::Spec.js_load(context, 'lib/preprocessor.js')
-      Emblem::Spec.js_load(context, 'lib/emberties.js')
+      context.eval('var exports = this.exports || {};')
+      context.eval(File.read('./spec/support/ember-template-compiler.js'))
+      context.eval('var EmberHandlebars = exports.emberHandlebars; ')
+
+      context.eval(File.read('./dist/emblem.js'))
 
       context["Handlebars"]["logger"]["level"] = ENV["DEBUG_JS"] ? context["Handlebars"]["logger"][ENV["DEBUG_JS"]] : 4
 

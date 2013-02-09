@@ -6339,7 +6339,7 @@ ENV.EMBER_LOAD_HOOKS || (ENV.EMBER_LOAD_HOOKS = {});
 (_base = ENV.EMBER_LOAD_HOOKS).application || (_base.application = []);
 
 ENV.EMBER_LOAD_HOOKS.application.push(function() {
-  return Emblem.enableEmber();
+  return Emblem.compileScriptTags();
 });
 ;
 

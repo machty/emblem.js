@@ -1,49 +1,64 @@
+## Emblem: Handlebars + Indentation + Ember-comptability
 
-### 1/24/2013: all test cases pass now, baseline features implemented
+Emblem.js is an indentation-based templating language that compiles
+to Handlebars. It is therefore
 
-Please see the TODO section below for how you might help get the ball
-rolling with this language.
+1. Efficiently/easily precompilable
+1. Compilable in the browser
+1. Fully compatible with Ember.js's auto-updating templates
+1. Way more fun to write/maintain than `{{mustached}}`'d HTML
 
-## Emblem: The Ember.js-infused Markup Language
+## Syntax Examples
 
-Emblem.js is an indentation-based templating language that supports
-Ember.js's auto-updating templates and offers lots of Ember-targeting
-syntactic sugar that can be disabled in non-Ember settings.
+- [Check out this JSBin.](http://jsbin.com/ulegec/47/edit)
+- Check out this [demo](http://emblem-test.herokuapp.com/) of 
+  an [ember-rails](https://github.com/machty/ember-rails) site
+  with Emblem enabled.
 
-## Features
-
-1. Indentation-based (inspired by Slim, HAML, Jade, etc), which keeps
-   your code neatly indented and prevents you from having to write
-   closing HTML tags.
-1. Written in JavaScript; templates can be compiled in the browser or in
-   Node. 
-1. Internally compiles to Handlebars, so all of the data-binding,
-   auto-updating functionality that you'd expect out of Ember will work.
-   Note that Handlebars is the only templating language that Ember
-   supports (that is, if you want auto-updating templates, which you
-   do).
-1. Lots of enhancements and shortcuts that favor Ember.js, but can be
-   disabled for use in non-Ember settings.
-
-## Example
-
-[Check out this JSBin.](http://jsbin.com/ulegec/40/edit)
+![Emblem.js Syntax](https://s3.amazonaws.com/machty/emblem-sample.png)
 
 ## Using Emblem in your application
 
-The `emblem.js` is essentially a superset drop-in replacement for
-`handlebars.js`. To use it with an Ember project, simply replace
-`handlebars.js` with `emblem.js`, and you're good to go. 
+You can use Emblem to compile either to vanilla Handlebars or Emberized
+Handlebars. Let's assume you're compiling to Emberized Handlebars
+for use with an Ember app.
 
-NOTE: Until [this fix](https://github.com/emberjs/ember.js/pull/1861),
-there was no way to Emblem to link into Ember's load hooks, which is
-required for the the `x-emblem` script tags to be compiled at Ember app
-launch.
+### Compiling in the Browser 
 
-Once we have the ability to precompile templates, the only JS you'll
-need is `handlebars.runtime.js`; there is no `emblem.runtime.js` because
-there isn't any additional code that Emblem requires once the templates
-are compiled.
+Follow the pattern in [this JSBin](http://jsbin.com/ulegec/47/edit):
+
+1. Include Handlebars
+1. Include Emblem
+1. Include Ember
+
+If you have a recent enough version of Ember, all the Emblem code you
+put into `<script type="text/x-emblem">` tags will get compiled and
+stripped out of the DOM. If you're using an out-of-date Ember, you
+can trigger this to happen manually before app initialization via
+
+```
+Ember.onLoad('application', Emblem.compileScriptTags);
+```
+
+### Via Rails 3.1+
+
+Use my fork of [ember-rails](https://github.com/machty/ember-rails) and
+any templates ending in `.emblem` will be precompiled for you. 
+
+Also check out the [demo](https://github.com/machty/ember-rails) of
+Emblemized `ember-rails`.
+
+### Via Rake Pipeline
+
+Coming extremely soon.
+
+### All Emblem Plugins
+
+1. [ember-rails](https://github.com/machty/ember-rails)
+1. [barber-emblem](https://github.com/machty/barber-emblem), a
+   Precompilation library for Ruby (used in `ember-rails`)
+1. [emblem-brunch](https://github.com/machty/emblem-brunch), Emblem
+   support for Brunch.io
 
 # Building Emblem.js
 
@@ -73,7 +88,12 @@ au BufNewFile,BufRead *.emblem set filetype=slim
 
 ## TODO / Contribute
 
-So many things. See the issues section.
+- Syntax suggestions / improvements
+- Syntax highlighting
+- Rake pipeline
+- Plugins for all sorts of frameworks
+- Refactor the code to be cross-platform (browser/Node/etc).
+  It currently is now, it's just mad ugly.
 
-PRs are welcome and encouraged!
-
+Pull Requests absolutely welcome and encouraged, just don't send me
+non-trivial changes without the test cases to back them up.

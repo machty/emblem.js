@@ -11,7 +11,6 @@ Emblem.compileScriptTags = () ->
 
   if document?
 
-
     Ember.$('script[type="text/x-emblem"], script[type="text/x-raw-emblem"]', Ember.$(document)).each ->
       script = Ember.$(@)
 
@@ -35,4 +34,4 @@ this.ENV ||= {}
 ENV = this.ENV
 ENV.EMBER_LOAD_HOOKS ||= {}
 ENV.EMBER_LOAD_HOOKS.application ||= []
-ENV.EMBER_LOAD_HOOKS.application.push -> Emblem.enableEmber()
+ENV.EMBER_LOAD_HOOKS.application.push -> Emblem.compileScriptTags()

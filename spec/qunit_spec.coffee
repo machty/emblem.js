@@ -1087,6 +1087,49 @@ test "partial in block", ->
   shouldCompileToString emblem, data, '<ul><a href="/people/1">Alan</a><a href="/people/2">Yehuda</a><ul>'
 ###
 
+suite "inline block helper"
+
+test "text only", ->
+  emblem =
+  """
+  view SomeView | Hello
+  """
+  shouldCompileToString emblem, '<SomeView nohash>Hello</SomeView>'
+
+test "capitalized", ->
+  emblem =
+  """
+  SomeView | Hello
+  """
+  shouldCompileToString emblem, '<SomeView nohash>Hello</SomeView>'
+
+test "multiline", ->
+  emblem =
+  """
+  view SomeView | Hello, 
+    How are you? 
+    Sup?
+  """
+  shouldCompileToString emblem, '<SomeView nohash>Hello, How are you? Sup?</SomeView>'
+
+test "multiline capitalized", ->
+  emblem =
+  """
+  SomeView | Hello, 
+    How are you? 
+    Sup?
+  """
+  shouldCompileToString emblem, '<SomeView nohash>Hello, How are you? Sup?</SomeView>'
+
+test "more complicated", ->
+  emblem =
+  """
+  SomeView borf="yes" | Hello, 
+    How are you? 
+    Sup?
+  """
+  shouldCompileToString emblem, '<SomeView borf=yes>Hello, How are you? Sup?</SomeView>'
+
 suite "misc."
 
 test "capitalized view helper should not kick in if suffix modifiers present", ->

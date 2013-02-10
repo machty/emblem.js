@@ -23,6 +23,41 @@
     wbr: true
   };
 
+  var KNOWN_TAGS = { 
+    figcaption: true, blockquote: true, plaintext: true, textarea: true, progress: true, 
+    optgroup: true, noscript: true, noframes: true, frameset: true, fieldset: true, 
+    datalist: true, colgroup: true, basefont: true, summary: true, section: true, 
+    marquee: true, listing: true, isindex: true, details: true, command: true, 
+    caption: true, bgsound: true, article: true, address: true, acronym: true, 
+    strong: true, strike: true, spacer: true, source: true, select: true, 
+    script: true, output: true, option: true, object: true, legend: true, 
+    keygen: true, iframe: true, hgroup: true, header: true, footer: true, 
+    figure: true, center: true, canvas: true, button: true, applet: true, video: true, 
+    track: true, title: true, thead: true, tfoot: true, tbody: true, table: true, 
+    style: true, small: true, param: true, meter: true, label: true, input: true, 
+    frame: true, embed: true, blink: true, audio: true, aside: true, time: true, 
+    span: true, samp: true, ruby: true, nobr: true, meta: true, menu: true, 
+    mark: true, main: true, link: true, html: true, head: true, form: true, 
+    font: true, data: true, code: true, cite: true, body: true, base: true, 
+    area: true, abbr: true, xmp: true, wbr: true, var: true, sup: true, 
+    sub: true, pre: true, nav: true, map: true, kbd: true, ins: true, 
+    img: true, div: true, dir: true, dfn: true, del: true, col: true, 
+    big: true, bdo: true, bdi: true, ul: true, tt: true, tr: true, th: true, td: true, 
+    rt: true, rp: true, ol: true, li: true, hr: true, h6: true, h5: true, h4: true, 
+    h3: true, h2: true, h1: true, em: true, dt: true, dl: true, dd: true, br: true, 
+    u: true, s: true, q: true, p: true, i: true, b: true, a: true
+  };
+
+  var KNOWN_EVENTS = {
+    "touchStart": true, "touchMove": true, "touchEnd": true, "touchCancel": true, 
+    "keyDown": true, "keyUp": true, "keyPress": true, "mouseDown": true, "mouseUp": true, 
+    "contextMenu": true, "click": true, "doubleClick": true, "mouseMove": true, 
+    "focusIn": true, "focusOut": true, "mouseEnter": true, "mouseLeave": true, 
+    "submit": true, "input": true, "change": true, "dragStart": true, 
+    "drag": true, "dragEnter": true, "dragLeave": true, 
+    "dragOver": true, "drop": true, "dragEnd": true
+  };
+
   // Returns a new MustacheNode with a new preceding param (id).
   function unshiftParam(mustacheNode, helperName, newHashPairs) {
 
@@ -189,10 +224,18 @@ htmlElementWithInlineContent
 }  
 
 mustacheMaybeBlock 
-  = mustacheNode:inMustache _ TERM block:(INDENT invertibleContent DEDENT)? 
+  = mustacheInlineBlock
+  / mustacheNode:inMustache _ TERM block:(INDENT invertibleContent DEDENT)? 
 { 
   if(!block) return mustacheNode;
   var programNode = block[1];
+  return new AST.BlockNode(mustacheNode, programNode, programNode.inverse, mustacheNode.id);
+}
+
+mustacheInlineBlock
+  = mustacheNode:inMustache _ t:textLine
+{
+  var programNode = new AST.ProgramNode(t, []);
   return new AST.BlockNode(mustacheNode, programNode, programNode.inverse, mustacheNode.id);
 }
 
@@ -495,44 +538,18 @@ nmchar = [_a-zA-Z0-9-] / nonascii
 nmstart = [_a-zA-Z] / nonascii
 nonascii = [\x80-\xFF]
 
+tagString 
+  = c:$tagChar+
+
 htmlTagName "KnownHTMLTagName"
-  = '%' c:$tagChar+ { return c; }
+  = '%' s:tagString { return s; }
   / knownTagName
+
+knownTagName = t:tagString &{ return !!KNOWN_TAGS[t]; }  { return t; }
 
 tagChar = [:_a-zA-Z0-9-]
 
-knownTagName "KnownHTMLTagName" =
-"figcaption"/"blockquote"/"plaintext"/"textarea"/"progress"/
-"optgroup"/"noscript"/"noframes"/"frameset"/"fieldset"/
-"datalist"/"colgroup"/"basefont"/"summary"/"section"/
-"marquee"/"listing"/"isindex"/"details"/"command"/
-"caption"/"bgsound"/"article"/"address"/"acronym"/
-"strong"/"strike"/"spacer"/"source"/"select"/
-"script"/"output"/"option"/"object"/"legend"/
-"keygen"/"iframe"/"hgroup"/"header"/"footer"/
-"figure"/"center"/"canvas"/"button"/"applet"/"video"/
-"track"/"title"/"thead"/"tfoot"/"tbody"/"table"/
-"style"/"small"/"param"/"meter"/"label"/"input"/
-"frame"/"embed"/"blink"/"audio"/"aside"/"time"/
-"span"/"samp"/"ruby"/"nobr"/"meta"/"menu"/
-"mark"/"main"/"link"/"html"/"head"/"form"/
-"font"/"data"/"code"/"cite"/"body"/"base"/
-"area"/"abbr"/"xmp"/"wbr"/"var"/"sup"/
-"sub"/"pre"/"nav"/"map"/"kbd"/"ins"/
-"img"/"div"/"dir"/"dfn"/"del"/"col"/
-"big"/"bdo"/"bdi"/"ul"/"tt"/"tr"/"th"/"td"/
-"rt"/"rp"/"ol"/"li"/"hr"/"h6"/"h5"/"h4"/
-"h3"/"h2"/"h1"/"em"/"dt"/"dl"/"dd"/"br"/
-"u"/"s"/"q"/"p"/"i"/"b"/"a"
-
-knownEvent "a JS event" =
-"touchStart"/"touchMove"/"touchEnd"/"touchCancel"/
-"keyDown"/"keyUp"/"keyPress"/"mouseDown"/"mouseUp"/
-"contextMenu"/"click"/"doubleClick"/"mouseMove"/
-"focusIn"/"focusOut"/"mouseEnter"/"mouseLeave"/
-"submit"/"input"/"change"/"dragStart"/
-"drag"/"dragEnter"/"dragLeave"/
-"dragOver"/"drop"/"dragEnd"
+knownEvent "a JS event" = t:tagString &{ return !!KNOWN_EVENTS[t]; }  { return t; }
 
 INDENT "INDENT" = "\uEFEF" { return ''; }
 DEDENT "DEDENT" = "\uEFFE" { return ''; }

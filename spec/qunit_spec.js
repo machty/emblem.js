@@ -996,6 +996,38 @@ test "partial in block", ->
 */
 
 
+suite("inline block helper");
+
+test("text only", function() {
+  var emblem;
+  emblem = "view SomeView | Hello";
+  return shouldCompileToString(emblem, '<SomeView nohash>Hello</SomeView>');
+});
+
+test("capitalized", function() {
+  var emblem;
+  emblem = "SomeView | Hello";
+  return shouldCompileToString(emblem, '<SomeView nohash>Hello</SomeView>');
+});
+
+test("multiline", function() {
+  var emblem;
+  emblem = "view SomeView | Hello, \n  How are you? \n  Sup?";
+  return shouldCompileToString(emblem, '<SomeView nohash>Hello, How are you? Sup?</SomeView>');
+});
+
+test("multiline capitalized", function() {
+  var emblem;
+  emblem = "SomeView | Hello, \n  How are you? \n  Sup?";
+  return shouldCompileToString(emblem, '<SomeView nohash>Hello, How are you? Sup?</SomeView>');
+});
+
+test("more complicated", function() {
+  var emblem;
+  emblem = "SomeView borf=\"yes\" | Hello, \n  How are you? \n  Sup?";
+  return shouldCompileToString(emblem, '<SomeView borf=yes>Hello, How are you? Sup?</SomeView>');
+});
+
 suite("misc.");
 
 test("capitalized view helper should not kick in if suffix modifiers present", function() {

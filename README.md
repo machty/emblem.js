@@ -1,4 +1,4 @@
-## Emblem: Handlebars + Indentation + Ember-comptability
+## Emblem: Handlebars + Indentation + Ember-compatibility
 
 Emblem.js is an indentation-based templating language that compiles
 to Handlebars. It is therefore

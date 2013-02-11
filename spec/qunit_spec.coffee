@@ -1130,7 +1130,57 @@ test "more complicated", ->
   """
   shouldCompileToString emblem, '<SomeView borf=yes>Hello, How are you? Sup?</SomeView>'
 
+suite "copy paste html"
+
+test "indented", ->
+  emblem =
+  """
+  <p>
+    <span>This be some text</span>
+    <title>Basic HTML Sample Page</title>
+  </p>
+  """
+  shouldCompileToString emblem, '<p><span>This be some text</span><title>Basic HTML Sample Page</title></p>'
+
+test "flatlina", ->
+  emblem =
+  """
+  <p>
+  <span>This be some text</span>
+  <title>Basic HTML Sample Page</title>
+  </p>
+  """
+  shouldCompileToString emblem, '<p><span>This be some text</span><title>Basic HTML Sample Page</title></p>'
+
+test "bigass", ->
+  emblem =
+  """
+  <div class="content">
+    <p>
+      We design and develop ambitious web and mobile applications,
+    </p>
+    <p>
+      A more official portfolio page is on its way, but in the meantime,
+      check out
+    </p>
+  </div>
+  """
+  expected = '<div class="content"><p>We design and develop ambitious web and mobile applications, </p><p>A more official portfolio page is on its way, but in the meantime, check out </p></div>'
+  shouldCompileToString emblem, expected
+
 suite "misc."
+
+test "end with indent", ->
+  emblem =
+  """
+  div
+    p
+      span Butts
+        em fpokasd
+        iunw
+          paosdk
+  """
+  shouldCompileToString emblem, ''
 
 test "capitalized view helper should not kick in if suffix modifiers present", ->
   emblem =

@@ -1028,7 +1028,34 @@ test("more complicated", function() {
   return shouldCompileToString(emblem, '<SomeView borf=yes>Hello, How are you? Sup?</SomeView>');
 });
 
+suite("copy paste html");
+
+test("indented", function() {
+  var emblem;
+  emblem = "<p>\n  <span>This be some text</span>\n  <title>Basic HTML Sample Page</title>\n</p>";
+  return shouldCompileToString(emblem, '<p><span>This be some text</span><title>Basic HTML Sample Page</title></p>');
+});
+
+test("flatlina", function() {
+  var emblem;
+  emblem = "<p>\n<span>This be some text</span>\n<title>Basic HTML Sample Page</title>\n</p>";
+  return shouldCompileToString(emblem, '<p><span>This be some text</span><title>Basic HTML Sample Page</title></p>');
+});
+
+test("bigass", function() {
+  var emblem, expected;
+  emblem = "<div class=\"content\">\n  <p>\n    We design and develop ambitious web and mobile applications,\n  </p>\n  <p>\n    A more official portfolio page is on its way, but in the meantime,\n    check out\n  </p>\n</div>";
+  expected = '<div class="content"><p>We design and develop ambitious web and mobile applications, </p><p>A more official portfolio page is on its way, but in the meantime, check out </p></div>';
+  return shouldCompileToString(emblem, expected);
+});
+
 suite("misc.");
+
+test("end with indent", function() {
+  var emblem;
+  emblem = "div\n  p\n    span Butts\n      em fpokasd\n      iunw\n        paosdk";
+  return shouldCompileToString(emblem, '');
+});
 
 test("capitalized view helper should not kick in if suffix modifiers present", function() {
   var emblem;

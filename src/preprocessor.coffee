@@ -73,7 +73,7 @@ Emblem.Preprocessor = class Preprocessor
       switch @context.peek()
 
         # We're either in initial state, or inside one of these braces.
-        when null, INDENT #, '#{', '[', '(', '{'
+        when null, INDENT
 
           # Check if we're at the beginning of a line, or if we can
           # discard whitespace til a newline.
@@ -82,9 +82,6 @@ Emblem.Preprocessor = class Preprocessor
             # We're at the beginning of a line, 
             # take this opportunity to establish base
             # present indentation
-
-            # we might require more input to determine indentation
-            #return if not isEnd and (@ss.check /// [#{ws}\n]* $ ///)?
 
             # Check if we've established starting indentation yet. This is
             # a nice feature to have particularly for people using emblem
@@ -103,7 +100,7 @@ Emblem.Preprocessor = class Preprocessor
             if @indents.length == 0
               # Haven't established indentation yet. Check if
               # there's whitespace immediately followed by non-(whitespace/comment)
-              if newIndent = @discard /// [#{ws}]+ ///
+              if newIndent = @scan /// [#{ws}]+ ///
                 @indents.push newIndent
                 @context.observe INDENT
                 @p INDENT
@@ -112,10 +109,15 @@ Emblem.Preprocessor = class Preprocessor
               indent = @indents[@indents.length - 1]
 
               # Check for new indents 
-              if newIndent = @discard /// (#{indent} [#{ws}]+) ///
-                @indents.push newIndent
-                @context.observe INDENT
-                @p INDENT
+              if @discard /// (#{indent}) ///
+
+                if @ss.check /// ([#{ws}]+) ///
+                  # Indentation.
+                  @p INDENT
+                  @scan /// ([#{ws}]+) ///
+                  @context.observe INDENT
+                  @indents.push newIndent
+
               else
                 # We've dedented, walk back through indents.
                 while @indents.length
@@ -142,7 +144,7 @@ Emblem.Preprocessor = class Preprocessor
           else if @scan /\n/
             @p "#{TERM}" 
 
-          @discard any_whitespaceFollowedByNewlines_
+          #@discard any_whitespaceFollowedByNewlines_
 
     # Done scanning. Check if we're at the end of the file.
     if isEnd

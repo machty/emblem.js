@@ -80,7 +80,7 @@
 
 start = invertibleContent
 
-invertibleContent = c:content i:( DEDENT 'else' _ TERM INDENT c:content {return c;})?
+invertibleContent = c:content i:( DEDENT 'else' _ TERM indentation c:content {return c;})?
 { 
   return new AST.ProgramNode(c, i || []);
 }
@@ -149,7 +149,7 @@ mustache
 }
 
 comment 
-  = '/' lineContent TERM ( INDENT (lineContent TERM)+ DEDENT )? { return []; }
+  = '/' lineContent TERM ( indentation (lineContent TERM)+ DEDENT )? { return []; }
 
 lineStartingMustache 
   = capitalizedLineStarterMustache / mustacheMaybeBlock
@@ -180,7 +180,7 @@ capitalizedLineStarterMustache
 }
 
 htmlElementMaybeBlock 
-  = h:htmlTagAndOptionalAttributes _ TERM c:(INDENT content DEDENT)? 
+  = h:htmlTagAndOptionalAttributes _ TERM c:(indentation content DEDENT)? 
 { 
   var ret = h[0];
   if(c) {
@@ -196,7 +196,7 @@ htmlElementMaybeBlock
 }
 
 htmlElementWithInlineContent 
-  = h:htmlTagAndOptionalAttributes ' ' c:htmlInlineContent multilineContent:(INDENT textNodes+ DEDENT)?
+  = h:htmlTagAndOptionalAttributes ' ' c:htmlInlineContent multilineContent:(indentation textNodes+ DEDENT)?
 { 
   // h is [[open tag content], closing tag ContentNode]
   var ret = h[0];
@@ -225,7 +225,7 @@ htmlElementWithInlineContent
 
 mustacheMaybeBlock 
   = mustacheInlineBlock
-  / mustacheNode:inMustache _ TERM block:(INDENT invertibleContent DEDENT)? 
+  / mustacheNode:inMustache _ TERM block:(indentation invertibleContent DEDENT)? 
 { 
   if(!block) return mustacheNode;
   var programNode = block[1];
@@ -290,7 +290,6 @@ inMustache
   return mustacheNode;
 }
 
-// TODO: this
 modifiedParam = p:param m:trailingModifier
 { 
   var ret = new String(p);
@@ -374,7 +373,24 @@ htmlInlineContent
   = m:explicitMustache { return [m]; } 
   / t:textNodes
 
-textLine = ('|' ' '? / &'<') nodes:textNodes indentedNodes:(INDENT textNodes* DEDENT)?
+whitespaceableTextNodes
+ = textNodes
+ / 
+
+
+p aoisjdoasidmaG
+  oiajsdboib
+    oinojweir 
+        wowe
+       weorijer FUCK how do i handle this?
+
+p aoiasodijasid TERM
+INDENT  okaspodkaspo TERM
+INDENT  oinoeinad TERM
+INDENT    wowe TERM
+UNMATCHED_DEDENT
+
+textLine = ('|' ' '? / &'<') nodes:textNodes indentedNodes:(indentation textNodes* DEDENT)?
 { 
   if(indentedNodes) {
     indentedNodes = indentedNodes[1];
@@ -551,8 +567,12 @@ tagChar = [:_a-zA-Z0-9-]
 
 knownEvent "a JS event" = t:tagString &{ return !!KNOWN_EVENTS[t]; }  { return t; }
 
+indentation
+  = INDENT __ { return ''; } 
+
 INDENT "INDENT" = "\uEFEF" { return ''; }
 DEDENT "DEDENT" = "\uEFFE" { return ''; }
+UNMATCHED_DEDENT "Unmatched DEDENT" = "\uEFEE" { return ''; }
 TERM  "LineEnd" = "\n" "\uEFFF"
 
 __ "RequiredWhitespace"

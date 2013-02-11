@@ -4629,6 +4629,8 @@ Emblem.Preprocessor = Preprocessor = (function() {
       if (!isEnd) {
         this.ss.concat(data);
         this.discard(any_whitespaceFollowedByNewlines_);
+        "ALEX OK";
+
       }
       while (!this.ss.eos()) {
         switch (this.context.peek()) {
@@ -4644,17 +4646,20 @@ Emblem.Preprocessor = Preprocessor = (function() {
                 this.base = RegExp("" + b);
               }
               if (this.indents.length === 0) {
-                if (newIndent = this.discard(RegExp("[" + ws + "]+"))) {
+                if (newIndent = this.scan(RegExp("[" + ws + "]+"))) {
                   this.indents.push(newIndent);
                   this.context.observe(INDENT);
                   this.p(INDENT);
                 }
               } else {
                 indent = this.indents[this.indents.length - 1];
-                if (newIndent = this.discard(RegExp("(" + indent + "[" + ws + "]+)"))) {
-                  this.indents.push(newIndent);
-                  this.context.observe(INDENT);
-                  this.p(INDENT);
+                if (this.discard(RegExp("(" + indent + ")"))) {
+                  if (this.ss.check(RegExp("([" + ws + "]+)"))) {
+                    this.p(INDENT);
+                    this.scan(RegExp("([" + ws + "]+)"));
+                    this.context.observe(INDENT);
+                    this.indents.push(newIndent);
+                  }
                 } else {
                   while (this.indents.length) {
                     indent = this.indents[this.indents.length - 1];
@@ -4679,7 +4684,6 @@ Emblem.Preprocessor = Preprocessor = (function() {
             } else if (this.scan(/\n/)) {
               this.p("" + TERM);
             }
-            this.discard(any_whitespaceFollowedByNewlines_);
         }
       }
       if (isEnd) {

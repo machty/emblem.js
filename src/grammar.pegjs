@@ -374,7 +374,11 @@ htmlInlineContent
   = m:explicitMustache { return [m]; } 
   / t:textNodes
 
-textLine = ('|' ' '? / &'<') nodes:textNodes indentedNodes:(INDENT textNodes* DEDENT)?
+textLineStart 
+ = s:[|`] ' '?  { return s; }
+ / &'<' { return '<'; }
+
+textLine = s:textLineStart nodes:textNodes indentedNodes:(INDENT textNodes* DEDENT)?
 { 
   if(indentedNodes) {
     indentedNodes = indentedNodes[1];
@@ -382,6 +386,12 @@ textLine = ('|' ' '? / &'<') nodes:textNodes indentedNodes:(INDENT textNodes* DE
       nodes = nodes.concat(indentedNodes[i]);
     }
   }
+
+  if(s == '`') {
+    nodes.push(new AST.ContentNode("\n"));
+  }
+
+
   return nodes; 
 }
 

@@ -1130,6 +1130,20 @@ test "more complicated", ->
   """
   shouldCompileToString emblem, '<SomeView borf=yes>Hello, How are you? Sup?</SomeView>'
 
+suite "pre"
+
+test "works", ->
+  emblem =
+  """
+  pre
+    ` This
+    `   should
+    `  hopefully
+    `    work, and work well.
+
+  """
+  shouldCompileToString emblem, '<pre>This\n  should\n hopefully\n   work, and work well.\n</pre>'
+
 suite "misc."
 
 test "capitalized view helper should not kick in if suffix modifiers present", ->

@@ -1028,6 +1028,14 @@ test("more complicated", function() {
   return shouldCompileToString(emblem, '<SomeView borf=yes>Hello, How are you? Sup?</SomeView>');
 });
 
+suite("pre");
+
+test("works", function() {
+  var emblem;
+  emblem = "pre\n  ` This\n  `   should\n  `  hopefully\n  `    work, and work well.\n";
+  return shouldCompileToString(emblem, '<pre>This\n  should\n hopefully\n   work, and work well.\n</pre>');
+});
+
 suite("misc.");
 
 test("capitalized view helper should not kick in if suffix modifiers present", function() {

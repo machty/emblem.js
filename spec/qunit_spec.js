@@ -134,7 +134,7 @@ test("indentation doesn't need to match starting inline content's", function() {
 
 test("indentation may vary between parent/child, must be consistent within inline-block", function() {
   var emblem;
-  emblem = "div\n  span Hello, \n       How are you? \n       Excellent.";
+  emblem = "div\n  span Hello, \n       How are you? \n       Excellent.\n  p asd";
   shouldCompileTo(emblem, "<div><span>Hello, How are you? Excellent.</span></div>");
   emblem = "div\n  span Hello, \n       How are you? \n     Excellent.";
   return shouldThrow(function() {
@@ -1047,6 +1047,14 @@ test("bigass", function() {
   emblem = "<div class=\"content\">\n  <p>\n    We design and develop ambitious web and mobile applications,\n  </p>\n  <p>\n    A more official portfolio page is on its way, but in the meantime,\n    check out\n  </p>\n</div>";
   expected = '<div class="content"><p>We design and develop ambitious web and mobile applications, </p><p>A more official portfolio page is on its way, but in the meantime, check out </p></div>';
   return shouldCompileToString(emblem, expected);
+});
+
+suite("pre");
+
+test("works", function() {
+  var emblem;
+  emblem = "pre\n  ` This\n  `   should\n\n  `  hopefully\n  `    work, and work well.";
+  return shouldCompileToString(emblem, '<pre>This\n  should\n hopefully\n   work, and work well.\n</pre>');
 });
 
 suite("misc.");

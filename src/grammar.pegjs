@@ -95,6 +95,8 @@ content = statements:statement*
   for(var i = 0; i < statements.length; ++i) {
     var nodes = statements[i];
 
+    if(!nodes) { continue; }
+
     for(var j = 0; j < nodes.length; ++j) {
       var node = nodes[j]
       if(node.type === "content") {
@@ -124,12 +126,15 @@ content = statements:statement*
 // A statement is an array of nodes.
 // Often they're single-element arrays, but for things
 // like text lines, there might be multiple elements.
-statement
-  = comment
+statement "BeginStatement"
+  = blankLine
+  / comment
   / legacyPartialInvocation
   / htmlElement
   / textLine
   / mustache
+
+blankLine = _ TERM { return null; } 
 
 legacyPartialInvocation
   = '>' _ n:legacyPartialName _ p:path? _ TERM { return new AST.PartialNode(n, p); }
@@ -196,7 +201,7 @@ htmlElementMaybeBlock
 }
 
 htmlElementWithInlineContent 
-  = h:htmlTagAndOptionalAttributes ' ' c:htmlInlineContent multilineContent:(indentation textNodes+ DEDENT)?
+  = h:htmlTagAndOptionalAttributes ' ' c:htmlInlineContent multilineContent:(indentation whitespaceableTextNodes+ DEDENT)?
 { 
   // h is [[open tag content], closing tag ContentNode]
   var ret = h[0];
@@ -374,10 +379,11 @@ htmlInlineContent
   / t:textNodes
 
 whitespaceableTextNodes
- = textNodes
- / 
+ = i:indentation textNodes whitespaceableTextNodes (anyDedent)
+ / textNodes
 
 
+/*
 p aoisjdoasidmaG
   oiajsdboib
     oinojweir 
@@ -389,8 +395,18 @@ INDENT  okaspodkaspo TERM
 INDENT  oinoeinad TERM
 INDENT    wowe TERM
 UNMATCHED_DEDENT
+*/
 
-textLine = ('|' ' '? / &'<') nodes:textNodes indentedNodes:(indentation textNodes* DEDENT)?
+
+asshole "ASSHOLE"
+ = 'sdfgsdfgsdfgsdfg'
+
+
+textLineStart 
+ = s:[|`] ' '?  { return s; }
+ / &'<' { return '<'; }
+
+textLine = s:textLineStart nodes:textNodes indentedNodes:(indentation whitespaceableTextNodes* DEDENT)?
 { 
   if(indentedNodes) {
     indentedNodes = indentedNodes[1];
@@ -398,6 +414,12 @@ textLine = ('|' ' '? / &'<') nodes:textNodes indentedNodes:(indentation textNode
       nodes = nodes.concat(indentedNodes[i]);
     }
   }
+
+  if(s == '`') {
+    nodes.push(new AST.ContentNode("\n"));
+  }
+
+
   return nodes; 
 }
 
@@ -429,7 +451,7 @@ preMustacheText
   = a:preMustacheUnit+ { return new AST.ContentNode(a.join('')); }
 
 preMustacheUnit
-  = !(tripleOpen / doubleOpen / hashStacheOpen / DEDENT / TERM) c:. { return c; }
+  = !(tripleOpen / doubleOpen / hashStacheOpen / anyDedent / TERM) c:. { return c; }
 
 // Support for div#id.whatever{ bindAttr whatever="asd" }
 inTagMustache = rawMustacheSingle / rawMustacheUnescaped / rawMustacheEscaped
@@ -568,12 +590,14 @@ tagChar = [:_a-zA-Z0-9-]
 knownEvent "a JS event" = t:tagString &{ return !!KNOWN_EVENTS[t]; }  { return t; }
 
 indentation
-  = INDENT __ { return ''; } 
+  = INDENT s:__ { return s; } 
 
 INDENT "INDENT" = "\uEFEF" { return ''; }
 DEDENT "DEDENT" = "\uEFFE" { return ''; }
 UNMATCHED_DEDENT "Unmatched DEDENT" = "\uEFEE" { return ''; }
-TERM  "LineEnd" = "\n" "\uEFFF"
+TERM  "LineEnd" = "\uEFFF" "\n"
+
+anyDedent = (DEDENT / UNMATCHED_DEDENT)
 
 __ "RequiredWhitespace"
   = whitespace+

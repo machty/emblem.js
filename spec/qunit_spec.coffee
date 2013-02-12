@@ -133,6 +133,7 @@ test "indentation may vary between parent/child, must be consistent within inlin
     span Hello, 
          How are you? 
          Excellent.
+    p asd
   """
   shouldCompileTo emblem, "<div><span>Hello, How are you? Excellent.</span></div>"
 
@@ -217,7 +218,7 @@ test "can be escaped", ->
 
 suite "text lines"
 
-test "basic", -> shouldCompileTo("| What what", "What what")
+test "basic", -> shouldCompileTo "| What what", "What what"
 test "with html", -> 
   shouldCompileTo '| What <span id="woot" data-t="oof" class="f">what</span>!',
                     'What <span id="woot" data-t="oof" class="f">what</span>!'
@@ -1167,6 +1168,20 @@ test "bigass", ->
   """
   expected = '<div class="content"><p>We design and develop ambitious web and mobile applications, </p><p>A more official portfolio page is on its way, but in the meantime, check out </p></div>'
   shouldCompileToString emblem, expected
+
+suite "pre"
+
+test "works", ->
+  emblem =
+  """
+  pre
+    ` This
+    `   should
+
+    `  hopefully
+    `    work, and work well.
+  """
+  shouldCompileToString emblem, '<pre>This\n  should\n hopefully\n   work, and work well.\n</pre>'
 
 suite "misc."
 

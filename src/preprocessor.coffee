@@ -9,6 +9,9 @@ Emblem.Preprocessor = class Preprocessor
   INDENT = '\uEFEF'
   DEDENT = '\uEFFE'
   TERM   = '\uEFFF'
+  #INDENT = 'INDET'
+  #DEDENT = 'DED'
+  #TERM   = 'TER'
 
   # Convenience names for regex's
   anyWhitespaceAndNewlinesTouchingEOF = /// [#{ws}\n]* $ ///
@@ -100,10 +103,11 @@ Emblem.Preprocessor = class Preprocessor
             if @indents.length == 0
               # Haven't established indentation yet. Check if
               # there's whitespace immediately followed by non-(whitespace/comment)
-              if newIndent = @scan /// [#{ws}]+ ///
-                @indents.push newIndent
-                @context.observe INDENT
+              if @ss.check /// [#{ws}]+ ///
+
                 @p INDENT
+                @context.observe INDENT
+                @indents.push @scan /// [#{ws}]+ ///
             else
 
               indent = @indents[@indents.length - 1]
@@ -114,9 +118,8 @@ Emblem.Preprocessor = class Preprocessor
                 if @ss.check /// ([#{ws}]+) ///
                   # Indentation.
                   @p INDENT
-                  @scan /// ([#{ws}]+) ///
                   @context.observe INDENT
-                  @indents.push newIndent
+                  @indents.push @scan /// ([#{ws}]+) ///
 
               else
                 # We've dedented, walk back through indents.
@@ -141,8 +144,8 @@ Emblem.Preprocessor = class Preprocessor
 
           if tok = @discard /\//
             @context.observe tok 
-          else if @scan /\n/
-            @p "#{TERM}" 
+          else if @discard /\n/
+            @p "#{TERM}\n" 
 
           #@discard any_whitespaceFollowedByNewlines_
 

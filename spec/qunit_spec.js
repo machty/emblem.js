@@ -134,12 +134,18 @@ test("indentation doesn't need to match starting inline content's", function() {
 
 test("indentation may vary between parent/child, must be consistent within inline-block", function() {
   var emblem;
-  emblem = "div\n  span Hello, \n       How are you? \n       Excellent.\n  p asd";
-  shouldCompileTo(emblem, "<div><span>Hello, How are you? Excellent.</span></div>");
+  emblem = "div\n      span Hello, \n           How are you? \n           Excellent.\n      p asd";
+  shouldCompileTo(emblem, "<div><span>Hello, How are you? Excellent.</span><p>asd</p></div>");
   emblem = "div\n  span Hello, \n       How are you? \n     Excellent.";
   return shouldThrow(function() {
     return CompilerContext.compile(emblem);
   });
+});
+
+test("indentation may vary between parent/child, must be consistent within inline-block pt 2", function() {
+  var emblem;
+  emblem = "div\n  span Hello, \n       How are you? \n       Excellent.";
+  return shouldCompileTo(emblem, "<div><span>Hello, How are you? Excellent.</span></div>");
 });
 
 test("w/ mustaches", function() {
@@ -317,6 +323,30 @@ test("mix and match with various indentation", function() {
   var emblem;
   emblem = "/ A test\np Hello\n\nspan\n  / This is gnarly\n  p Yessir nope.\n\n/ Nothin but comments\n  so many comments.\n\n/\n  p Should not show up";
   return shouldCompileTo(emblem, "<p>Hello</p><span><p>Yessir nope.</p></span>");
+});
+
+test("uneven indentation", function() {
+  var emblem;
+  emblem = "/ nop\n  nope\n    nope";
+  return shouldCompileTo(emblem, "");
+});
+
+test("uneven indentation 2", function() {
+  var emblem;
+  emblem = "/ n\n  no\n    nop\n   nope";
+  return shouldCompileTo(emblem, "");
+});
+
+test("uneven indentation 3", function() {
+  var emblem;
+  emblem = "/ n\n  no\n    nop\n  nope";
+  return shouldCompileTo(emblem, "");
+});
+
+test("empty first line", function() {
+  var emblem;
+  emblem = "/ \n  nop\n  nope\n    nope\n  no";
+  return shouldCompileTo(emblem, "");
 });
 
 suite("indentation");
@@ -826,14 +856,6 @@ test("line number is provided for pegjs error", function() {
   }), "line 2");
 });
 
-test("line number is provided for preprocessor error", function() {
-  var emblem;
-  emblem = "p\n  span Hello\n nope";
-  return shouldThrow((function() {
-    return CompilerContext.compile(emblem);
-  }), /line 3.*indentation/);
-});
-
 test("single quote test", function() {
   var emblem;
   emblem = "button click='p' Frank\n      \n/ form s='d target=\"App\"'\n  label I'm a label!";
@@ -1044,17 +1066,23 @@ test("flatlina", function() {
 
 test("bigass", function() {
   var emblem, expected;
-  emblem = "<div class=\"content\">\n  <p>\n    We design and develop ambitious web and mobile applications,\n  </p>\n  <p>\n    A more official portfolio page is on its way, but in the meantime,\n    check out\n  </p>\n</div>";
-  expected = '<div class="content"><p>We design and develop ambitious web and mobile applications, </p><p>A more official portfolio page is on its way, but in the meantime, check out </p></div>';
+  emblem = "<div class=\"content\">\n  <p>\n    We design and develop ambitious web and mobile applications, \n  </p>\n  <p>\n    A more official portfolio page is on its way, but in the meantime, \n    check out\n  </p>\n</div>";
+  expected = '<div class="content"><p>  We design and develop ambitious web and mobile applications, </p><p>  A more official portfolio page is on its way, but in the meantime, check out</p></div>';
   return shouldCompileToString(emblem, expected);
 });
 
 suite("pre");
 
-test("works", function() {
+test("backtick on each line", function() {
   var emblem;
-  emblem = "pre\n  ` This\n  `   should\n\n  `  hopefully\n  `    work, and work well.";
+  emblem = "pre\n  ` This\n  `   should\n  `  hopefully\n  `    work, and work well.";
   return shouldCompileToString(emblem, '<pre>This\n  should\n hopefully\n   work, and work well.\n</pre>');
+});
+
+test("backtick on each line", function() {
+  var emblem;
+  emblem = "pre\n  ` This\n  `   should\n  `\n  `  hopefully\n  `    work, and work well.";
+  return shouldCompileToString(emblem, '<pre>This\n  should\n\n hopefully\n   work, and work well.\n</pre>');
 });
 
 suite("misc.");
@@ -1062,7 +1090,7 @@ suite("misc.");
 test("end with indent", function() {
   var emblem;
   emblem = "div\n  p\n    span Butts\n      em fpokasd\n      iunw\n        paosdk";
-  return shouldCompileToString(emblem, '');
+  return shouldCompileToString(emblem, '<div><p><span>Buttsem fpokasdiunw  paosdk</span></p></div>');
 });
 
 test("capitalized view helper should not kick in if suffix modifiers present", function() {

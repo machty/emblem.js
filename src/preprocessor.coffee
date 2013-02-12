@@ -1,17 +1,13 @@
 StringScanner = require 'StringScanner'
 Emblem = require './emblem'
 
-#inspect = (o) -> (require 'util').inspect o, no, 9e9, yes
-
 Emblem.Preprocessor = class Preprocessor
 
   ws = '\\t\\x0B\\f \\xA0\\u1680\\u180E\\u2000-\\u200A\\u202F\\u205F\\u3000\\uFEFF'
   INDENT = '\uEFEF'
   DEDENT = '\uEFFE'
+  UNMATCHED_DEDENT = '\uEFEE'
   TERM   = '\uEFFF'
-  #INDENT = 'INDET'
-  #DEDENT = 'DED'
-  #TERM   = 'TER'
 
   # Convenience names for regex's
   anyWhitespaceAndNewlinesTouchingEOF = /// [#{ws}\n]* $ ///
@@ -104,22 +100,23 @@ Emblem.Preprocessor = class Preprocessor
               # Haven't established indentation yet. Check if
               # there's whitespace immediately followed by non-(whitespace/comment)
               if @ss.check /// [#{ws}]+ ///
-
                 @p INDENT
                 @context.observe INDENT
-                @indents.push @scan /// [#{ws}]+ ///
+                @indents.push @scan /// ([#{ws}]+) ///
             else
 
               indent = @indents[@indents.length - 1]
 
               # Check for new indents 
-              if @discard /// (#{indent}) ///
+              if d = @ss.check /// (#{indent}) ///
+
+                @discard d
 
                 if @ss.check /// ([#{ws}]+) ///
                   # Indentation.
                   @p INDENT
                   @context.observe INDENT
-                  @indents.push @scan /// ([#{ws}]+) ///
+                  @indents.push d + @scan /// ([#{ws}]+) ///
 
               else
                 # We've dedented, walk back through indents.
@@ -133,21 +130,21 @@ Emblem.Preprocessor = class Preprocessor
 
                   @indents.pop()
 
-                # Make sure there's no ws
-                if @ss.check /// [#{ws}]+ ///
-                  lines = @ss.str.substr(0, @ss.pos).split(/\n/) || ['']
-                  message = "Invalid indentation"
-                  Emblem.throwCompileError lines.length, message
+                # Check for invalid dedent.
+                if s = @discard /// [#{ws}]+ ///
+
+                  @output = @output.slice(0,-1)
+                  @output += UNMATCHED_DEDENT
+
+                  @p INDENT
+                  @context.observe INDENT
+                  @indents.push s
 
           # scan safe characters (anything that doesn't *introduce* context)
           @scan /[^\n\\]+/
 
-          if tok = @discard /\//
-            @context.observe tok 
-          else if @discard /\n/
+          if @discard /\n/
             @p "#{TERM}\n" 
-
-          #@discard any_whitespaceFollowedByNewlines_
 
     # Done scanning. Check if we're at the end of the file.
     if isEnd

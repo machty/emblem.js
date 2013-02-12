@@ -95,8 +95,6 @@ content = statements:statement*
   for(var i = 0; i < statements.length; ++i) {
     var nodes = statements[i];
 
-    if(!nodes) { continue; }
-
     for(var j = 0; j < nodes.length; ++j) {
       var node = nodes[j]
       if(node.type === "content") {
@@ -134,7 +132,7 @@ statement "BeginStatement"
   / textLine
   / mustache
 
-blankLine = _ TERM { return null; } 
+blankLine = _ TERM { return []; } 
 
 legacyPartialInvocation
   = '>' _ n:legacyPartialName _ p:path? _ TERM { return new AST.PartialNode(n, p); }
@@ -153,8 +151,11 @@ mustache
   return [m]; 
 }
 
+commentContent
+ = lineContent TERM ( indentation (commentContent)+ DEDENT )? { return []; }
+
 comment 
-  = '/' lineContent TERM ( indentation (lineContent TERM)+ DEDENT )? { return []; }
+  = '/' commentContent
 
 lineStartingMustache 
   = capitalizedLineStarterMustache / mustacheMaybeBlock
@@ -379,28 +380,15 @@ htmlInlineContent
   / t:textNodes
 
 whitespaceableTextNodes
- = i:indentation textNodes whitespaceableTextNodes (anyDedent)
+ = ind:indentation nodes:textNodes w:whitespaceableTextNodes* anyDedent
+{
+  for(var i = 0; i < w.length; ++i) {
+    nodes = nodes.concat(w[i]);
+  }
+  nodes.unshift(new AST.ContentNode(ind));
+  return nodes; 
+}
  / textNodes
-
-
-/*
-p aoisjdoasidmaG
-  oiajsdboib
-    oinojweir 
-        wowe
-       weorijer FUCK how do i handle this?
-
-p aoiasodijasid TERM
-INDENT  okaspodkaspo TERM
-INDENT  oinoeinad TERM
-INDENT    wowe TERM
-UNMATCHED_DEDENT
-*/
-
-
-asshole "ASSHOLE"
- = 'sdfgsdfgsdfgsdfg'
-
 
 textLineStart 
  = s:[|`] ' '?  { return s; }
@@ -560,8 +548,6 @@ normalAttribute
 
 attributeName = $attributeChar*
 attributeValue = string / param 
-
-
 attributeChar = alpha / [0-9] /'_' / '-'
 
 tagNameShorthand = '%' c:cssIdentifier { return c; }
@@ -600,7 +586,7 @@ TERM  "LineEnd" = "\uEFFF" "\n"
 anyDedent = (DEDENT / UNMATCHED_DEDENT)
 
 __ "RequiredWhitespace"
-  = whitespace+
+  = $whitespace+
 
 _ "OptionalWhitespace"
   = whitespace*

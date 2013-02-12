@@ -130,12 +130,12 @@ test "indentation may vary between parent/child, must be consistent within inlin
   emblem =
   """
   div
-    span Hello, 
-         How are you? 
-         Excellent.
-    p asd
+        span Hello, 
+             How are you? 
+             Excellent.
+        p asd
   """
-  shouldCompileTo emblem, "<div><span>Hello, How are you? Excellent.</span></div>"
+  shouldCompileTo emblem, "<div><span>Hello, How are you? Excellent.</span><p>asd</p></div>"
 
   emblem =
   """
@@ -145,6 +145,17 @@ test "indentation may vary between parent/child, must be consistent within inlin
        Excellent.
   """
   shouldThrow -> CompilerContext.compile emblem
+
+test "indentation may vary between parent/child, must be consistent within inline-block pt 2", ->
+  emblem =
+  """
+  div
+    span Hello, 
+         How are you? 
+         Excellent.
+  """
+  shouldCompileTo emblem, "<div><span>Hello, How are you? Excellent.</span></div>"
+
 
 test "w/ mustaches", ->
   emblem =
@@ -371,6 +382,45 @@ test "mix and match with various indentation", ->
   """
   shouldCompileTo emblem, "<p>Hello</p><span><p>Yessir nope.</p></span>"
 
+test "uneven indentation", ->
+  emblem =
+  """
+  / nop
+    nope
+      nope
+  """
+  shouldCompileTo emblem, ""
+
+test "uneven indentation 2", ->
+  emblem =
+  """
+  / n
+    no
+      nop
+     nope
+  """
+  shouldCompileTo emblem, ""
+
+test "uneven indentation 3", ->
+  emblem =
+  """
+  / n
+    no
+      nop
+    nope
+  """
+  shouldCompileTo emblem, ""
+
+test "empty first line", ->
+  emblem =
+  """
+  / 
+    nop
+    nope
+      nope
+    no
+  """
+  shouldCompileTo emblem, ""
 
 suite "indentation"
 
@@ -903,15 +953,6 @@ test "line number is provided for pegjs error", ->
   """
   shouldThrow (-> CompilerContext.compile emblem), "line 2"
 
-test "line number is provided for preprocessor error", ->
-  emblem =
-  """
-  p
-    span Hello
-   nope
-  """
-  shouldThrow (-> CompilerContext.compile emblem), /line 3.*indentation/
-
 # https://github.com/machty/emblem.js/issues/6
 test "single quote test", ->
   emblem =
@@ -1158,30 +1199,41 @@ test "bigass", ->
   """
   <div class="content">
     <p>
-      We design and develop ambitious web and mobile applications,
+      We design and develop ambitious web and mobile applications, 
     </p>
     <p>
-      A more official portfolio page is on its way, but in the meantime,
+      A more official portfolio page is on its way, but in the meantime, 
       check out
     </p>
   </div>
   """
-  expected = '<div class="content"><p>We design and develop ambitious web and mobile applications, </p><p>A more official portfolio page is on its way, but in the meantime, check out </p></div>'
+  expected = '<div class="content"><p>  We design and develop ambitious web and mobile applications, </p><p>  A more official portfolio page is on its way, but in the meantime, check out</p></div>'
   shouldCompileToString emblem, expected
 
 suite "pre"
 
-test "works", ->
+test "backtick on each line", ->
   emblem =
   """
   pre
     ` This
     `   should
-
     `  hopefully
     `    work, and work well.
   """
   shouldCompileToString emblem, '<pre>This\n  should\n hopefully\n   work, and work well.\n</pre>'
+
+test "backtick on each line", ->
+  emblem =
+  """
+  pre
+    ` This
+    `   should
+    `
+    `  hopefully
+    `    work, and work well.
+  """
+  shouldCompileToString emblem, '<pre>This\n  should\n\n hopefully\n   work, and work well.\n</pre>'
 
 suite "misc."
 
@@ -1195,7 +1247,7 @@ test "end with indent", ->
         iunw
           paosdk
   """
-  shouldCompileToString emblem, ''
+  shouldCompileToString emblem, '<div><p><span>Buttsem fpokasdiunw  paosdk</span></p></div>'
 
 test "capitalized view helper should not kick in if suffix modifiers present", ->
   emblem =

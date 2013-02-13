@@ -45,14 +45,17 @@ Ember.onLoad('application', Emblem.compileScriptTags);
 If you're using Rails, you have two options to choose from:
 
 1. [Alex Speller's `emblem-rails` gem](https://github.com/alexspeller/emblem-rails)
-1. [My fork of `emblem-rails`\*](https://github.com/machty/ember-rails)
+1. [My fork of `emblem-rails`](https://github.com/machty/ember-rails)
 
-\* You must also added https://github.com/machty/barber-emblem.git to
-your gemfile until the next barber version is pushed
+**Note: stay on the safe side and add the follow to your Gemfile**
 
-The first one contains only code for integrating Emblem with Rails, and
-the second one contains all of `ember-rails` (generators, Handlebars
-support, etc.). Use whichever seems most appropriate.
+```
+gem "barber", "~> 0.2.1"
+```
+
+`emblem-rails` contains only code for integrating Emblem with Rails, 
+while `emblem-rails` contains all of `ember-rails` (generators, Handlebars
+support, etc.) in addition to support for Emblem. Use whichever seems most appropriate to your needs.
 
 Also check out the [demo](https://github.com/machty/ember-rails), 
 which uses the second option above.

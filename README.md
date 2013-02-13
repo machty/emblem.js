@@ -45,7 +45,7 @@ Ember.onLoad('application', Emblem.compileScriptTags);
 If you're using Rails, you have two options to choose from:
 
 1. [Alex Speller's `emblem-rails` gem](https://github.com/alexspeller/emblem-rails)
-1. [My fork of `emblem-rails`](https://github.com/machty/ember-rails)
+1. [My fork of `ember-rails`](https://github.com/machty/ember-rails)
 
 **Note: stay on the safe side and add the follow to your Gemfile**
 

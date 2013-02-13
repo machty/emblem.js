@@ -54,7 +54,7 @@ gem "barber-emblem", "~> 0.0.2"
 ```
 
 `emblem-rails` contains only code for integrating Emblem with Rails, 
-while `emblem-rails` contains all of `ember-rails` (generators, Handlebars
+while my `ember-rails` fork contains all of `ember-rails` (generators, Handlebars
 support, etc.) in addition to support for Emblem. Use whichever seems most appropriate to your needs.
 
 Also check out the [demo](https://github.com/machty/ember-rails), 

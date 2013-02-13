@@ -50,7 +50,7 @@ If you're using Rails, you have two options to choose from:
 **Note: stay on the safe side and add the follow to your Gemfile**
 
 ```
-gem "barber", "~> 0.2.1"
+gem "barber-emblem", "~> 0.0.2"
 ```
 
 `emblem-rails` contains only code for integrating Emblem with Rails, 

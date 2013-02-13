@@ -152,10 +152,10 @@ mustache
 }
 
 commentContent
- = lineContent TERM ( indentation (commentContent)+ DEDENT )? { return []; }
+ = lineContent TERM ( indentation (commentContent)+ anyDedent)* { return []; }
 
 comment 
-  = '/' commentContent
+  = '/' commentContent { return []; }
 
 lineStartingMustache 
   = capitalizedLineStarterMustache / mustacheMaybeBlock
@@ -382,10 +382,13 @@ htmlInlineContent
 whitespaceableTextNodes
  = ind:indentation nodes:textNodes w:whitespaceableTextNodes* anyDedent
 {
-  for(var i = 0; i < w.length; ++i) {
-    nodes = nodes.concat(w[i]);
-  }
   nodes.unshift(new AST.ContentNode(ind));
+
+  for(var i = 0; i < w.length; ++i) {
+    nodes.push(new AST.ContentNode(ind));
+    nodes = nodes.concat(w[i]);
+    nodes.push("\n");
+  }
   return nodes; 
 }
  / textNodes
@@ -396,19 +399,33 @@ textLineStart
 
 textLine = s:textLineStart nodes:textNodes indentedNodes:(indentation whitespaceableTextNodes* DEDENT)?
 { 
+  if(nodes.length || !indentedNodes) {
+    nodes.push("\n");
+  }
+
   if(indentedNodes) {
     indentedNodes = indentedNodes[1];
     for(var i = 0; i < indentedNodes.length; ++i) {
+      /*nodes.push(new AST.ContentNode("#"));*/
       nodes = nodes.concat(indentedNodes[i]);
+      nodes.push("\n");
     }
   }
 
-  if(s == '`') {
-    nodes.push(new AST.ContentNode("\n"));
+  var ret = [];
+  var strip = s !== '`';
+  for(var i = 0; i < nodes.length; ++i) {
+    var node = nodes[i];
+    if(node == "\n") {
+      if(!strip) {
+        ret.push(new AST.ContentNode("\n"));
+      }
+    } else {
+      ret.push(node);
+    }
   }
 
-
-  return nodes; 
+  return ret;
 }
 
 textNodes = first:preMustacheText? tail:(rawMustache preMustacheText?)* TERM
@@ -583,7 +600,7 @@ DEDENT "DEDENT" = "\uEFFE" { return ''; }
 UNMATCHED_DEDENT "Unmatched DEDENT" = "\uEFEE" { return ''; }
 TERM  "LineEnd" = "\uEFFF" "\n"
 
-anyDedent = (DEDENT / UNMATCHED_DEDENT)
+anyDedent "ANYDEDENT" = (DEDENT / UNMATCHED_DEDENT)
 
 __ "RequiredWhitespace"
   = $whitespace+

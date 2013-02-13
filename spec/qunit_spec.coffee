@@ -227,64 +227,180 @@ test "can be escaped", ->
   shouldCompileTo emblem, '<span>#{yes}</span>'
 ###
 
-suite "text lines"
+runTextLineSuite = (ch) ->
 
-test "basic", -> shouldCompileTo "| What what", "What what"
-test "with html", -> 
-  shouldCompileTo '| What <span id="woot" data-t="oof" class="f">what</span>!',
-                    'What <span id="woot" data-t="oof" class="f">what</span>!'
+  sct = (emblem, obj, expected) ->
+    unless expected?
+      expected = obj
+      obj = {}
 
-test "multiline", ->
-  emblem =
-  """
-  | Blork
-    Snork
-  """
-  shouldCompileTo emblem, "BlorkSnork"
+    if ch == '|'
+      expected = expected.replace /\n/g, ""
+    emblem = emblem.replace /_/g, ch
 
-test "triple multiline", ->
-  emblem =
-  """
-  | Blork
-    Snork
-    Bork
-  """
-  shouldCompileTo emblem, "BlorkSnorkBork"
+    shouldCompileTo emblem, obj, expected
 
 
-test "multiline w/ trailing whitespace", ->
-  emblem =
-  """
-  | Blork 
-    Snork
-  """
-  shouldCompileTo emblem, "Blork Snork"
+  suite "text lines starting with '#{ch}'"
 
-test "multiline with empty first line", ->
-  emblem =
-  """
-  | 
-    Good
-  """
-  shouldCompileTo emblem, "Good"
+  test "basic", -> sct "_ What what", "What what\n"
+  test "with html", -> 
+    sct '_ What <span id="woot" data-t="oof" class="f">what</span>!',
+                      'What <span id="woot" data-t="oof" class="f">what</span>!\n'
 
-test "with a mustache", ->
-  emblem =
-  """
-  | Bork {{foo}}!
-  """
-  shouldCompileTo emblem, 
-    { foo: "YEAH" },
-    'Bork YEAH!'
+  test "multiline", ->
+    emblem =
+    """
+    _ Blork
+      Snork
+    """
+    sct emblem, "Blork\nSnork\n"
 
-test "with mustaches", ->
-  emblem =
-  """
-  | Bork {{foo}} {{{bar}}}!
-  """
-  shouldCompileTo emblem, 
-    { foo: "YEAH", bar: "<span>NO</span>"},
-    'Bork YEAH <span>NO</span>!'
+  test "triple multiline", ->
+    emblem =
+    """
+    _ Blork
+      Snork
+      Bork
+    """
+    sct emblem, "Blork\nSnork\nBork\n"
+
+  test "quadruple multiline", ->
+    emblem =
+    """
+    _ Blork
+      Snork
+      Bork
+      Fork
+    """
+    sct emblem, "Blork\nSnork\nBork\nFork\n"
+
+  test "multiline w/ trailing whitespace", ->
+    emblem =
+    """
+    _ Blork 
+      Snork
+    """
+    sct emblem, "Blork \nSnork\n"
+
+  test "secondline", ->
+    emblem =
+    """
+    _
+      Good
+    """
+    sct emblem, "Good\n"
+
+  test "secondline multiline", ->
+    emblem =
+    """
+    _ 
+      Good
+      Bork
+    """
+    sct emblem, "Good\nBork\n"
+
+  test "with a mustache", ->
+    emblem =
+    """
+    _ Bork {{foo}}!
+    """
+    sct emblem, 
+      { foo: "YEAH" },
+      'Bork YEAH!\n'
+
+  test "with mustaches", ->
+    emblem =
+    """
+    _ Bork {{foo}} {{{bar}}}!
+    """
+    sct emblem, 
+      { foo: "YEAH", bar: "<span>NO</span>"},
+      'Bork YEAH <span>NO</span>!\n'
+
+  test "indented, then in a row", ->
+    emblem =
+    """
+    _ 
+      Good
+        riddance2
+        dude
+        gnar
+        foo
+    """
+    sct emblem, "Good\n  riddance2\n  dude\n  gnar\n  foo\n"
+
+  test "indented, then in a row, then indented", ->
+    emblem =
+    """
+    _ 
+      Good
+        riddance2
+        dude
+        gnar
+          foo
+          far
+          faz
+    """
+    sct emblem, "Good\n  riddance2\n  dude\n  gnar\n    foo\n    far\n    faz\n"
+
+
+
+  test "uneven indentation megatest", ->
+    emblem =
+    """
+    _ 
+      Good
+        riddance
+      dude
+    """
+    sct emblem, "Good\n  riddance\ndude\n"
+
+    emblem =
+    """
+    _ 
+      Good
+       riddance3
+        dude
+    """
+    sct emblem, "Good\n riddance3\n  dude\n"
+
+    emblem =
+    """
+    _ Good
+      riddance
+       dude
+    """
+    sct emblem, "Good\nriddance\n dude\n"
+
+  test "on each line", ->
+    emblem =
+    """
+    pre
+      _ This
+      _   should
+      _  hopefully
+      _    work, and work well.
+    """
+    sct emblem, '<pre>This\n  should\n hopefully\n   work, and work well.\n</pre>'
+
+  test "with blank", ->
+    emblem =
+    """
+    pre
+      _ This
+      _   should
+      _
+      _  hopefully
+      _    work, and work well.
+    """
+    sct emblem, '<pre>This\n  should\n\n hopefully\n   work, and work well.\n</pre>'
+
+
+runTextLineSuite '|'
+runTextLineSuite '`'
+
+suite "text line starting with angle bracket"
 
 test "can start with angle bracket html", ->
   emblem =
@@ -397,7 +513,7 @@ test "uneven indentation 2", ->
   / n
     no
       nop
-     nope
+    nope
   """
   shouldCompileTo emblem, ""
 
@@ -410,6 +526,7 @@ test "uneven indentation 3", ->
     nope
   """
   shouldCompileTo emblem, ""
+
 
 test "empty first line", ->
   emblem =
@@ -1209,31 +1326,6 @@ test "bigass", ->
   """
   expected = '<div class="content"><p>  We design and develop ambitious web and mobile applications, </p><p>  A more official portfolio page is on its way, but in the meantime, check out</p></div>'
   shouldCompileToString emblem, expected
-
-suite "pre"
-
-test "backtick on each line", ->
-  emblem =
-  """
-  pre
-    ` This
-    `   should
-    `  hopefully
-    `    work, and work well.
-  """
-  shouldCompileToString emblem, '<pre>This\n  should\n hopefully\n   work, and work well.\n</pre>'
-
-test "backtick on each line", ->
-  emblem =
-  """
-  pre
-    ` This
-    `   should
-    `
-    `  hopefully
-    `    work, and work well.
-  """
-  shouldCompileToString emblem, '<pre>This\n  should\n\n hopefully\n   work, and work well.\n</pre>'
 
 suite "misc."
 

@@ -79,8 +79,11 @@ Emblem.Preprocessor = class Preprocessor
           if @ss.bol() or @discard any_whitespaceFollowedByNewlines_
 
             # We're at the beginning of a line, 
-            # take this opportunity to establish base
-            # present indentation
+
+            # Check for empty line.
+            if @discard /// [#{ws}]*\n ///
+              @p "#{TERM}\n" 
+              continue
 
             # Check if we've established starting indentation yet. This is
             # a nice feature to have particularly for people using emblem

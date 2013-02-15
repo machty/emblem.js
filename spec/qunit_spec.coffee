@@ -1371,7 +1371,6 @@ test "w/ blank whitespaced lines", ->
   emblem = "  p Hello\n"
   emblem += "  p\n"
   emblem += "\n"
-  emblem += "                \n"
   emblem += "    | Woot\n"
   emblem += "        \n"
   emblem += "       \n"

@@ -4889,6 +4889,10 @@ Emblem.Preprocessor = Preprocessor = (function() {
           case null:
           case INDENT:
             if (this.ss.bol() || this.discard(any_whitespaceFollowedByNewlines_)) {
+              if (this.discard(RegExp("[" + ws + "]*\\n"))) {
+                this.p("" + TERM + "\n");
+                continue;
+              }
               if (this.base != null) {
                 if ((this.discard(this.base)) == null) {
                   throw new Error("inconsistent base indentation");

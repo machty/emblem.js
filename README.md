@@ -42,23 +42,18 @@ Ember.onLoad('application', Emblem.compileScriptTags);
 
 ### Via Rails 3.1+
 
-If you're using Rails, you have two options to choose from:
-
-1. [Alex Speller's `emblem-rails` gem](https://github.com/alexspeller/emblem-rails)
-1. [My fork of `ember-rails`](https://github.com/machty/ember-rails)
-
-**Note: stay on the safe side and add the follow to your Gemfile**
+Add the following to your Gemfile:
 
 ```
-gem "barber-emblem", "~> 0.0.2"
+gem 'ember-rails', github: "emberjs/ember-rails"
+gem 'emblem-rails'
 ```
 
-`emblem-rails` contains only code for integrating Emblem with Rails, 
-while my `ember-rails` fork contains all of `ember-rails` (generators, Handlebars
-support, etc.) in addition to support for Emblem. Use whichever seems most appropriate to your needs.
+With these two gems, any templates ending in `.emblem` will be 
+(pre)compiled with Emblem.js.
 
-Also check out the [demo](https://github.com/machty/ember-rails), 
-which uses the second option above.
+Also, check out the [demo app](https://github.com/machty/emblem-rails-demo)
+which uses the above configuration.
 
 ### Via Rake Pipeline
 
@@ -66,8 +61,7 @@ Coming extremely soon.
 
 ### All Emblem Plugins
 
-1. [Alex Speller's `emblem-rails` gem](https://github.com/alexspeller/emblem-rails)
-1. [ember-rails](https://github.com/machty/ember-rails)
+1. [emblem-rails](https://github.com/alexspeller/emblem-rails)
 1. [barber-emblem](https://github.com/machty/barber-emblem), a
    Precompilation library for Ruby (used in `ember-rails`)
 1. [emblem-brunch](https://github.com/machty/emblem-brunch), Emblem

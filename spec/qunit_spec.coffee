@@ -1327,6 +1327,59 @@ test "bigass", ->
   expected = '<div class="content"><p>  We design and develop ambitious web and mobile applications, </p><p>  A more official portfolio page is on its way, but in the meantime, check out</p></div>'
   shouldCompileToString emblem, expected
 
+suite "base indent / predent"
+
+test "predent", ->
+  emblem = "        \n"
+  s = 
+  """
+  pre
+    ` This
+    `   should
+    `  hopefully
+    `    work, and work well.
+
+  """
+  emblem += s
+  shouldCompileToString emblem, '<pre>This\n  should\n hopefully\n   work, and work well.\n</pre>'
+
+test "mixture", ->
+  emblem =  "        \n"
+  emblem += "  p Hello\n"
+  emblem += "  p\n"
+  emblem += "    | Woot\n"
+  emblem += "  span yes\n"
+  shouldCompileToString emblem, '<p>Hello</p><p>Woot</p><span>yes</span>'
+
+test "mixture w/o opening blank", ->
+  emblem = "  p Hello\n"
+  emblem += "  p\n"
+  emblem += "    | Woot\n"
+  emblem += "  span yes\n"
+  shouldCompileToString emblem, '<p>Hello</p><p>Woot</p><span>yes</span>'
+
+test "w/ blank lines", ->
+  emblem = "  p Hello\n"
+  emblem += "  p\n"
+  emblem += "\n"
+  emblem += "    | Woot\n"
+  emblem += "\n"
+  emblem += "  span yes\n"
+  shouldCompileToString emblem, '<p>Hello</p><p>Woot</p><span>yes</span>'
+
+test "w/ blank whitespaced lines", ->
+  emblem = "  p Hello\n"
+  emblem += "  p\n"
+  emblem += "\n"
+  emblem += "                \n"
+  emblem += "    | Woot\n"
+  emblem += "        \n"
+  emblem += "       \n"
+  emblem += "         \n"
+  emblem += "\n"
+  emblem += "  span yes\n"
+  shouldCompileToString emblem, '<p>Hello</p><p>Woot</p><span>yes</span>'
+
 suite "misc."
 
 test "end with indent", ->

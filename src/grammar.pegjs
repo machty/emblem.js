@@ -202,7 +202,7 @@ htmlElementMaybeBlock
 }
 
 htmlElementWithInlineContent 
-  = h:htmlTagAndOptionalAttributes ' ' c:htmlInlineContent multilineContent:(indentation whitespaceableTextNodes+ DEDENT)?
+  = h:htmlTagAndOptionalAttributes (' ' / &'=' ) c:htmlInlineContent multilineContent:(indentation whitespaceableTextNodes+ DEDENT)?
 { 
   // h is [[open tag content], closing tag ContentNode]
   var ret = h[0];
@@ -376,7 +376,7 @@ alpha = [A-Za-z]
 
 // returns an array of nodes.
 htmlInlineContent 
-  = m:explicitMustache { return [m]; } 
+  = _ m:explicitMustache { return [m]; } 
   / t:textNodes
 
 whitespaceableTextNodes
@@ -586,7 +586,7 @@ htmlTagName "KnownHTMLTagName"
   = '%' s:tagString { return s; }
   / knownTagName
 
-knownTagName = t:tagString &{ return !!KNOWN_TAGS[t]; }  { return t; }
+knownTagName = t:tagString &{ handlebarsVariant.log(9, "SHITSHIT: " + t);  return !!KNOWN_TAGS[t]; }  { return t; }
 
 tagChar = [:_a-zA-Z0-9-]
 

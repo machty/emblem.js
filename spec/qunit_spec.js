@@ -1195,6 +1195,30 @@ test("capitalized view helper should not kick in if suffix modifiers present", f
   return shouldCompileToString(emblem, '<unbound class="Foo">Foo</unbound>');
 });
 
+test("GH-26: no need for space before equal sign", function() {
+  var emblem;
+  emblem = "span= foo";
+  shouldCompileToString(emblem, {
+    foo: "YEAH"
+  }, '<span>YEAH</span>');
+  emblem = "span.foo= foo";
+  shouldCompileToString(emblem, {
+    foo: "YEAH"
+  }, '<span class="foo">YEAH</span>');
+  emblem = "span#hooray.foo= foo";
+  shouldCompileToString(emblem, {
+    foo: "YEAH"
+  }, '<span id="hooray" class="foo">YEAH</span>');
+  emblem = "#hooray= foo";
+  shouldCompileToString(emblem, {
+    foo: "YEAH"
+  }, '<div id="hooray">YEAH</div>');
+  emblem = ".hooray= foo";
+  return shouldCompileToString(emblem, {
+    foo: "YEAH"
+  }, '<div class="hooray">YEAH</div>');
+});
+
 test("Emblem has a VERSION defined", function() {
   return ok(Emblem.VERSION, "Emblem.VERSION should be defined");
 });

@@ -1368,7 +1368,7 @@ test "w/ blank lines", ->
   shouldCompileToString emblem, '<p>Hello</p><p>Woot</p><span>yes</span>'
 
 test "w/ blank whitespaced lines", ->
-  emblem = "  p Hello\n"
+  emblem =  "  p Hello\n"
   emblem += "  p\n"
   emblem += "\n"
   emblem += "    | Woot\n"
@@ -1377,7 +1377,12 @@ test "w/ blank whitespaced lines", ->
   emblem += "         \n"
   emblem += "\n"
   emblem += "  span yes\n"
-  shouldCompileToString emblem, '<p>Hello</p><p>Woot</p><span>yes</span>'
+  emblem += "\n"
+  emblem += "  sally\n"
+  emblem += "\n"
+  emblem += "         \n"
+  emblem += "    | Woot\n"
+  shouldCompileToString emblem, '<p>Hello</p><p>Woot</p><span>yes</span><sally class="none">Woot</sally>'
 
 suite "misc."
 

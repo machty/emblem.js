@@ -1167,14 +1167,18 @@ test("w/ blank whitespaced lines", function() {
   emblem = "  p Hello\n";
   emblem += "  p\n";
   emblem += "\n";
-  emblem += "                \n";
   emblem += "    | Woot\n";
   emblem += "        \n";
   emblem += "       \n";
   emblem += "         \n";
   emblem += "\n";
   emblem += "  span yes\n";
-  return shouldCompileToString(emblem, '<p>Hello</p><p>Woot</p><span>yes</span>');
+  emblem += "\n";
+  emblem += "  sally\n";
+  emblem += "\n";
+  emblem += "         \n";
+  emblem += "    | Woot\n";
+  return shouldCompileToString(emblem, '<p>Hello</p><p>Woot</p><span>yes</span><sally class="none">Woot</sally>');
 });
 
 suite("misc.");

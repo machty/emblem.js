@@ -348,7 +348,7 @@ Emblem.Parser = (function() {
         peg$c22 = function(h, c) { 
           var ret = h[0];
           if(c) {
-            ret = ret.concat(c[1]);
+            ret = ret.concat(c[2]);
           }
 
           // Push the closing tag ContentNode if it exists (self-closing if not)
@@ -387,7 +387,7 @@ Emblem.Parser = (function() {
         },
         peg$c26 = function(mustacheNode, block) { 
           if(!block) return mustacheNode;
-          var programNode = block[1];
+          var programNode = block[2];
           return new AST.BlockNode(mustacheNode, programNode, programNode.inverse, mustacheNode.id);
         },
         peg$c27 = function(mustacheNode, t) {
@@ -1286,7 +1286,7 @@ Emblem.Parser = (function() {
     }
 
     function peg$parsehtmlElementMaybeBlock() {
-      var s0, s1, s2, s3, s4, s5, s6, s7;
+      var s0, s1, s2, s3, s4, s5, s6, s7, s8;
 
       s0 = peg$currPos;
       s1 = peg$parsehtmlTagAndOptionalAttributes();
@@ -1296,14 +1296,25 @@ Emblem.Parser = (function() {
           s3 = peg$parseTERM();
           if (s3 !== null) {
             s4 = peg$currPos;
-            s5 = peg$parseindentation();
+            s5 = [];
+            s6 = peg$parseblankLine();
+            while (s6 !== null) {
+              s5.push(s6);
+              s6 = peg$parseblankLine();
+            }
             if (s5 !== null) {
-              s6 = peg$parsecontent();
+              s6 = peg$parseindentation();
               if (s6 !== null) {
-                s7 = peg$parseDEDENT();
+                s7 = peg$parsecontent();
                 if (s7 !== null) {
-                  s5 = [s5, s6, s7];
-                  s4 = s5;
+                  s8 = peg$parseDEDENT();
+                  if (s8 !== null) {
+                    s5 = [s5, s6, s7, s8];
+                    s4 = s5;
+                  } else {
+                    peg$currPos = s4;
+                    s4 = peg$c0;
+                  }
                 } else {
                   peg$currPos = s4;
                   s4 = peg$c0;
@@ -1427,7 +1438,7 @@ Emblem.Parser = (function() {
     }
 
     function peg$parsemustacheMaybeBlock() {
-      var s0, s1, s2, s3, s4, s5, s6, s7;
+      var s0, s1, s2, s3, s4, s5, s6, s7, s8;
 
       s0 = peg$parsemustacheInlineBlock();
       if (s0 === null) {
@@ -1439,14 +1450,25 @@ Emblem.Parser = (function() {
             s3 = peg$parseTERM();
             if (s3 !== null) {
               s4 = peg$currPos;
-              s5 = peg$parseindentation();
+              s5 = [];
+              s6 = peg$parseblankLine();
+              while (s6 !== null) {
+                s5.push(s6);
+                s6 = peg$parseblankLine();
+              }
               if (s5 !== null) {
-                s6 = peg$parseinvertibleContent();
+                s6 = peg$parseindentation();
                 if (s6 !== null) {
-                  s7 = peg$parseDEDENT();
+                  s7 = peg$parseinvertibleContent();
                   if (s7 !== null) {
-                    s5 = [s5, s6, s7];
-                    s4 = s5;
+                    s8 = peg$parseDEDENT();
+                    if (s8 !== null) {
+                      s5 = [s5, s6, s7, s8];
+                      s4 = s5;
+                    } else {
+                      peg$currPos = s4;
+                      s4 = peg$c0;
+                    }
                   } else {
                     peg$currPos = s4;
                     s4 = peg$c0;

@@ -186,11 +186,11 @@ capitalizedLineStarterMustache
 }
 
 htmlElementMaybeBlock 
-  = h:htmlTagAndOptionalAttributes _ TERM c:(indentation content DEDENT)? 
+  = h:htmlTagAndOptionalAttributes _ TERM c:(blankLine* indentation content DEDENT)? 
 { 
   var ret = h[0];
   if(c) {
-    ret = ret.concat(c[1]);
+    ret = ret.concat(c[2]);
   }
 
   // Push the closing tag ContentNode if it exists (self-closing if not)
@@ -231,10 +231,10 @@ htmlElementWithInlineContent
 
 mustacheMaybeBlock 
   = mustacheInlineBlock
-  / mustacheNode:inMustache _ TERM block:(indentation invertibleContent DEDENT)? 
+  / mustacheNode:inMustache _ TERM block:(blankLine* indentation invertibleContent DEDENT)? 
 { 
   if(!block) return mustacheNode;
-  var programNode = block[1];
+  var programNode = block[2];
   return new AST.BlockNode(mustacheNode, programNode, programNode.inverse, mustacheNode.id);
 }
 

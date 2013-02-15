@@ -110,33 +110,33 @@ suite("html multi-lines");
 
 test("two lines", function() {
   var emblem;
-  emblem = "p This is \n  pretty cool.";
+  emblem = "p This is\n  pretty cool.";
   return shouldCompileTo(emblem, "<p>This is pretty cool.</p>");
 });
 
 test("three lines", function() {
   var emblem;
-  emblem = "p This is \n  pretty damn \n  cool.";
+  emblem = "p This is\n  pretty damn\n  cool.";
   return shouldCompileTo(emblem, "<p>This is pretty damn cool.</p>");
 });
 
 test("three lines w/ embedded html", function() {
   var emblem;
-  emblem = "p This is \n  pretty <span>damn</span> \n  cool.";
+  emblem = "p This is\n  pretty <span>damn</span>\n  cool.";
   return shouldCompileTo(emblem, "<p>This is pretty <span>damn</span> cool.</p>");
 });
 
 test("indentation doesn't need to match starting inline content's", function() {
   var emblem;
-  emblem = "span Hello, \n  How are you?";
+  emblem = "span Hello,\n  How are you?";
   return shouldCompileTo(emblem, "<span>Hello, How are you?</span>");
 });
 
 test("indentation may vary between parent/child, must be consistent within inline-block", function() {
   var emblem;
-  emblem = "div\n      span Hello, \n           How are you? \n           Excellent.\n      p asd";
+  emblem = "div\n      span Hello,\n           How are you?\n           Excellent.\n      p asd";
   shouldCompileTo(emblem, "<div><span>Hello, How are you? Excellent.</span><p>asd</p></div>");
-  emblem = "div\n  span Hello, \n       How are you? \n     Excellent.";
+  emblem = "div\n  span Hello,\n       How are you?\n     Excellent.";
   return shouldThrow(function() {
     return CompilerContext.compile(emblem);
   });
@@ -144,13 +144,13 @@ test("indentation may vary between parent/child, must be consistent within inlin
 
 test("indentation may vary between parent/child, must be consistent within inline-block pt 2", function() {
   var emblem;
-  emblem = "div\n  span Hello, \n       How are you? \n       Excellent.";
+  emblem = "div\n  span Hello,\n       How are you?\n       Excellent.";
   return shouldCompileTo(emblem, "<div><span>Hello, How are you? Excellent.</span></div>");
 });
 
 test("w/ mustaches", function() {
   var emblem;
-  emblem = "div\n  span Hello, \n       {{foo}} are you? \n       Excellent.";
+  emblem = "div\n  span Hello,\n       {{foo}} are you?\n       Excellent.";
   return shouldCompileTo(emblem, {
     foo: "YEAH"
   }, "<div><span>Hello, YEAH are you? Excellent.</span></div>");
@@ -158,7 +158,7 @@ test("w/ mustaches", function() {
 
 test("with followup", function() {
   var emblem;
-  emblem = "p This is \n  pretty cool.\np Hello.";
+  emblem = "p This is\n  pretty cool.\np Hello.";
   return shouldCompileTo(emblem, "<p>This is pretty cool.</p><p>Hello.</p>");
 });
 
@@ -283,7 +283,7 @@ runTextLineSuite = function(ch) {
   test("indented, then in a row, then indented", function() {
     var emblem;
     emblem = "_ \n  Good\n    riddance2\n    dude\n    gnar\n      foo\n      far\n      faz";
-    return sct(emblem, "Good\n  riddance2\n  dude\n  gnar\n    foo\n    far\n    faz\n");
+    return sct(emblem, "Good \n  riddance2 \n  dude \n  gnar \n    foo \n    far \n    faz \n");
   });
   test("uneven indentation megatest", function() {
     var emblem;
@@ -1183,6 +1183,14 @@ test("w/ blank whitespaced lines", function() {
   emblem += "         \n";
   emblem += "    | Woot\n";
   return shouldCompileToString(emblem, '<p>Hello</p><p>Woot</p><span>yes</span><sally class="none">Woot</sally>');
+});
+
+suite("EOL Whitespace");
+
+test("shouldn't be necessary to insert a space", function() {
+  var emblem;
+  emblem = "p Hello,\n  How are you?\np I'm fine, thank you.";
+  return shouldCompileToString(emblem, "<p>Hello, How are you?</p><p>I'm fine, thank you.</p>");
 });
 
 suite("misc.");

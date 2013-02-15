@@ -217,6 +217,7 @@ htmlElementWithInlineContent
 
     multilineContent = multilineContent[1];
     for(var i = 0; i < multilineContent.length; ++i) {
+      ret.push(new AST.ContentNode(' '));
       ret = ret.concat(multilineContent[i]);
     }
   }

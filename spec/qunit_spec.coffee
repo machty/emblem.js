@@ -95,7 +95,7 @@ suite "html multi-lines"
 test "two lines", ->
   emblem =
   """
-  p This is 
+  p This is
     pretty cool.
   """
   shouldCompileTo emblem, "<p>This is pretty cool.</p>"
@@ -103,8 +103,8 @@ test "two lines", ->
 test "three lines", ->
   emblem =
   """
-  p This is 
-    pretty damn 
+  p This is
+    pretty damn
     cool.
   """
   shouldCompileTo emblem, "<p>This is pretty damn cool.</p>"
@@ -112,8 +112,8 @@ test "three lines", ->
 test "three lines w/ embedded html", ->
   emblem =
   """
-  p This is 
-    pretty <span>damn</span> 
+  p This is
+    pretty <span>damn</span>
     cool.
   """
   shouldCompileTo emblem, "<p>This is pretty <span>damn</span> cool.</p>"
@@ -121,7 +121,7 @@ test "three lines w/ embedded html", ->
 test "indentation doesn't need to match starting inline content's", ->
   emblem =
   """
-  span Hello, 
+  span Hello,
     How are you?
   """
   shouldCompileTo emblem, "<span>Hello, How are you?</span>"
@@ -130,8 +130,8 @@ test "indentation may vary between parent/child, must be consistent within inlin
   emblem =
   """
   div
-        span Hello, 
-             How are you? 
+        span Hello,
+             How are you?
              Excellent.
         p asd
   """
@@ -140,8 +140,8 @@ test "indentation may vary between parent/child, must be consistent within inlin
   emblem =
   """
   div
-    span Hello, 
-         How are you? 
+    span Hello,
+         How are you?
        Excellent.
   """
   shouldThrow -> CompilerContext.compile emblem
@@ -150,8 +150,8 @@ test "indentation may vary between parent/child, must be consistent within inlin
   emblem =
   """
   div
-    span Hello, 
-         How are you? 
+    span Hello,
+         How are you?
          Excellent.
   """
   shouldCompileTo emblem, "<div><span>Hello, How are you? Excellent.</span></div>"
@@ -161,8 +161,8 @@ test "w/ mustaches", ->
   emblem =
   """
   div
-    span Hello, 
-         {{foo}} are you? 
+    span Hello,
+         {{foo}} are you?
          Excellent.
   """
   shouldCompileTo emblem, { foo: "YEAH" }, "<div><span>Hello, YEAH are you? Excellent.</span></div>"
@@ -171,7 +171,7 @@ test "w/ mustaches", ->
 test "with followup", ->
   emblem =
   """
-  p This is 
+  p This is
     pretty cool.
   p Hello.
   """
@@ -342,7 +342,7 @@ runTextLineSuite = (ch) ->
           far
           faz
     """
-    sct emblem, "Good\n  riddance2\n  dude\n  gnar\n    foo\n    far\n    faz\n"
+    sct emblem, "Good \n  riddance2 \n  dude \n  gnar \n    foo \n    far \n    faz \n"
 
 
 
@@ -1386,6 +1386,18 @@ test "w/ blank whitespaced lines", ->
   emblem += "         \n"
   emblem += "    | Woot\n"
   shouldCompileToString emblem, '<p>Hello</p><p>Woot</p><span>yes</span><sally class="none">Woot</sally>'
+
+suite "EOL Whitespace"
+
+test "shouldn't be necessary to insert a space", ->
+  emblem =
+  """
+  p Hello,
+    How are you?
+  p I'm fine, thank you.
+  """
+  shouldCompileToString emblem, "<p>Hello, How are you?</p><p>I'm fine, thank you.</p>"
+
 
 suite "misc."
 

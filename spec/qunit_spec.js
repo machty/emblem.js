@@ -1036,6 +1036,61 @@ test("works", function() {
   return shouldCompileToString(emblem, '<pre>This\n  should\n hopefully\n   work, and work well.\n</pre>');
 });
 
+suite("base indent / predent");
+
+test("predent", function() {
+  var emblem, s;
+  emblem = "        \n";
+  s = "pre\n  ` This\n  `   should\n  `  hopefully\n  `    work, and work well.\n";
+  emblem += s;
+  return shouldCompileToString(emblem, '<pre>This\n  should\n hopefully\n   work, and work well.\n</pre>');
+});
+
+test("mixture", function() {
+  var emblem;
+  emblem = "        \n";
+  emblem += "  p Hello\n";
+  emblem += "  p\n";
+  emblem += "    | Woot\n";
+  emblem += "  span yes\n";
+  return shouldCompileToString(emblem, '<p>Hello</p><p>Woot</p><span>yes</span>');
+});
+
+test("mixture w/o opening blank", function() {
+  var emblem;
+  emblem = "  p Hello\n";
+  emblem += "  p\n";
+  emblem += "    | Woot\n";
+  emblem += "  span yes\n";
+  return shouldCompileToString(emblem, '<p>Hello</p><p>Woot</p><span>yes</span>');
+});
+
+test("w/ blank lines", function() {
+  var emblem;
+  emblem = "  p Hello\n";
+  emblem += "  p\n";
+  emblem += "\n";
+  emblem += "    | Woot\n";
+  emblem += "\n";
+  emblem += "  span yes\n";
+  return shouldCompileToString(emblem, '<p>Hello</p><p>Woot</p><span>yes</span>');
+});
+
+test("w/ blank whitespaced lines", function() {
+  var emblem;
+  emblem = "  p Hello\n";
+  emblem += "  p\n";
+  emblem += "\n";
+  emblem += "                \n";
+  emblem += "    | Woot\n";
+  emblem += "        \n";
+  emblem += "       \n";
+  emblem += "         \n";
+  emblem += "\n";
+  emblem += "  span yes\n";
+  return shouldCompileToString(emblem, '<p>Hello</p><p>Woot</p><span>yes</span>');
+});
+
 suite("misc.");
 
 test("capitalized view helper should not kick in if suffix modifiers present", function() {

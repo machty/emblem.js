@@ -746,6 +746,10 @@ test("basic", function() {
   return shouldCompileTo('p class=foo', '<p bindAttr class to foo></p>');
 });
 
+test("basic w/ underscore", function() {
+  return shouldCompileTo('p class=foo_urns', '<p bindAttr class to foo_urns></p>');
+});
+
 test("multiple", function() {
   return shouldCompileTo('p class=foo id="yup" data-thinger=yeah Hooray', '<p bindAttr class to foo id="yup" bindAttr data-thinger to yeah>Hooray</p>');
 });

@@ -531,7 +531,7 @@ fullAttribute
   return [new AST.ContentNode(' '), a]; 
 }
 
-boundAttributeValueText = $[A-Za-z.:0-9]+ 
+boundAttributeValueText = $[A-Za-z.:0-9_]+ 
 
 // Value of an action can be an unwrapped string, or a single or double quoted string
 actionValue
@@ -586,7 +586,7 @@ htmlTagName "KnownHTMLTagName"
   = '%' s:tagString { return s; }
   / knownTagName
 
-knownTagName = t:tagString &{ handlebarsVariant.log(9, "SHITSHIT: " + t);  return !!KNOWN_TAGS[t]; }  { return t; }
+knownTagName = t:tagString &{ return !!KNOWN_TAGS[t]; }  { return t; }
 
 tagChar = [:_a-zA-Z0-9-]
 

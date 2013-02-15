@@ -916,6 +916,9 @@ suite "bindAttr behavior for unquoted attribute values"
 test "basic", ->
   shouldCompileTo 'p class=foo', '<p bindAttr class to foo></p>'
 
+test "basic w/ underscore", ->
+  shouldCompileTo 'p class=foo_urns', '<p bindAttr class to foo_urns></p>'
+
 test "multiple", ->
   shouldCompileTo 'p class=foo id="yup" data-thinger=yeah Hooray', 
                   '<p bindAttr class to foo id="yup" bindAttr data-thinger to yeah>Hooray</p>'

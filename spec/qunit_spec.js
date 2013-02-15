@@ -758,6 +758,12 @@ test("class bindAttr special syntax", function() {
   return shouldCompileTo('p class=foo:bar:baz', '<p bindAttr class to foo:bar:baz></p>');
 });
 
+test("class bindAttr braced syntax", function() {
+  shouldCompileTo('p class={foo:bar :baz}', '<p bindAttr class to foo:bar :baz></p>');
+  shouldCompileTo('p class={ foo:bar :baz }', '<p bindAttr class to foo:bar :baz></p>');
+  return shouldCompileTo('p class={ foo:bar :baz } Hello', '<p bindAttr class to foo:bar :baz>Hello</p>');
+});
+
 suite("in-tag explicit mustache");
 
 Handlebars.registerHelper('inTagHelper', function(p) {

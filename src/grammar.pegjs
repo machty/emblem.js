@@ -532,7 +532,7 @@ fullAttribute
   return [new AST.ContentNode(' '), a]; 
 }
 
-boundAttributeValueText = $[A-Za-z.:0-9_]+ 
+boundAttributeValueChar = [A-Za-z.:0-9_]
 
 // Value of an action can be an unwrapped string, or a single or double quoted string
 actionValue
@@ -548,8 +548,12 @@ actionAttribute
   return unshiftParam(mustacheNode, 'action', [['on', new AST.StringNode(event)]]);
 }
 
+boundAttributeValue
+  = '{' _ value:$(boundAttributeValueChar / ' ')+ _ '}' { return value.replace(/ *$/, ''); }
+  / $boundAttributeValueChar+
+
 boundAttribute
-  = key:key '=' value:boundAttributeValueText
+  = key:key '=' value:boundAttributeValue
 { 
   var hashNode = new AST.HashNode([[key, new AST.StringNode(value)]]);
   var params = [new AST.IdNode(['bindAttr'])];

@@ -45,12 +45,12 @@ Ember.onLoad('application', Emblem.compileScriptTags);
 Add the following to your Gemfile:
 
 ```
-gem 'ember-rails'
 gem 'emblem-rails'
 ```
 
-With these two gems, any templates ending in `.emblem` will be 
-(pre)compiled with Emblem.js.
+`emblem-rails` presently depends on `ember-rails`. With these 
+two gems, any templates ending in `.emblem` will be (pre)compiled 
+with Emblem.js.
 
 Also, check out the [demo app](https://github.com/machty/emblem-rails-demo)
 which uses the above configuration.

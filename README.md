@@ -45,7 +45,7 @@ Ember.onLoad('application', Emblem.compileScriptTags);
 Add the following to your Gemfile:
 
 ```
-gem 'ember-rails', github: "emberjs/ember-rails"
+gem 'ember-rails'
 gem 'emblem-rails'
 ```
 

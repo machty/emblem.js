@@ -158,10 +158,10 @@ comment
   = '/' commentContent { return []; }
 
 lineStartingMustache 
-  = capitalizedLineStarterMustache / mustacheMaybeBlock
+  = capitalizedLineStarterMustache  / mustacheMaybeBlock
 
 capitalizedLineStarterMustache 
-  = &[A-Z] ret:mustacheMaybeBlock
+  = &[A-Z] ret:mustacheMaybeBlock &{ return IS_EMBER; }
 {
   // TODO make this configurable
   var defaultCapitalizedHelper = 'view';
@@ -527,9 +527,9 @@ attributesAtLeastClass
   = classes:classShorthand+ { return [null, classes]; }
 
 fullAttribute
-  = ' '+ a:(actionAttribute / boundAttribute / normalAttribute)  
+  = ' '+ a:(actionAttribute / boundAttribute / rawMustacheAttribute / normalAttribute)  
 {
-  return [new AST.ContentNode(' '), a]; 
+  return [new AST.ContentNode(' ')].concat(a); 
 }
 
 boundAttributeValueChar = [A-Za-z.:0-9_]
@@ -545,27 +545,41 @@ actionAttribute
   = event:knownEvent '=' mustacheNode:actionValue
 {
   // Unshift the action helper and augment the hash
-  return unshiftParam(mustacheNode, 'action', [['on', new AST.StringNode(event)]]);
+  return [unshiftParam(mustacheNode, 'action', [['on', new AST.StringNode(event)]])];
 }
 
 boundAttributeValue
   = '{' _ value:$(boundAttributeValueChar / ' ')+ _ '}' { return value.replace(/ *$/, ''); }
   / $boundAttributeValueChar+
 
+// With Ember-Handlebars variant, 
+// p class=something -> <p {{bindAttr class="something"}}></p>
 boundAttribute
-  = key:key '=' value:boundAttributeValue
+  = key:key '=' value:boundAttributeValue &{ return IS_EMBER; }
 { 
   var hashNode = new AST.HashNode([[key, new AST.StringNode(value)]]);
   var params = [new AST.IdNode(['bindAttr'])];
-
-  return new AST.MustacheNode(params, hashNode);
+  return [new AST.MustacheNode(params, hashNode)];
 }
+
+// With vanilla Handlebars variant, 
+// p class=something -> <p class="{{something}}"></p>
+rawMustacheAttribute
+  = key:key '=' id:pathIdNode 
+{ 
+  return [
+    new AST.ContentNode(key + '=' + '"'),
+    new AST.MustacheNode([id]),
+    new AST.ContentNode('"'),
+  ];
+}
+
 
 normalAttribute
   = key:key '=' value:string
 { 
   var s = key + '=' + '"' + value + '"';
-  return new AST.ContentNode(s);
+  return [new AST.ContentNode(s)];
 }
 
 attributeName = $attributeChar*

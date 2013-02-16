@@ -1,4 +1,5 @@
 
+
 unless Emblem?
   # Setup for Node package testing
   Handlebars = require('handlebars')
@@ -23,6 +24,9 @@ unless CompilerContext?
       #templateSpec = Emblem.precompile(Handlebars, template, options)
       #Handlebars.template eval "(#{templateSpec})"  
       #compileWithPartial: (template, options) ->
+
+shouldEmberPrecompileToHelper = (emblem, helper = 'bindAttr') ->
+  ok Emblem.precompile(EmberHandlebars, emblem).toString().match "helpers.#{helper}"
 
 shouldCompileToString = (string, hashOrArray, expected) ->
 
@@ -752,7 +756,8 @@ test "should invoke `view` helper by default", ->
   """
   SomeView
   """
-  shouldCompileToString emblem, '<SomeView nohash>SomeView</SomeView>'
+  shouldEmberPrecompileToHelper emblem, 'view'
+  #shouldCompileToString emblem, '<SomeView nohash>SomeView</SomeView>'
 
 test "should support block mode", ->
   emblem =
@@ -760,7 +765,8 @@ test "should support block mode", ->
   SomeView
     p View content
   """
-  shouldCompileToString emblem, '<SomeView nohash><p>View content</p></SomeView>'
+  #shouldCompileToString emblem, '<SomeView nohash><p>View content</p></SomeView>'
+  shouldEmberPrecompileToHelper emblem, 'view'
 
 test "should not kick in if preceded by equal sign", ->
   emblem =
@@ -901,7 +907,7 @@ test "unless", ->
   """
   shouldCompileTo emblem, {foo: true, bar: false}, 'FooWootHooray'
 
-Handlebars.registerHelper 'bindAttr', ->
+bindAttrHelper = ->
   options = arguments[arguments.length - 1]
   params = Array::slice.call arguments, 0, -1
   bindingString = ""
@@ -911,25 +917,34 @@ Handlebars.registerHelper 'bindAttr', ->
   param = params[0] || 'none'
   "bindAttr#{bindingString}"
 
+Handlebars.registerHelper 'bindAttr', bindAttrHelper
+EmberHandlebars.registerHelper 'bindAttr', bindAttrHelper
+
 suite "bindAttr behavior for unquoted attribute values"
 
 test "basic", ->
-  shouldCompileTo 'p class=foo', '<p bindAttr class to foo></p>'
+  emblem = 'p class=foo'
+  shouldCompileTo emblem, {foo:"YEAH"}, '<p class="YEAH"></p>'
+  shouldEmberPrecompileToHelper emblem
 
 test "basic w/ underscore", ->
-  shouldCompileTo 'p class=foo_urns', '<p bindAttr class to foo_urns></p>'
+  emblem = 'p class=foo_urns'
+  shouldCompileTo emblem, {foo_urns: "YEAH"}, '<p class="YEAH"></p>'
+  shouldEmberPrecompileToHelper emblem
 
 test "multiple", ->
-  shouldCompileTo 'p class=foo id="yup" data-thinger=yeah Hooray', 
-                  '<p bindAttr class to foo id="yup" bindAttr data-thinger to yeah>Hooray</p>'
+  shouldCompileTo 'p class=foo id="yup" data-thinger=yeah Hooray', { foo: "FOO", yeah: "YEAH" },
+                  '<p class="FOO" id="yup" data-thinger="YEAH">Hooray</p>'
 
 test "class bindAttr special syntax", ->
-  shouldCompileTo 'p class=foo:bar:baz', '<p bindAttr class to foo:bar:baz></p>'
+  emblem = 'p class=foo:bar:baz'
+  shouldEmberPrecompileToHelper emblem
+  shouldThrow (-> CompilerContext.compile emblem)
 
 test "class bindAttr braced syntax", ->
-  shouldCompileTo 'p class={foo:bar :baz}',   '<p bindAttr class to foo:bar :baz></p>'
-  shouldCompileTo 'p class={ foo:bar :baz }', '<p bindAttr class to foo:bar :baz></p>'
-  shouldCompileTo 'p class={ foo:bar :baz } Hello', '<p bindAttr class to foo:bar :baz>Hello</p>'
+  shouldEmberPrecompileToHelper 'p class={foo:bar :baz}'
+  shouldEmberPrecompileToHelper 'p class={ foo:bar :baz }'
+  shouldEmberPrecompileToHelper 'p class={ foo:bar :baz } Hello'
 
 suite "in-tag explicit mustache"
 

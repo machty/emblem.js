@@ -649,7 +649,7 @@ Emblem.Parser = (function() {
         peg$c134 = function(key, id) { 
           return [
             new AST.ContentNode(key + '=' + '"'),
-            new AST.MustacheNode([id]),
+            new AST.MustacheNode(id, new AST.HashNode([])),
             new AST.ContentNode('"'),
           ];
         },

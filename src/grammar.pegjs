@@ -161,7 +161,7 @@ lineStartingMustache
   = capitalizedLineStarterMustache  / mustacheMaybeBlock
 
 capitalizedLineStarterMustache 
-  = &[A-Z] ret:mustacheMaybeBlock &{ return IS_EMBER; }
+  = &[A-Z] ret:mustacheMaybeBlock 
 {
   // TODO make this configurable
   var defaultCapitalizedHelper = 'view';
@@ -171,7 +171,7 @@ capitalizedLineStarterMustache
 
     // Make sure a suffix modifier hasn't already been applied.
     var ch = ret.mustache.id.string.charAt(0);
-    if(!ch.match(/[A-Z]/)) return ret;
+    if(!IS_EMBER || !ch.match(/[A-Z]/)) return ret;
 
     ret.mustache = unshiftParam(ret.mustache, defaultCapitalizedHelper);
     return ret;

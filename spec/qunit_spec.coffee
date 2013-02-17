@@ -1143,7 +1143,7 @@ test "tagName w/ space", ->
 test "tagName block", ->
   emblem =
   """
-  App.FunView%span
+  view App.FunView%span
     p Hello
   """
   shouldCompileToString emblem, '<App.FunView tagName=span><p>Hello</p></App.FunView>'
@@ -1278,13 +1278,6 @@ test "text only", ->
   """
   shouldCompileToString emblem, '<SomeView nohash>Hello</SomeView>'
 
-test "capitalized", ->
-  emblem =
-  """
-  SomeView | Hello
-  """
-  shouldCompileToString emblem, '<SomeView nohash>Hello</SomeView>'
-
 test "multiline", ->
   emblem =
   """
@@ -1294,19 +1287,10 @@ test "multiline", ->
   """
   shouldCompileToString emblem, '<SomeView nohash>Hello, How are you? Sup?</SomeView>'
 
-test "multiline capitalized", ->
-  emblem =
-  """
-  SomeView | Hello, 
-    How are you? 
-    Sup?
-  """
-  shouldCompileToString emblem, '<SomeView nohash>Hello, How are you? Sup?</SomeView>'
-
 test "more complicated", ->
   emblem =
   """
-  SomeView borf="yes" | Hello, 
+  view SomeView borf="yes" | Hello, 
     How are you? 
     Sup?
   """

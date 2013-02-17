@@ -3669,7 +3669,10 @@ Emblem.Parser = (function() {
         if (s2 === null) {
           s2 = peg$parseboundAttribute();
           if (s2 === null) {
-            s2 = peg$parsenormalAttribute();
+            s2 = peg$parserawMustacheAttribute();
+            if (s2 === null) {
+              s2 = peg$parsenormalAttribute();
+            }
           }
         }
         if (s2 !== null) {

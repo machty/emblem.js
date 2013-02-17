@@ -412,7 +412,7 @@ suite("indentation");
 test("it doesn't throw when indenting after a line with inline content", function() {
   var emblem;
   emblem = "p Hello\n  p invalid";
-  return shouldCompileTo(emblem, "<p>Hellop invalid</p>");
+  return shouldCompileTo(emblem, "<p>Hello p invalid</p>");
 });
 
 test("it throws on half dedent", function() {

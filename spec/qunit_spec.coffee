@@ -553,7 +553,7 @@ test "it doesn't throw when indenting after a line with inline content", ->
   p Hello
     p invalid
   """
-  shouldCompileTo emblem, "<p>Hellop invalid</p>"
+  shouldCompileTo emblem, "<p>Hello p invalid</p>"
 
 test "it throws on half dedent", ->
   emblem =

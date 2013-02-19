@@ -1,4 +1,4 @@
-## Emblem: Handlebars + Indentation + Ember-compatibility
+# Emblem: Handlebars + Indentation + Ember-compatibility
 
 Emblem.js is an indentation-based templating language that compiles
 to Handlebars. It is therefore
@@ -8,8 +8,12 @@ to Handlebars. It is therefore
 1. Fully compatible with Ember.js's auto-updating templates
 1. Way more fun to write/maintain than `{{mustached}}`'d HTML
 
+Check out the Emblem.js docs site
+[http://www.emblemjs.com](http://www.emblemjs.com).
+
 ## Syntax Examples
 
+- [Read the syntax documentation](http://www.emblemjs.com/syntax).
 - [Check out this JSBin.](http://jsbin.com/ulegec/47/edit)
 - Check out this [demo](http://emblem-test.herokuapp.com/) of 
   an [ember-rails](https://github.com/machty/ember-rails) site

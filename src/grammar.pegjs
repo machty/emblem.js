@@ -532,7 +532,7 @@ fullAttribute
   return [new AST.ContentNode(' ')].concat(a); 
 }
 
-boundAttributeValueChar = [A-Za-z.:0-9_]
+boundAttributeValueChar = [A-Za-z.:0-9_-]
 
 // Value of an action can be an unwrapped string, or a single or double quoted string
 actionValue

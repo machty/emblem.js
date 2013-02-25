@@ -941,10 +941,10 @@ test "class bindAttr special syntax", ->
   shouldEmberPrecompileToHelper emblem
   shouldThrow (-> CompilerContext.compile emblem)
 
-test "class bindAttr braced syntax", ->
-  shouldEmberPrecompileToHelper 'p class={foo:bar :baz}'
-  shouldEmberPrecompileToHelper 'p class={ foo:bar :baz }'
-  shouldEmberPrecompileToHelper 'p class={ foo:bar :baz } Hello'
+test "class bindAttr braced syntax w/ underscores and dashes", ->
+  shouldEmberPrecompileToHelper 'p class={f-oo:bar :b_az}'
+  shouldEmberPrecompileToHelper 'p class={ f-oo:bar :b_az }'
+  shouldEmberPrecompileToHelper 'p class={ f-oo:bar :b_az } Hello'
 
 suite "in-tag explicit mustache"
 

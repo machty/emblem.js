@@ -787,10 +787,10 @@ test("class bindAttr special syntax", function() {
   }));
 });
 
-test("class bindAttr braced syntax", function() {
-  shouldEmberPrecompileToHelper('p class={foo:bar :baz}');
-  shouldEmberPrecompileToHelper('p class={ foo:bar :baz }');
-  return shouldEmberPrecompileToHelper('p class={ foo:bar :baz } Hello');
+test("class bindAttr braced syntax w/ underscores and dashes", function() {
+  shouldEmberPrecompileToHelper('p class={f-oo:bar :b_az}');
+  shouldEmberPrecompileToHelper('p class={ f-oo:bar :b_az }');
+  return shouldEmberPrecompileToHelper('p class={ f-oo:bar :b_az } Hello');
 });
 
 suite("in-tag explicit mustache");

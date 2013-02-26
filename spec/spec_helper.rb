@@ -1,4 +1,6 @@
 require "v8"
+require "ember/source"
+require "handlebars/source"
 
 # Monkey patches due to bugs in RubyRacer
 class V8::JSError
@@ -59,9 +61,21 @@ module Emblem
     CONTEXT.instance_eval do |context|
       Emblem::Spec.load_helpers(context);
 
-      context.eval('var exports = this.exports || {};')
-      context.eval(File.read('./spec/support/ember-template-compiler.js'))
-      context.eval('var EmberHandlebars = exports.emberHandlebars; ')
+      context.eval <<-EOS
+        var exports = this.exports || {};
+
+        var Emblem;
+        var self = this;
+
+        function require() {
+          // ember-template-compiler only requires('handlebars')
+          return Handlebars;
+        }
+      EOS
+
+      context.eval(File.read(Handlebars::Source.bundled_path))
+      context.eval(File.read(Ember::Source.bundled_path_for("ember-template-compiler.js")))
+      context.eval('var EmberHandlebars = exports.EmberHandlebars; ')
 
       context.eval(File.read('./dist/emblem.js'))
 

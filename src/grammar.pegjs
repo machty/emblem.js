@@ -76,6 +76,22 @@
     params.unshift(new AST.IdNode([helperName]));
     return new AST.MustacheNode(params, hash, !mustacheNode.escaped);
   }
+
+  function textNodesResult(first, tail) {
+    var ret = [];
+    if(first) { ret.push(first); } 
+    for(var i = 0; i < tail.length; ++i) {
+      var t = tail[i];
+      ret.push(t[0]);
+      if(t[1]) { ret.push(t[1]); }
+    }
+    return ret;
+  }
+
+  // Only for debugging use.
+  function log(msg) {
+    handlebarsVariant.log(9, msg);
+  }
 }
 
 start = invertibleContent
@@ -179,7 +195,7 @@ capitalizedLineStarterMustache
 
     // Make sure a suffix modifier hasn't already been applied.
     var ch = ret.id.string.charAt(0);
-    if(!ch.match(/[A-Z]/)) return ret;
+    if(!IS_EMBER || !ch.match(/[A-Z]/)) return ret;
 
     return unshiftParam(ret, defaultCapitalizedHelper);
   }
@@ -255,7 +271,7 @@ explicitMustache
 }
 
 inMustache
-  = path:pathIdNode tm:trailingModifier? params:inMustacheParam* hash:hash? 
+  = path:pathIdNode params:inMustacheParam* hash:hash? 
 { 
   var actualParams = [];
   var attrs = {};
@@ -286,22 +302,16 @@ inMustache
 
   var mustacheNode = new AST.MustacheNode(actualParams, hash); 
 
-  if(tm == '!') {
+  var tm = path._emblemSuffixModifier;
+  if(tm === '!') {
     return unshiftParam(mustacheNode, 'unbound');
-  } else if(tm == '?') {
+  } else if(tm === '?') {
     return unshiftParam(mustacheNode, 'if');
-  } else if(tm == '^') {
+  } else if(tm === '^') {
     return unshiftParam(mustacheNode, 'unless');
   }
 
   return mustacheNode;
-}
-
-modifiedParam = p:param m:trailingModifier
-{ 
-  var ret = new String(p);
-  ret.trailingModifier = m;
-  return ret;
 }
 
 // %div converts to tagName="div", .foo.thing converts to class="foo thing", #id converst to id="id"
@@ -323,14 +333,11 @@ attributesAtLeastClass
 inMustacheParam
   = _ h:(htmlMustacheAttribute / param) { return h; }
 
-trailingModifier "TrailingModifier"
-  = [!?*^]
-
 hash 
   = h:hashSegment+ { return new AST.HashNode(h); }
 
 pathIdent "PathIdent"
-  = '..' / '.' / s:$[a-zA-Z0-9_$-]+ !'=' { return s; }
+  = '..' / '.' / s:$[a-zA-Z0-9_$\-!\?\^]+ !'=' { return s; }
 
 key "Key"
   = ident
@@ -359,7 +366,22 @@ path = first:pathIdent tail:(seperator p:pathIdent { return p; })*
 
 seperator "PathSeparator" = [\/.]
 
-pathIdNode  = v:path    { return new AST.IdNode(v); }
+pathIdNode  = v:path    
+{ 
+  var last = v[v.length - 1];
+  var match;
+  var suffixModifier;
+  if(match = last.match(/[!\?\^]$/)) {
+    suffixModifier = match[0];
+    v[v.length - 1] = last.slice(0, -1);
+  }
+
+  var idNode = new AST.IdNode(v); 
+  idNode._emblemSuffixModifier = suffixModifier;
+
+  return idNode;
+}
+
 stringNode  = v:string  { return new AST.StringNode(v); }
 integerNode = v:integer { return new AST.IntegerNode(v); }
 booleanNode = v:boolean { return new AST.BooleanNode(v); }
@@ -431,20 +453,18 @@ textLine = s:textLineStart nodes:textNodes indentedNodes:(indentation whitespace
 
 textNodes = first:preMustacheText? tail:(rawMustache preMustacheText?)* TERM
 {
-  var ret = [];
-  if(first) { ret.push(first); } 
-  for(var i = 0; i < tail.length; ++i) {
-    var t = tail[i];
-    ret.push(t[0]);
-    if(t[1]) { ret.push(t[1]); }
-  }
-  return ret;
+  return textNodesResult(first, tail);
+}
+
+attributeTextNodes
+  = '"' a:attributeTextNodesInner '"' { return a; }
+
+attributeTextNodesInner = first:preAttrMustacheText? tail:(rawMustache preAttrMustacheText?)*
+{
+  return textNodesResult(first, tail);
 }
 
 rawMustache = rawMustacheUnescaped / rawMustacheEscaped
-
-rawMustacheSingle
- = singleOpen _ m:inMustache _ singleClose { m.escaped = true; return m; }
 
 rawMustacheEscaped   
  = doubleOpen _ m:inMustache _ doubleClose { m.escaped = true; return m; }
@@ -453,14 +473,24 @@ rawMustacheEscaped
 rawMustacheUnescaped 
  = tripleOpen _ m:inMustache _ tripleClose { m.escaped = false; return m; }
 
-preMustacheText 
-  = a:preMustacheUnit+ { return new AST.ContentNode(a.join('')); }
+preAttrMustacheText 
+  = a:$preAttrMustacheUnit+ { return new AST.ContentNode(a); }
+preAttrMustacheUnit
+  = !(nonMustacheUnit / '"') c:. { return c; }
 
+preMustacheText 
+  = a:$preMustacheUnit+ { return new AST.ContentNode(a); }
 preMustacheUnit
-  = !(tripleOpen / doubleOpen / hashStacheOpen / anyDedent / TERM) c:. { return c; }
+  = !nonMustacheUnit c:. { return c; }
+
+nonMustacheUnit
+  = tripleOpen / doubleOpen / hashStacheOpen / anyDedent / TERM
 
 // Support for div#id.whatever{ bindAttr whatever="asd" }
-inTagMustache = rawMustacheSingle / rawMustacheUnescaped / rawMustacheEscaped
+rawMustacheSingle
+ = singleOpen _ m:inMustache _ singleClose { m.escaped = true; return m; }
+inTagMustache 
+  = rawMustacheSingle / rawMustacheUnescaped / rawMustacheEscaped
 
 singleOpen "SingleMustacheOpen" = '{'
 doubleOpen "DoubleMustacheOpen" = '{{'
@@ -532,7 +562,7 @@ fullAttribute
   return [new AST.ContentNode(' ')].concat(a); 
 }
 
-boundAttributeValueChar = [A-Za-z.:0-9_-]
+boundAttributeValueChar = [A-Za-z.:0-9_\-]
 
 // Value of an action can be an unwrapped string, or a single or double quoted string
 actionValue
@@ -555,11 +585,19 @@ boundAttributeValue
 // With Ember-Handlebars variant, 
 // p class=something -> <p {{bindAttr class="something"}}></p>
 boundAttribute
-  = key:key '=' value:boundAttributeValue &{ return IS_EMBER; }
+  = key:key '=' value:boundAttributeValue !'!' &{ return IS_EMBER; }
 { 
   var hashNode = new AST.HashNode([[key, new AST.StringNode(value)]]);
   var params = [new AST.IdNode(['bindAttr'])];
-  return [new AST.MustacheNode(params, hashNode)];
+  var mustacheNode = new AST.MustacheNode(params, hashNode);
+
+  /* 
+  if(whatever) {
+    mustacheNode = return unshiftParam(mustacheNode, 'unbound');
+  }
+  */
+
+  return [mustacheNode];
 }
 
 // With vanilla Handlebars variant, 
@@ -567,19 +605,24 @@ boundAttribute
 rawMustacheAttribute
   = key:key '=' id:pathIdNode 
 { 
+  var mustacheNode = new AST.MustacheNode([id]);
+
+  if(IS_EMBER && id._emblemSuffixModifier === '!') {
+    mustacheNode = unshiftParam(mustacheNode, 'unbound');
+  }
+
   return [
     new AST.ContentNode(key + '=' + '"'),
-    new AST.MustacheNode([id]),
+    mustacheNode,
     new AST.ContentNode('"'),
   ];
 }
 
-
 normalAttribute
-  = key:key '=' value:string
+  = key:key '=' nodes:attributeTextNodes
 { 
-  var s = key + '=' + '"' + value + '"';
-  return [new AST.ContentNode(s)];
+  var result = [ new AST.ContentNode(key + '=' + '"') ].concat(nodes);
+  return result.concat([new AST.ContentNode('"')]);
 }
 
 attributeName = $attributeChar*

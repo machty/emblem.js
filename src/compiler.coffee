@@ -3,6 +3,17 @@ Emblem = require './emblem'
 Emblem.throwCompileError = (line, msg) ->
   throw new Error "Emblem syntax error, line #{line}: #{msg}"
 
+Emblem.registerPartial = (handlebarsVariant, partialName, text) ->
+  # Handle 2-arg
+  unless text
+    text = partialName
+    partialName = handlebarsVariant
+
+    # Always assume Handlebars. No one uses vanilla HB partials in Ember.
+    handlebarsVariant = Handlebars
+
+  handlebarsVariant.registerPartial partialName, Emblem.compile handlebarsVariant, text
+
 Emblem.parse = (string) -> 
   # Pre-process, parse
   try

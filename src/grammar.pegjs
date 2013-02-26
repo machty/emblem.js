@@ -151,7 +151,10 @@ statement "BeginStatement"
 blankLine = _ TERM { return []; } 
 
 legacyPartialInvocation
-  = '>' _ n:legacyPartialName _ p:path? _ TERM { return new AST.PartialNode(n, p); }
+  = '>' _ n:legacyPartialName _ params:inMustacheParam* _ TERM 
+{ 
+  return [new AST.PartialNode(n, params[0])]; 
+}
 
 legacyPartialName
   = s:$[a-zA-Z0-9_$-/]+ { return new AST.PartialNameNode(s); }
@@ -271,8 +274,13 @@ explicitMustache
 }
 
 inMustache
-  = path:pathIdNode params:inMustacheParam* hash:hash? 
+  = isPartial:'>'? _ path:pathIdNode params:inMustacheParam* hash:hash? 
 { 
+  if(isPartial) {
+    var n = new AST.PartialNameNode(path.string);
+    return new AST.PartialNode(n, params[0]);
+  }
+
   var actualParams = [];
   var attrs = {};
   var hasAttrs = false;

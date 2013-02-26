@@ -1323,16 +1323,42 @@ test "array", ->
   shouldCompileToString emblem, hash, "cruel world!"
 
 
-#Handlebars.registerPartial('link', '<a href="/people/{{id}}">{{name}}</a>')
+Handlebars.registerPartial('hbPartial', '<a href="/people/{{id}}">{{name}}</a>')
 
-###
-test "partial", ->
+test "calling handlebars partial", ->
+  emblem =
+  '''
+  > hbPartial
+  | Hello #{> hbPartial}
+  '''
+  shouldCompileToString emblem, 
+    { id: 666, name: "Death" }, 
+    '<a href="/people/666">Death</a>Hello <a href="/people/666">Death</a>'
+
+Emblem.registerPartial(Handlebars, 'emblemPartial', 'a href="/people/{{id}}" = name')
+Emblem.registerPartial(Handlebars, 'emblemPartialB', 'p Grr')
+Emblem.registerPartial(Handlebars, 'emblemPartialC', 'p = a')
+
+test "calling emblem partial", ->
   emblem =
   """
-  > link
+  > emblemPartial
   """
-  shouldCompileToString emblem, [{ id: 666, name: "Death" }], '<a href="/people/666">Death</a>'
-###
+  shouldCompileToString emblem, { id: 666, name: "Death" }, '<a href="/people/666">Death</a>'
+
+test "calling emblem partial with context", ->
+  emblem =
+  """
+  > emblemPartialC foo
+  """
+  shouldCompileToString emblem, { foo: { a: "YES" } }, '<p>YES</p>'
+
+test "partials in mustaches", ->
+  emblem =
+  """
+  | Hello, {{> emblemPartialC foo}}{{>emblemPartialB}}{{>emblemPartialB }}
+  """
+  shouldCompileToString emblem, { foo: { a: "YES" } }, 'Hello, <p>YES</p><p>Grr</p><p>Grr</p>'
 
 test "block as #each", ->
   emblem =

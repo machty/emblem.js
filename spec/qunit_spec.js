@@ -1164,15 +1164,51 @@ test("array", function() {
   return shouldCompileToString(emblem, hash, "cruel world!");
 });
 
-/*
-test "partial", ->
-  emblem =
-  """
-  > link
-  """
-  shouldCompileToString emblem, [{ id: 666, name: "Death" }], '<a href="/people/666">Death</a>'
-*/
+Handlebars.registerPartial('hbPartial', '<a href="/people/{{id}}">{{name}}</a>');
 
+test("calling handlebars partial", function() {
+  var emblem;
+  emblem = '> hbPartial\n| Hello #{> hbPartial}';
+  return shouldCompileToString(emblem, {
+    id: 666,
+    name: "Death"
+  }, '<a href="/people/666">Death</a>Hello <a href="/people/666">Death</a>');
+});
+
+Emblem.registerPartial(Handlebars, 'emblemPartial', 'a href="/people/{{id}}" = name');
+
+Emblem.registerPartial(Handlebars, 'emblemPartialB', 'p Grr');
+
+Emblem.registerPartial(Handlebars, 'emblemPartialC', 'p = a');
+
+test("calling emblem partial", function() {
+  var emblem;
+  emblem = "> emblemPartial";
+  return shouldCompileToString(emblem, {
+    id: 666,
+    name: "Death"
+  }, '<a href="/people/666">Death</a>');
+});
+
+test("calling emblem partial with context", function() {
+  var emblem;
+  emblem = "> emblemPartialC foo";
+  return shouldCompileToString(emblem, {
+    foo: {
+      a: "YES"
+    }
+  }, '<p>YES</p>');
+});
+
+test("partials in mustaches", function() {
+  var emblem;
+  emblem = "| Hello, {{> emblemPartialC foo}}{{>emblemPartialB}}{{>emblemPartialB }}";
+  return shouldCompileToString(emblem, {
+    foo: {
+      a: "YES"
+    }
+  }, 'Hello, <p>YES</p><p>Grr</p><p>Grr</p>');
+});
 
 test("block as #each", function() {
   var emblem;

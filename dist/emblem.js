@@ -312,7 +312,9 @@ Emblem.Parser = (function() {
         peg$c9 = function() { return []; },
         peg$c10 = ">",
         peg$c11 = "\">\"",
-        peg$c12 = function(n, p) { return new AST.PartialNode(n, p); },
+        peg$c12 = function(n, params) { 
+          return [new AST.PartialNode(n, params[0])]; 
+        },
         peg$c13 = /^[a-zA-Z0-9_$-\/]/,
         peg$c14 = "[a-zA-Z0-9_$-\\/]",
         peg$c15 = function(s) { return new AST.PartialNameNode(s); },
@@ -402,7 +404,12 @@ Emblem.Parser = (function() {
           mustache.escaped = e;
           return ret;
         },
-        peg$c31 = function(path, params, hash) { 
+        peg$c31 = function(isPartial, path, params, hash) { 
+          if(isPartial) {
+            var n = new AST.PartialNameNode(path.string);
+            return new AST.PartialNode(n, params[0]);
+          }
+
           var actualParams = [];
           var attrs = {};
           var hasAttrs = false;
@@ -998,9 +1005,11 @@ Emblem.Parser = (function() {
           if (s3 !== null) {
             s4 = peg$parse_();
             if (s4 !== null) {
-              s5 = peg$parsepath();
-              if (s5 === null) {
-                s5 = peg$c1;
+              s5 = [];
+              s6 = peg$parseinMustacheParam();
+              while (s6 !== null) {
+                s5.push(s6);
+                s6 = peg$parseinMustacheParam();
               }
               if (s5 !== null) {
                 s6 = peg$parse_();
@@ -1620,30 +1629,51 @@ Emblem.Parser = (function() {
     }
 
     function peg$parseinMustache() {
-      var s0, s1, s2, s3;
+      var s0, s1, s2, s3, s4, s5;
 
       s0 = peg$currPos;
-      s1 = peg$parsepathIdNode();
+      if (input.charCodeAt(peg$currPos) === 62) {
+        s1 = peg$c10;
+        peg$currPos++;
+      } else {
+        s1 = null;
+        if (peg$silentFails === 0) { peg$fail(peg$c11); }
+      }
+      if (s1 === null) {
+        s1 = peg$c1;
+      }
       if (s1 !== null) {
-        s2 = [];
-        s3 = peg$parseinMustacheParam();
-        while (s3 !== null) {
-          s2.push(s3);
-          s3 = peg$parseinMustacheParam();
-        }
+        s2 = peg$parse_();
         if (s2 !== null) {
-          s3 = peg$parsehash();
-          if (s3 === null) {
-            s3 = peg$c1;
-          }
+          s3 = peg$parsepathIdNode();
           if (s3 !== null) {
-            peg$reportedPos = s0;
-            s1 = peg$c31(s1,s2,s3);
-            if (s1 === null) {
-              peg$currPos = s0;
-              s0 = s1;
+            s4 = [];
+            s5 = peg$parseinMustacheParam();
+            while (s5 !== null) {
+              s4.push(s5);
+              s5 = peg$parseinMustacheParam();
+            }
+            if (s4 !== null) {
+              s5 = peg$parsehash();
+              if (s5 === null) {
+                s5 = peg$c1;
+              }
+              if (s5 !== null) {
+                peg$reportedPos = s0;
+                s1 = peg$c31(s1,s3,s4,s5);
+                if (s1 === null) {
+                  peg$currPos = s0;
+                  s0 = s1;
+                } else {
+                  s0 = s1;
+                }
+              } else {
+                peg$currPos = s0;
+                s0 = peg$c0;
+              }
             } else {
-              s0 = s1;
+              peg$currPos = s0;
+              s0 = peg$c0;
             }
           } else {
             peg$currPos = s0;
@@ -5150,6 +5180,15 @@ var Emblem;
 
 Emblem.throwCompileError = function(line, msg) {
   throw new Error("Emblem syntax error, line " + line + ": " + msg);
+};
+
+Emblem.registerPartial = function(handlebarsVariant, partialName, text) {
+  if (!text) {
+    text = partialName;
+    partialName = handlebarsVariant;
+    handlebarsVariant = Handlebars;
+  }
+  return handlebarsVariant.registerPartial(partialName, Emblem.compile(handlebarsVariant, text));
 };
 
 Emblem.parse = function(string) {

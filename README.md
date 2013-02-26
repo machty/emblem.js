@@ -70,6 +70,7 @@ Coming extremely soon.
    Precompilation library for Ruby (used in `ember-rails`)
 1. [emblem-brunch](https://github.com/machty/emblem-brunch), Emblem
    support for Brunch.io
+1. [Mimosa (support for Emblem since v 0.10.1)](https://github.com/dbashford/mimosa)
 
 # Building Emblem.js
 

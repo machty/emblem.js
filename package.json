@@ -1,7 +1,7 @@
 {
   "name": "emblem",
   "description": "Templating language targeting Handlebars with default Ember.js conventions",
-  "version":  "0.1.11",
+  "version":  "0.1.12",
   "homepage": "http://www.emblemjs.com/",
   "keywords": [
     "ember handlebars template html indentation"
@@ -14,7 +14,7 @@
     "node": ">=0.4.7"
   },
   "dependencies": {
-    "handlebars": "git://github.com/machty/handlebars.js.git#397149429d81dbfc73a4ded9d89bd89d6983dee5",
+    "handlebars": ">= 1.0.10",
     "optimist": "~0.3",
     "uglify-js": "~1.2",
     "StringScanner": "~0.0.3"

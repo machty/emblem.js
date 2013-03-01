@@ -1,0 +1,8 @@
+{
+  "name": "emblem",
+  "version":  "0.1.12",
+  "main": "./dist/emblem.js",
+  "dependencies": {
+    "handlebars": ">= 1.0.10"
+  }
+}

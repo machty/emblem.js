@@ -328,7 +328,6 @@ htmlMustacheAttribute
   / i:idShorthand       { return ['elementId', i]; }
   / c:classShorthand    { return ['class', c]; }
 
-
 shorthandAttributes 
   = attributesAtLeastID / attributesAtLeastClass
 
@@ -556,13 +555,21 @@ htmlTagAndOptionalAttributes
 }
 
 shorthandAttributes 
-  = attributesAtLeastID / attributesAtLeastClass
+  = shorthands:(s:idShorthand    { return { shorthand: s, id: true}; } /
+                s:classShorthand { return { shorthand: s }; } )+
+{
+  var id, classes = [];
+  for(var i = 0, len = shorthands.length; i < len; ++i) {
+    var shorthand = shorthands[i];
+    if(shorthand.id) {
+      id = shorthand.shorthand;
+    } else {
+      classes.push(shorthand.shorthand);
+    }
+  }
 
-attributesAtLeastID 
-  = id:idShorthand classes:classShorthand* { return [id, classes]; }
-
-attributesAtLeastClass 
-  = classes:classShorthand+ { return [null, classes]; }
+  return [id, classes];
+}
 
 fullAttribute
   = ' '+ a:(actionAttribute / boundAttribute / rawMustacheAttribute / normalAttribute)  

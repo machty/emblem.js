@@ -458,6 +458,13 @@ test("class shorthand", function() {
   return shouldCompileTo("span.woot.loot", '<span class="woot loot"></span>');
 });
 
+test("class can come first", function() {
+  shouldCompileTo(".woot#hello", '<div id="hello" class="woot"></div>');
+  shouldCompileTo("span.woot#hello", '<span id="hello" class="woot"></span>');
+  shouldCompileTo("span.woot.loot#hello", '<span id="hello" class="woot loot"></span>');
+  return shouldCompileTo("span.woot.loot#hello.boot", '<span id="hello" class="woot loot boot"></span>');
+});
+
 suite("full attributes - tags with content");
 
 test("class only", function() {

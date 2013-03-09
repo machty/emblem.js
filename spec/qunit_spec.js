@@ -237,55 +237,60 @@ runTextLineSuite = function(ch) {
       expected = obj;
       obj = {};
     }
-    if (ch === '|') {
+    if (ch !== '`') {
       expected = expected.replace(/\n/g, "");
+    }
+    if (ch === "'") {
+      expected = expected.replace(/\t/g, " ");
+    } else {
+      expected = expected.replace(/\t/g, "");
     }
     emblem = emblem.replace(/_/g, ch);
     return shouldCompileTo(emblem, obj, expected);
   };
   suite("text lines starting with '" + ch + "'");
   test("basic", function() {
-    return sct("_ What what", "What what\n");
+    return sct("_ What what", "What what\n\t");
   });
   test("with html", function() {
-    return sct('_ What <span id="woot" data-t="oof" class="f">what</span>!', 'What <span id="woot" data-t="oof" class="f">what</span>!\n');
+    return sct('_ What <span id="woot" data-t="oof" class="f">what</span>!', 'What <span id="woot" data-t="oof" class="f">what</span>!\n\t');
   });
   test("multiline", function() {
     var emblem;
     emblem = "_ Blork\n  Snork";
-    return sct(emblem, "Blork\nSnork\n");
+    return sct(emblem, "Blork\nSnork\n\t");
   });
   test("triple multiline", function() {
     var emblem;
     emblem = "_ Blork\n  Snork\n  Bork";
-    return sct(emblem, "Blork\nSnork\nBork\n");
+    return sct(emblem, "Blork\nSnork\nBork\n\t");
   });
   test("quadruple multiline", function() {
     var emblem;
     emblem = "_ Blork\n  Snork\n  Bork\n  Fork";
-    return sct(emblem, "Blork\nSnork\nBork\nFork\n");
+    return sct(emblem, "Blork\nSnork\nBork\nFork\n\t");
   });
   test("multiline w/ trailing whitespace", function() {
     var emblem;
     emblem = "_ Blork \n  Snork";
-    return sct(emblem, "Blork \nSnork\n");
+    return sct(emblem, "Blork \nSnork\n\t");
   });
   test("secondline", function() {
     var emblem;
     emblem = "_\n  Good";
-    return sct(emblem, "Good\n");
+    return sct(emblem, "Good\n\t");
   });
   test("secondline multiline", function() {
     var emblem;
     emblem = "_ \n  Good\n  Bork";
-    return sct(emblem, "Good\nBork\n");
+    return sct(emblem, "Good\nBork\n\t");
   });
   test("with a mustache", function() {
     var emblem;
     emblem = "_ Bork {{foo}}!";
     return sct(emblem, {
       foo: "YEAH"
-    }, 'Bork YEAH!\n');
+    }, 'Bork YEAH!\n\t');
   });
   test("with mustaches", function() {
     var emblem;
@@ -293,45 +298,47 @@ runTextLineSuite = function(ch) {
     return sct(emblem, {
       foo: "YEAH",
       bar: "<span>NO</span>"
-    }, 'Bork YEAH <span>NO</span>!\n');
+    }, 'Bork YEAH <span>NO</span>!\n\t');
   });
   test("indented, then in a row", function() {
     var emblem;
     return "PENDING";
     emblem = "_ \n  Good\n    riddance2\n    dude\n    gnar\n    foo";
-    return sct(emblem, "Good\n  riddance2\n  dude\n  gnar\n  foo\n");
+    return sct(emblem, "Good\n  riddance2\n  dude\n  gnar\n  foo\n\t");
   });
   test("indented, then in a row, then indented", function() {
     var emblem;
     return "PENDING";
     emblem = "_ \n  Good\n    riddance2\n    dude\n    gnar\n      foo\n      far\n      faz";
-    return sct(emblem, "Good \n  riddance2 \n  dude \n  gnar \n    foo \n    far \n    faz \n");
+    return sct(emblem, "Good \n  riddance2 \n  dude \n  gnar \n    foo \n    far \n    faz \n\t");
   });
   test("uneven indentation megatest", function() {
     var emblem;
     return "PENDING";
     emblem = "_ \n  Good\n    riddance\n  dude";
-    sct(emblem, "Good\n  riddance\ndude\n");
+    sct(emblem, "Good\n  riddance\ndude\n\t");
     emblem = "_ \n  Good\n   riddance3\n    dude";
-    sct(emblem, "Good\n riddance3\n  dude\n");
+    sct(emblem, "Good\n riddance3\n  dude\n\t");
     emblem = "_ Good\n  riddance\n   dude";
-    return sct(emblem, "Good\nriddance\n dude\n");
+    return sct(emblem, "Good\nriddance\n dude\n\t");
   });
   test("on each line", function() {
     var emblem;
     emblem = "pre\n  _ This\n  _   should\n  _  hopefully\n  _    work, and work well.";
-    return sct(emblem, '<pre>This\n  should\n hopefully\n   work, and work well.\n</pre>');
+    return sct(emblem, '<pre>This\n\t  should\n\t hopefully\n\t   work, and work well.\n\t</pre>');
   });
   return test("with blank", function() {
     var emblem;
     emblem = "pre\n  _ This\n  _   should\n  _\n  _  hopefully\n  _    work, and work well.";
-    return sct(emblem, '<pre>This\n  should\n\n hopefully\n   work, and work well.\n</pre>');
+    return sct(emblem, '<pre>This\n\t  should\n\t\n\t hopefully\n\t   work, and work well.\n\t</pre>');
   });
 };
 
 runTextLineSuite('|');
 
 runTextLineSuite('`');
+
+runTextLineSuite("'");
 
 suite("text line starting with angle bracket");
 

@@ -178,7 +178,7 @@ this.Emblem = {};
 
 Emblem = this.Emblem;
 
-Emblem.VERSION = "0.1.11";
+Emblem.VERSION = "0.1.13";
 
 
 
@@ -527,8 +527,8 @@ Emblem.Parser = (function() {
           }
           return nodes; 
         },
-        peg$c80 = /^[|`]/,
-        peg$c81 = "[|`]",
+        peg$c80 = /^[|`']/,
+        peg$c81 = "[|`']",
         peg$c82 = "<",
         peg$c83 = "\"<\"",
         peg$c84 = function() { return '<'; },
@@ -557,6 +557,10 @@ Emblem.Parser = (function() {
             } else {
               ret.push(node);
             }
+          }
+
+          if(s === "'") {
+            ret.push(new AST.ContentNode(" "));
           }
 
           return ret;

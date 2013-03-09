@@ -247,8 +247,15 @@ runTextLineSuite = (ch) ->
       expected = obj
       obj = {}
 
-    if ch == '|'
+    unless ch == '`'
       expected = expected.replace /\n/g, ""
+
+    # Replace tabs with optional trailing whitespace.
+    if ch == "'"
+      expected = expected.replace /\t/g, " "
+    else
+      expected = expected.replace /\t/g, ""
+
     emblem = emblem.replace /_/g, ch
 
     shouldCompileTo emblem, obj, expected
@@ -256,10 +263,10 @@ runTextLineSuite = (ch) ->
 
   suite "text lines starting with '#{ch}'"
 
-  test "basic", -> sct "_ What what", "What what\n"
+  test "basic", -> sct "_ What what", "What what\n\t"
   test "with html", -> 
     sct '_ What <span id="woot" data-t="oof" class="f">what</span>!',
-                      'What <span id="woot" data-t="oof" class="f">what</span>!\n'
+                      'What <span id="woot" data-t="oof" class="f">what</span>!\n\t'
 
   test "multiline", ->
     emblem =
@@ -267,7 +274,7 @@ runTextLineSuite = (ch) ->
     _ Blork
       Snork
     """
-    sct emblem, "Blork\nSnork\n"
+    sct emblem, "Blork\nSnork\n\t"
 
   test "triple multiline", ->
     emblem =
@@ -276,7 +283,7 @@ runTextLineSuite = (ch) ->
       Snork
       Bork
     """
-    sct emblem, "Blork\nSnork\nBork\n"
+    sct emblem, "Blork\nSnork\nBork\n\t"
 
   test "quadruple multiline", ->
     emblem =
@@ -286,7 +293,7 @@ runTextLineSuite = (ch) ->
       Bork
       Fork
     """
-    sct emblem, "Blork\nSnork\nBork\nFork\n"
+    sct emblem, "Blork\nSnork\nBork\nFork\n\t"
 
   test "multiline w/ trailing whitespace", ->
     emblem =
@@ -294,7 +301,7 @@ runTextLineSuite = (ch) ->
     _ Blork 
       Snork
     """
-    sct emblem, "Blork \nSnork\n"
+    sct emblem, "Blork \nSnork\n\t"
 
   test "secondline", ->
     emblem =
@@ -302,7 +309,7 @@ runTextLineSuite = (ch) ->
     _
       Good
     """
-    sct emblem, "Good\n"
+    sct emblem, "Good\n\t"
 
   test "secondline multiline", ->
     emblem =
@@ -311,7 +318,7 @@ runTextLineSuite = (ch) ->
       Good
       Bork
     """
-    sct emblem, "Good\nBork\n"
+    sct emblem, "Good\nBork\n\t"
 
   test "with a mustache", ->
     emblem =
@@ -320,7 +327,7 @@ runTextLineSuite = (ch) ->
     """
     sct emblem, 
       { foo: "YEAH" },
-      'Bork YEAH!\n'
+      'Bork YEAH!\n\t'
 
   test "with mustaches", ->
     emblem =
@@ -329,7 +336,7 @@ runTextLineSuite = (ch) ->
     """
     sct emblem, 
       { foo: "YEAH", bar: "<span>NO</span>"},
-      'Bork YEAH <span>NO</span>!\n'
+      'Bork YEAH <span>NO</span>!\n\t'
 
   test "indented, then in a row", ->
     return "PENDING"
@@ -342,7 +349,7 @@ runTextLineSuite = (ch) ->
         gnar
         foo
     """
-    sct emblem, "Good\n  riddance2\n  dude\n  gnar\n  foo\n"
+    sct emblem, "Good\n  riddance2\n  dude\n  gnar\n  foo\n\t"
 
   test "indented, then in a row, then indented", ->
     return "PENDING"
@@ -357,7 +364,7 @@ runTextLineSuite = (ch) ->
           far
           faz
     """
-    sct emblem, "Good \n  riddance2 \n  dude \n  gnar \n    foo \n    far \n    faz \n"
+    sct emblem, "Good \n  riddance2 \n  dude \n  gnar \n    foo \n    far \n    faz \n\t"
 
 
 
@@ -370,7 +377,7 @@ runTextLineSuite = (ch) ->
         riddance
       dude
     """
-    sct emblem, "Good\n  riddance\ndude\n"
+    sct emblem, "Good\n  riddance\ndude\n\t"
 
     emblem =
     """
@@ -379,7 +386,7 @@ runTextLineSuite = (ch) ->
        riddance3
         dude
     """
-    sct emblem, "Good\n riddance3\n  dude\n"
+    sct emblem, "Good\n riddance3\n  dude\n\t"
 
     emblem =
     """
@@ -387,7 +394,7 @@ runTextLineSuite = (ch) ->
       riddance
        dude
     """
-    sct emblem, "Good\nriddance\n dude\n"
+    sct emblem, "Good\nriddance\n dude\n\t"
 
   test "on each line", ->
     emblem =
@@ -398,7 +405,7 @@ runTextLineSuite = (ch) ->
       _  hopefully
       _    work, and work well.
     """
-    sct emblem, '<pre>This\n  should\n hopefully\n   work, and work well.\n</pre>'
+    sct emblem, '<pre>This\n\t  should\n\t hopefully\n\t   work, and work well.\n\t</pre>'
 
   test "with blank", ->
     emblem =
@@ -410,11 +417,12 @@ runTextLineSuite = (ch) ->
       _  hopefully
       _    work, and work well.
     """
-    sct emblem, '<pre>This\n  should\n\n hopefully\n   work, and work well.\n</pre>'
+    sct emblem, '<pre>This\n\t  should\n\t\n\t hopefully\n\t   work, and work well.\n\t</pre>'
 
 
 runTextLineSuite '|'
 runTextLineSuite '`'
+runTextLineSuite "'"
 
 suite "text line starting with angle bracket"
 

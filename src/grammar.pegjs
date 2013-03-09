@@ -424,7 +424,7 @@ whitespaceableTextNodes
  / textNodes
 
 textLineStart 
- = s:[|`] ' '?  { return s; }
+ = s:[|`'] ' '?  { return s; }
  / &'<' { return '<'; }
 
 textLine = s:textLineStart nodes:textNodes indentedNodes:(indentation whitespaceableTextNodes* DEDENT)?
@@ -453,6 +453,10 @@ textLine = s:textLineStart nodes:textNodes indentedNodes:(indentation whitespace
     } else {
       ret.push(node);
     }
+  }
+
+  if(s === "'") {
+    ret.push(new AST.ContentNode(" "));
   }
 
   return ret;

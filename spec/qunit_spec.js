@@ -782,6 +782,15 @@ test("if else ", function() {
   }, 'FooWootHooray');
 });
 
+test("else with preceding `=`", function() {
+  var emblem;
+  emblem = "= if foo\n  p Yeah\n= else\n  p No\n= if bar\n  p Yeah!\n= else\n  p No!\n=if bar\n  p Yeah!\n=else\n  p No!";
+  return shouldCompileTo(emblem, {
+    foo: true,
+    bar: false
+  }, '<p>Yeah</p><p>No!</p><p>No!</p>');
+});
+
 test("unless", function() {
   var emblem;
   emblem = "unless bar\n  | Foo\n  unless foo\n    | Bar\n  else\n    | Woot\nelse\n  | WRONG\nunless foo\n  | WRONG\nelse\n  | Hooray";
@@ -829,6 +838,19 @@ test("basic w/ underscore", function() {
   emblem = 'p class=foo_urns';
   shouldCompileTo(emblem, {
     foo_urns: "YEAH"
+  }, '<p class="YEAH"></p>');
+  return shouldEmberPrecompileToHelper(emblem);
+});
+
+test("subproperties", function() {
+  var emblem;
+  emblem = 'p class=foo._death.woot';
+  shouldCompileTo(emblem, {
+    foo: {
+      _death: {
+        woot: "YEAH"
+      }
+    }
   }, '<p class="YEAH"></p>');
   return shouldEmberPrecompileToHelper(emblem);
 });

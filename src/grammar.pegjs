@@ -96,10 +96,13 @@
 
 start = invertibleContent
 
-invertibleContent = c:content i:( DEDENT 'else' _ TERM indentation c:content {return c;})?
+invertibleContent = c:content i:( DEDENT else _ TERM indentation c:content {return c;})?
 { 
   return new AST.ProgramNode(c, i || []);
 }
+
+else
+  = ('=' _)? 'else'
 
 content = statements:statement*
 {

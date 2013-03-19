@@ -942,6 +942,25 @@ test "if else ", ->
   """
   shouldCompileTo emblem, {foo: true, bar: false}, 'FooWootHooray'
 
+test "else with preceding `=`", ->
+  emblem =
+  """
+  = if foo
+    p Yeah
+  = else
+    p No
+  = if bar
+    p Yeah!
+  = else
+    p No!
+  =if bar
+    p Yeah!
+  =else
+    p No!
+  """
+  shouldCompileTo emblem, {foo: true, bar: false}, '<p>Yeah</p><p>No!</p><p>No!</p>'
+
+
 test "unless", ->
   emblem =
   """
@@ -983,6 +1002,11 @@ test "basic", ->
 test "basic w/ underscore", ->
   emblem = 'p class=foo_urns'
   shouldCompileTo emblem, {foo_urns: "YEAH"}, '<p class="YEAH"></p>'
+  shouldEmberPrecompileToHelper emblem
+
+test "subproperties", ->
+  emblem = 'p class=foo._death.woot'
+  shouldCompileTo emblem, {foo: { _death: { woot: "YEAH" } }}, '<p class="YEAH"></p>'
   shouldEmberPrecompileToHelper emblem
 
 test "multiple", ->
@@ -1396,6 +1420,24 @@ test "partial in block", ->
     ]
   shouldCompileToString emblem, data, '<ul><a href="/people/1">Alan</a><a href="/people/2">Yehuda</a><ul>'
 ###
+
+
+#suite "helper hash"
+
+#test "quoteless values get treated as bindings", ->
+  #emblem =
+  #"""
+  #view SomeView a=b
+    #| Yes
+  #"""
+  #shouldCompileToString emblem, '<SomeView aBinding=b>Yes</SomeView>'
+
+#test "more complex", ->
+  #emblem =
+  #"""
+  #view SomeView a=b foo=thing.gnar
+  #"""
+  #shouldCompileToString emblem, '<SomeView aBinding=b fooBinding=thing.gnar>SomeView</SomeView>'
 
 suite "inline block helper"
 

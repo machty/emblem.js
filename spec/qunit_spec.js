@@ -594,6 +594,13 @@ test("nested combo syntax", function() {
 
 suite("mustache helpers");
 
+Handlebars.registerHelper('booltest', function(options) {
+  var hash, result;
+  hash = options.hash;
+  result = hash.what === true ? "true" : hash.what === false ? "false" : "neither";
+  return result;
+});
+
 Handlebars.registerHelper('frank', function() {
   var options;
   options = arguments[arguments.length - 1];
@@ -622,6 +629,13 @@ test("basic", function() {
 
 test("hashed parameters should work", function() {
   return shouldCompileTo('frank text="YES" text2="NO"', 'WOO: YES NO');
+});
+
+test("booleans", function() {
+  shouldCompileTo('booltest what=false', 'false');
+  shouldCompileTo('booltest what=true', 'true');
+  shouldCompileTo('booltest what="false"', 'neither');
+  return shouldCompileTo('booltest what="true"', 'neither');
 });
 
 test("nesting", function() {

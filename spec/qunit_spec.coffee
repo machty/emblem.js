@@ -737,6 +737,15 @@ test "nested combo syntax", ->
 
 suite "mustache helpers"
 
+Handlebars.registerHelper 'booltest', (options) ->
+  hash = options.hash
+  result = if hash.what == true
+    "true"
+  else if hash.what == false
+    "false"
+  else "neither"
+  result
+
 Handlebars.registerHelper 'frank', ->
   options = arguments[arguments.length - 1]
   "WOO: #{options.hash.text} #{options.hash.text2}"
@@ -756,6 +765,12 @@ test "basic", -> shouldCompileTo 'echo foo', {foo: "YES"}, 'ECHO YES'
 
 test "hashed parameters should work", ->
   shouldCompileTo 'frank text="YES" text2="NO"', 'WOO: YES NO'
+
+test "booleans", ->
+  shouldCompileTo 'booltest what=false', 'false'
+  shouldCompileTo 'booltest what=true',  'true'
+  shouldCompileTo 'booltest what="false"',  'neither'
+  shouldCompileTo 'booltest what="true"',  'neither'
 
 test "nesting", ->
   emblem =

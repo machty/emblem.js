@@ -353,10 +353,10 @@ key "Key"
   = ident
 
 hashSegment
-  = _ h:( key '=' pathIdNode
+  = _ h:( key '=' booleanNode 
+        / key '=' pathIdNode
         / key '=' stringNode 
-        / key '=' integerNode 
-        / key '=' booleanNode ) { return [h[0], h[2]]; }
+        / key '=' integerNode ) { return [h[0], h[2]]; }
 
 param
   = pathIdNode

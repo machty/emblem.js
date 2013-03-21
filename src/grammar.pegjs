@@ -354,9 +354,9 @@ key "Key"
 
 hashSegment
   = _ h:( key '=' booleanNode 
+        / key '=' integerNode
         / key '=' pathIdNode
-        / key '=' stringNode 
-        / key '=' integerNode ) { return [h[0], h[2]]; }
+        / key '=' stringNode ) { return [h[0], h[2]]; }
 
 param
   = pathIdNode

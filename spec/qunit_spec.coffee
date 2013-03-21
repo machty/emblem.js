@@ -746,6 +746,10 @@ Handlebars.registerHelper 'booltest', (options) ->
   else "neither"
   result
 
+Handlebars.registerHelper 'typetest', (options) ->
+  hash = options.hash
+  typeof hash.what
+
 Handlebars.registerHelper 'frank', ->
   options = arguments[arguments.length - 1]
   "WOO: #{options.hash.text} #{options.hash.text2}"
@@ -771,6 +775,10 @@ test "booleans", ->
   shouldCompileTo 'booltest what=true',  'true'
   shouldCompileTo 'booltest what="false"',  'neither'
   shouldCompileTo 'booltest what="true"',  'neither'
+
+test "integers", ->
+  shouldCompileTo 'typetest what=1', 'number'
+  shouldCompileTo 'typetest what=200', 'number'
 
 test "nesting", ->
   emblem =

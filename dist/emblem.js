@@ -2085,7 +2085,7 @@ Emblem.Parser = (function() {
               if (peg$silentFails === 0) { peg$fail(peg$c5); }
             }
             if (s4 !== null) {
-              s5 = peg$parsepathIdNode();
+              s5 = peg$parseintegerNode();
               if (s5 !== null) {
                 s3 = [s3, s4, s5];
                 s2 = s3;
@@ -2113,7 +2113,7 @@ Emblem.Parser = (function() {
                 if (peg$silentFails === 0) { peg$fail(peg$c5); }
               }
               if (s4 !== null) {
-                s5 = peg$parsestringNode();
+                s5 = peg$parsepathIdNode();
                 if (s5 !== null) {
                   s3 = [s3, s4, s5];
                   s2 = s3;
@@ -2141,7 +2141,7 @@ Emblem.Parser = (function() {
                   if (peg$silentFails === 0) { peg$fail(peg$c5); }
                 }
                 if (s4 !== null) {
-                  s5 = peg$parseintegerNode();
+                  s5 = peg$parsestringNode();
                   if (s5 !== null) {
                     s3 = [s3, s4, s5];
                     s2 = s3;

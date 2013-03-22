@@ -630,6 +630,15 @@ test "nesting", ->
   """
   shouldCompileTo emblem, '<p class="hello" data-foo="gnarly"><span>Yes</span></p>'
 
+suite "full attributes - mixed quotes"
+
+test "single empty", ->
+  shouldCompileTo "p class=''", '<p class=""></p>'
+test "single full", ->
+  shouldCompileTo "p class='woot yeah'", '<p class="woot yeah"></p>'
+test "mixed", ->
+  shouldCompileTo "p class='woot \"oof\" yeah'", '<p class="woot "oof" yeah"></p>'
+
 suite "full attributes - tags without content"
 
 test "empty", ->

@@ -472,11 +472,10 @@ textNodes = first:preMustacheText? tail:(rawMustache preMustacheText?)* TERM
 
 attributeTextNodes
   = '"' a:attributeTextNodesInner '"' { return a; }
+  / "'" a:attributeTextNodesInnerSingle "'" { return a; }
 
-attributeTextNodesInner = first:preAttrMustacheText? tail:(rawMustache preAttrMustacheText?)*
-{
-  return textNodesResult(first, tail);
-}
+attributeTextNodesInner = first:preAttrMustacheText? tail:(rawMustache preAttrMustacheText?)* { return textNodesResult(first, tail); }
+attributeTextNodesInnerSingle = first:preAttrMustacheTextSingle? tail:(rawMustache preAttrMustacheTextSingle?)* { return textNodesResult(first, tail); }
 
 rawMustache = rawMustacheUnescaped / rawMustacheEscaped
 
@@ -487,10 +486,11 @@ rawMustacheEscaped
 rawMustacheUnescaped 
  = tripleOpen _ m:inMustache _ tripleClose { m.escaped = false; return m; }
 
-preAttrMustacheText 
-  = a:$preAttrMustacheUnit+ { return new AST.ContentNode(a); }
-preAttrMustacheUnit
-  = !(nonMustacheUnit / '"') c:. { return c; }
+preAttrMustacheText = a:$preAttrMustacheUnit+ { return new AST.ContentNode(a); }
+preAttrMustacheTextSingle = a:$preAttrMustacheUnitSingle+ { return new AST.ContentNode(a); }
+
+preAttrMustacheUnit       = !(nonMustacheUnit / '"') c:. { return c; }
+preAttrMustacheUnitSingle = !(nonMustacheUnit / "'") c:. { return c; }
 
 preMustacheText 
   = a:$preMustacheUnit+ { return new AST.ContentNode(a); }

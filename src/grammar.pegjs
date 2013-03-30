@@ -146,7 +146,10 @@ content = statements:statement*
 statement "BeginStatement"
   = blankLine
   / comment
-  / legacyPartialInvocation
+  / contentStatement
+
+contentStatement "ContentStatement"
+  = legacyPartialInvocation
   / htmlElement
   / textLine
   / mustache
@@ -162,10 +165,6 @@ legacyPartialInvocation
 legacyPartialName
   = s:$[a-zA-Z0-9_$-/]+ { return new AST.PartialNameNode(s); }
 
-
-htmlElement
-  = htmlElementMaybeBlock / htmlElementWithInlineContent
-
 // Returns [MustacheNode] or [BlockNode]
 mustache 
   = m:(explicitMustache / lineStartingMustache) 
@@ -180,10 +179,10 @@ comment
   = '/' commentContent { return []; }
 
 lineStartingMustache 
-  = capitalizedLineStarterMustache  / mustacheMaybeBlock
+  = capitalizedLineStarterMustache / mustacheOrBlock
 
 capitalizedLineStarterMustache 
-  = &[A-Z] ret:mustacheMaybeBlock 
+  = &[A-Z] ret:mustacheOrBlock 
 {
   // TODO make this configurable
   var defaultCapitalizedHelper = 'view';
@@ -207,69 +206,71 @@ capitalizedLineStarterMustache
   }
 }
 
-htmlElementMaybeBlock 
-  = h:htmlTagAndOptionalAttributes _ TERM c:(blankLine* indentation content DEDENT)? 
-{ 
-  var ret = h[0];
-  if(c) {
-    ret = ret.concat(c[2]);
-  }
-
-  // Push the closing tag ContentNode if it exists (self-closing if not)
-  if(h[1]) {
-    ret.push(h[1]);
-  }
-
-  return ret;
-}
-
-htmlElementWithInlineContent 
-  = h:htmlTagAndOptionalAttributes (' ' / &'=' ) c:htmlInlineContent multilineContent:(indentation whitespaceableTextNodes+ DEDENT)?
-{ 
-  // h is [[open tag content], closing tag ContentNode]
-  var ret = h[0];
-  if(c) {
-    ret = ret.concat(c);
-  }
-
+// (Possibly multi-line) text content beginning on the same
+// line as the html tag. Examples (within *):
+// p *Hello*
+// p *This is a multi-line
+//   text block*
+// p *This has text and #{foo} mustaches*
+htmlNestedTextNodes
+  = ' ' ret:textNodes multilineContent:(indentation whitespaceableTextNodes+ DEDENT)?
+{
   if(multilineContent) {
-    // Handle multi-line content, e.g.
-    // span Hello, 
-    //      This is valid markup.
-
     multilineContent = multilineContent[1];
-    for(var i = 0; i < multilineContent.length; ++i) {
+    for(var i = 0, len = multilineContent.length; i < len; ++i) {
       ret.push(new AST.ContentNode(' '));
       ret = ret.concat(multilineContent[i]);
     }
   }
+  return ret;
+}
+
+indentedContent = blankLine* indentation c:content DEDENT { return c; }
+
+// The end of an HTML statement. Could be a bunch of
+// text, a mustache, or a combination of html elements / mustaches
+// that get nested within the HTML element, or could just be a line
+// terminator.
+htmlTerminator
+  = colonContent 
+  / _ m:explicitMustache { return [m]; } 
+  / _ TERM c:indentedContent? { return c; }
+  / htmlNestedTextNodes
+
+
+// A whole HTML element, including the html tag itself
+// and any nested content inside of it.
+htmlElement = h:inHtmlTag nested:htmlTerminator
+{
+  // h is [[open tag content], closing tag ContentNode]
+  var ret = h[0];
+  if(nested) { ret = ret.concat(nested); }
 
   // Push the closing tag ContentNode if it exists (self-closing if not)
-  if(h[1]) {
-    ret.push(h[1]);
-  }
+  if(h[1]) { ret.push(h[1]); }
 
   return ret;
-}  
+}
 
-mustacheMaybeBlock 
-  = mustacheInlineBlock
-  / mustacheNode:inMustache _ TERM block:(blankLine* indentation invertibleContent DEDENT)? 
+mustacheOrBlock = mustacheNode:inMustache _ nestedContentProgramNode:mustacheNestedContent
 { 
-  if(!block) return mustacheNode;
-  var programNode = block[2];
-  return new AST.BlockNode(mustacheNode, programNode, programNode.inverse, mustacheNode.id);
+  if (!nestedContentProgramNode) { return mustacheNode; }
+  return new AST.BlockNode(mustacheNode, nestedContentProgramNode, nestedContentProgramNode.inverse, mustacheNode.id);
 }
 
-mustacheInlineBlock
-  = mustacheNode:inMustache _ t:textLine
-{
-  var programNode = new AST.ProgramNode(t, []);
-  return new AST.BlockNode(mustacheNode, programNode, programNode.inverse, mustacheNode.id);
+invertibleContent = c:content i:( DEDENT else _ TERM indentation c:content {return c;})?
+{ 
+  return new AST.ProgramNode(c, i || []);
 }
 
-explicitMustache 
-  = e:equalSign ret:mustacheMaybeBlock
+colonContent = ': ' _ c:contentStatement { return c; }
+
+// Returns a ProgramNode
+mustacheNestedContent
+  = statements:(colonContent / textLine) { return new AST.ProgramNode(statements, []); }
+  / TERM block:(blankLine* indentation invertibleContent DEDENT)? { return block && block[2]; }
+
+explicitMustache = e:equalSign ret:mustacheOrBlock
 {
   var mustache = ret.mustache || ret;
   mustache.escaped = e;
@@ -341,7 +342,7 @@ attributesAtLeastClass
   = classes:classShorthand+ { return [null, classes]; }
 
 inMustacheParam
-  = _ h:(htmlMustacheAttribute / param) { return h; }
+  = _ a:(htmlMustacheAttribute / param) { return a; }
 
 hash 
   = h:hashSegment+ { return new AST.HashNode(h); }
@@ -406,11 +407,6 @@ hashDoubleQuoteStringValue = $(!(TERM) [^"}])*
 hashSingleQuoteStringValue = $(!(TERM) [^'}])*
 
 alpha = [A-Za-z]
-
-// returns an array of nodes.
-htmlInlineContent 
-  = _ m:explicitMustache { return [m]; } 
-  / t:textNodes
 
 whitespaceableTextNodes
  = ind:indentation nodes:textNodes w:whitespaceableTextNodes* anyDedent
@@ -519,15 +515,23 @@ hashStacheClose "InterpolationClose" = '}'
 // Returns whether the mustache should be escaped.
 equalSign = "==" ' '? { return false; } / "=" ' '? { return true; } 
 
-// #div.clasdsd{ bindAttr class="funky" } attr="whatever" Hello
-htmlTagAndOptionalAttributes
-  = h:(h:htmlTagName s:shorthandAttributes? m:inTagMustache* f:fullAttribute* { return [h, s, m, f]; }
-      / s:shorthandAttributes m:inTagMustache* f:fullAttribute* { return [null, s, m, f] } )
+
+// Start of a chunk of HTML. Must have either tagName or shorthand 
+// class/id attributes or both. Examples:
+// p#some-id
+// #some-id
+// .a-class
+// span.combo#of.stuff
+htmlStart = h:htmlTagName? s:shorthandAttributes? &{ return h || s; } 
+
+// Everything that goes in the angle brackets of an html tag. Examples:
+// p#some-id class="asdasd"
+// #some-id data-foo="sdsdf"
+// p{ action "click" target="view" }
+inHtmlTag = h:htmlStart inTagMustaches:inTagMustache* fullAttributes:fullAttribute*
 {
   var tagName = h[0] || 'div',
       shorthandAttributes = h[1] || [],
-      inTagMustaches = h[2],
-      fullAttributes = h[3],
       id = shorthandAttributes[0],
       classes = shorthandAttributes[1];
 
@@ -667,12 +671,12 @@ tagString
   = c:$tagChar+
 
 htmlTagName "KnownHTMLTagName"
-  = '%' s:tagString { return s; }
+  = '%' _ s:tagString { return s; }
   / knownTagName
 
 knownTagName = t:tagString &{ return !!KNOWN_TAGS[t]; }  { return t; }
 
-tagChar = [:_a-zA-Z0-9-]
+tagChar = [_a-zA-Z0-9-] / c:':' !' ' { return c; }
 
 knownEvent "a JS event" = t:tagString &{ return !!KNOWN_EVENTS[t]; }  { return t; }
 
@@ -682,7 +686,7 @@ indentation
 INDENT "INDENT" = "\uEFEF" { return ''; }
 DEDENT "DEDENT" = "\uEFFE" { return ''; }
 UNMATCHED_DEDENT "Unmatched DEDENT" = "\uEFEE" { return ''; }
-TERM  "LineEnd" = "\uEFFF" "\n"
+TERM  "LineEnd" = "\uEFFF" "\n" { return false; }
 
 anyDedent "ANYDEDENT" = (DEDENT / UNMATCHED_DEDENT)
 

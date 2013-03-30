@@ -594,6 +594,15 @@ test "new indentation levels don't have to match parents'", ->
   """
   shouldCompileTo emblem, "<p><span><div><span>yes</span></div></span></p>"
 
+suite "whitespace fussiness"
+
+test "spaces after html elements", ->
+  shouldCompileTo "p \n  span asd", "<p><span>asd</span></p>"
+  shouldCompileTo "p \nspan  \n\ndiv\nspan", "<p></p><span></span><div></div><span></span>"
+
+test "spaces after mustaches", ->
+  shouldCompileTo "each foo    \n  p \n  span", { foo: [1,2] }, "<p></p><span></span><p></p><span></span>"
+
 suite "attribute shorthand"
 
 test "id shorthand", ->
@@ -1410,18 +1419,10 @@ Emblem.registerPartial(Handlebars, 'emblemPartialB', 'p Grr')
 Emblem.registerPartial(Handlebars, 'emblemPartialC', 'p = a')
 
 test "calling emblem partial", ->
-  emblem =
-  """
-  > emblemPartial
-  """
-  shouldCompileToString emblem, { id: 666, name: "Death" }, '<a href="/people/666">Death</a>'
+  shouldCompileToString '> emblemPartial', { id: 666, name: "Death" }, '<a href="/people/666">Death</a>'
 
 test "calling emblem partial with context", ->
-  emblem =
-  """
-  > emblemPartialC foo
-  """
-  shouldCompileToString emblem, { foo: { a: "YES" } }, '<p>YES</p>'
+  shouldCompileToString '> emblemPartialC foo', { foo: { a: "YES" } }, '<p>YES</p>'
 
 test "partials in mustaches", ->
   emblem =
@@ -1536,6 +1537,61 @@ test "bigass", ->
   """
   expected = '<div class="content"><p>  We design and develop ambitious web and mobile applications, </p><p>  A more official portfolio page is on its way, but in the meantime, check out</p></div>'
   shouldCompileToString emblem, expected
+
+suite "`this` keyword"
+
+test "basic", ->
+  emblem = '''
+  each foo
+    p = this
+    this
+  '''
+  shouldCompileTo emblem, 
+    { foo: [ "Alex", "Emily" ] }, 
+    '<p>Alex</p>Alex<p>Emily</p>Emily'
+
+suite "colon separator"
+
+test "basic", ->
+  emblem = 'each foo: p Hello, #{this}'
+  shouldCompileTo emblem, 
+    { foo: [ "Alex", "Emily", "Nicole" ] }, 
+    '<p>Hello, Alex</p><p>Hello, Emily</p><p>Hello, Nicole</p>'
+
+test "html stack", ->
+  emblem = '.container: .row: .span5: span Hello'
+  shouldCompileToString emblem, 
+    '<div class="container"><div class="row"><div class="span5"><span>Hello</span></div></div></div>'
+
+test "epic", ->
+  emblem = '''
+  .container: .row: .span5
+    ul#list data-foo="yes": each foo: li
+      span: this
+  '''
+  shouldCompileTo emblem, { foo: ["a","b"] },
+    '<div class="container"><div class="row"><div class="span5"><ul id="list" data-foo="yes"><li><span>a</span></li><li><span>b</span></li></ul></div></div></div>'
+
+test "html stack elements only", ->
+  emblem = 'p: span: div: p: foo'
+  shouldCompileToString emblem, { foo: "alex" },
+    '<p><span><div><p>alex</p></div></span></p>'
+
+test "mixed separators", ->
+  emblem = '.fun = each foo: %nork = this'
+  shouldCompileTo emblem,
+    { foo: [ "Alex", "Emily", "Nicole" ] }, 
+    '<div class="fun"><nork>Alex</nork><nork>Emily</nork><nork>Nicole</nork></div>'
+
+test "mixed separators rewritten", ->
+  emblem = '.fun: each foo: %nork: this'
+  shouldCompileTo emblem,
+    { foo: [ "Alex", "Emily", "Nicole" ] }, 
+    '<div class="fun"><nork>Alex</nork><nork>Emily</nork><nork>Nicole</nork></div>'
+
+test "with text terminator", ->
+  emblem = '.fun: view SomeView | Hello'
+  shouldCompileToString emblem, '<div class="fun"><SomeView nohash>Hello</SomeView></div>'
 
 suite "base indent / predent"
 

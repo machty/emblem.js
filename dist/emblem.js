@@ -178,7 +178,7 @@ this.Emblem = {};
 
 Emblem = this.Emblem;
 
-Emblem.VERSION = "0.1.17";
+Emblem.VERSION = "0.2.0";
 
 
 

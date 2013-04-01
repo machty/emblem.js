@@ -1593,6 +1593,27 @@ test "with text terminator", ->
   emblem = '.fun: view SomeView | Hello'
   shouldCompileToString emblem, '<div class="fun"><SomeView nohash>Hello</SomeView></div>'
 
+test "test from heartsentwined", ->
+  shouldCompileTo 'li data-foo=bar: a', { bar: "abc" }, '<li data-foo="abc"><a></a></li>'
+  shouldCompileTo "li data-foo='bar': a", '<li data-foo="bar"><a></a></li>'
+
+test "mixture of colon and indentation", ->
+  emblem = """
+  li data-foo=bar: a
+    baz
+  """
+  shouldCompileTo emblem, { bar: "abc", baz: "Hello" }, '<li data-foo="abc"><a>Hello</a></li>'
+
+test "mixture of colon and indentation", ->
+  emblem = """
+  ul
+    li data-foo=bar: a quux
+    li data-foo='bar': a quux
+    li data-foo=bar href='#': a quux
+  """
+  result = precompileEmber emblem
+  ok(!result.match "a quux")
+
 suite "base indent / predent"
 
 test "predent", ->

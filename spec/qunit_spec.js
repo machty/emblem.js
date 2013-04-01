@@ -1430,6 +1430,30 @@ test("with text terminator", function() {
   return shouldCompileToString(emblem, '<div class="fun"><SomeView nohash>Hello</SomeView></div>');
 });
 
+test("test from heartsentwined", function() {
+  shouldCompileTo('li data-foo=bar: a', {
+    bar: "abc"
+  }, '<li data-foo="abc"><a></a></li>');
+  return shouldCompileTo("li data-foo='bar': a", '<li data-foo="bar"><a></a></li>');
+});
+
+test("mixture of colon and indentation", function() {
+  var emblem;
+  emblem = "li data-foo=bar: a\n  baz";
+  return shouldCompileTo(emblem, {
+    bar: "abc",
+    baz: "Hello"
+  }, '<li data-foo="abc"><a>Hello</a></li>');
+});
+
+test("mixture of colon and indentation", function() {
+  var emblem, result;
+  emblem = "ul\n  li data-foo=bar: a quux\n  li data-foo='bar': a quux\n  li data-foo=bar href='#': a quux";
+  result = precompileEmber(emblem);
+  Handlebars.log(9, result);
+  return ok(!result.match("a quux"));
+});
+
 suite("base indent / predent");
 
 test("predent", function() {

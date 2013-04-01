@@ -588,7 +588,7 @@ fullAttribute
   return [new AST.ContentNode(' ')].concat(a); 
 }
 
-boundAttributeValueChar = [A-Za-z.:0-9_\-]
+boundAttributeValueChar = [A-Za-z.0-9_\-] / nonSeparatorColon
 
 // Value of an action can be an unwrapped string, or a single or double quoted string
 actionValue
@@ -616,12 +616,6 @@ boundAttribute
   var hashNode = new AST.HashNode([[key, new AST.StringNode(value)]]);
   var params = [new AST.IdNode(['bindAttr'])];
   var mustacheNode = new AST.MustacheNode(params, hashNode);
-
-  /* 
-  if(whatever) {
-    mustacheNode = return unshiftParam(mustacheNode, 'unbound');
-  }
-  */
 
   return [mustacheNode];
 }
@@ -676,7 +670,9 @@ htmlTagName "KnownHTMLTagName"
 
 knownTagName = t:tagString &{ return !!KNOWN_TAGS[t]; }  { return t; }
 
-tagChar = [_a-zA-Z0-9-] / c:':' !' ' { return c; }
+tagChar = [_a-zA-Z0-9-] / nonSeparatorColon
+
+nonSeparatorColon = c:':' !' ' { return c; }
 
 knownEvent "a JS event" = t:tagString &{ return !!KNOWN_EVENTS[t]; }  { return t; }
 

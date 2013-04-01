@@ -1450,7 +1450,6 @@ test("mixture of colon and indentation", function() {
   var emblem, result;
   emblem = "ul\n  li data-foo=bar: a quux\n  li data-foo='bar': a quux\n  li data-foo=bar href='#': a quux";
   result = precompileEmber(emblem);
-  Handlebars.log(9, result);
   return ok(!result.match("a quux"));
 });
 

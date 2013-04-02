@@ -522,6 +522,8 @@ equalSign = "==" ' '? { return false; } / "=" ' '? { return true; }
 // #some-id
 // .a-class
 // span.combo#of.stuff
+// NOTE: this returns a 2 element array of [h,s].
+// The return is used to reject a when both h an s are falsy.
 htmlStart = h:htmlTagName? s:shorthandAttributes? &{ return h || s; } 
 
 // Everything that goes in the angle brackets of an html tag. Examples:
@@ -655,7 +657,7 @@ classShorthand = '.' c:cssIdentifier { return c; }
 
 cssIdentifier "CSSIdentifier" = ident
 
-ident = nmstart:nmstart nmchars:$nmchar* { return nmstart + nmchars; }
+ident = $nmchar* 
 
 nmchar = [_a-zA-Z0-9-] / nonascii
 nmstart = [_a-zA-Z] / nonascii

@@ -1736,9 +1736,14 @@ test "GH-26: no need for space before equal sign", ->
   """
   shouldCompileToString emblem, {foo: "YEAH"}, '<div class="hooray">YEAH</div>'
 
-
-
-
+test "numbers in shorthand", ->
+  shouldCompileToString '#4a', '<div id="4a"></div>'
+  shouldCompileToString '.4a', '<div class="4a"></div>'
+  shouldCompileToString '.4', '<div class="4"></div>'
+  shouldCompileToString '#4', '<div id="4"></div>'
+  shouldCompileToString '%4', '<4></4>'
+  shouldCompileToString '%4 ermagerd', '<4>ermagerd</4>'
+  shouldCompileToString '%4#4.4 ermagerd', '<4 id="4" class="4">ermagerd</4>'
 
 test "Emblem has a VERSION defined", ->
   ok(Emblem.VERSION, "Emblem.VERSION should be defined")

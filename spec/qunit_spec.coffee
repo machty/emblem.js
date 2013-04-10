@@ -180,6 +180,15 @@ test "w/ mustaches", ->
   """
   shouldCompileTo emblem, { foo: "YEAH" }, "<div><span>Hello, YEAH are you? Excellent.</span></div>"
 
+test "w/ block mustaches", ->
+  emblem =
+  '''
+  p Hello, #{ sally | Hello },
+    and {{sally: span Hello}}!
+  '''
+
+  shouldCompileTo emblem, 
+                  '<p>Hello <sally class="none">Hello</sally>, and <sally class="none"><span>Hello</span></sally></p>'
 
 test "with followup", ->
   emblem =
@@ -189,8 +198,6 @@ test "with followup", ->
   p Hello.
   """
   shouldCompileTo emblem, "<p>This is pretty cool.</p><p>Hello.</p>"
-
-
 
 suite '#{} syntax'
   

@@ -176,6 +176,12 @@ test("w/ mustaches", function() {
   }, "<div><span>Hello, YEAH are you? Excellent.</span></div>");
 });
 
+test("w/ block mustaches", function() {
+  var emblem;
+  emblem = 'p Hello, #{ sally | Hello },\n  and {{sally: span Hello}}!';
+  return shouldCompileTo(emblem, '<p>Hello <sally class="none">Hello</sally>, and <sally class="none"><span>Hello</span></sally></p>');
+});
+
 test("with followup", function() {
   var emblem;
   emblem = "p This is\n  pretty cool.\np Hello.";

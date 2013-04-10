@@ -59,6 +59,11 @@ with Emblem.js.
 Also, check out the [demo app](https://github.com/machty/emblem-rails-demo)
 which uses the above configuration.
 
+Updates to Emblem syntax do not require an update to `emblem-rails`. To
+update to the latest Emblem, you can run:
+    
+    bundle update emblem-source
+
 ### Via Rake Pipeline
 
 Coming extremely soon.

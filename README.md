@@ -71,6 +71,7 @@ Coming extremely soon.
 1. [emblem-brunch](https://github.com/machty/emblem-brunch), Emblem
    support for Brunch.io
 1. [Mimosa (support for Emblem since v 0.10.1)](https://github.com/dbashford/mimosa)
+1. [grunt-emblem](https://github.com/wordofchristian/grunt-emblem), Emblem support for Grunt (and Yeoman)
 
 # Building Emblem.js
 

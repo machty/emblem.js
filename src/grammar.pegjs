@@ -172,11 +172,15 @@ mustache
   return [m]; 
 }
 
+
 commentContent
  = lineContent TERM ( indentation (commentContent)+ anyDedent)* { return []; }
 
 comment 
   = '/' commentContent { return []; }
+
+inlineComment
+  = '/' lineContent
 
 lineStartingMustache 
   = capitalizedLineStarterMustache / mustacheOrBlock
@@ -234,9 +238,8 @@ indentedContent = blankLine* indentation c:content DEDENT { return c; }
 htmlTerminator
   = colonContent 
   / _ m:explicitMustache { return [m]; } 
-  / _ TERM c:indentedContent? { return c; }
+  / _ inlineComment? TERM c:indentedContent? { return c; }
   / htmlNestedTextNodes
-
 
 // A whole HTML element, including the html tag itself
 // and any nested content inside of it.
@@ -252,7 +255,7 @@ htmlElement = h:inHtmlTag nested:htmlTerminator
   return ret;
 }
 
-mustacheOrBlock = mustacheNode:inMustache _ nestedContentProgramNode:mustacheNestedContent
+mustacheOrBlock = mustacheNode:inMustache _ inlineComment? nestedContentProgramNode:mustacheNestedContent
 { 
   if (!nestedContentProgramNode) { return mustacheNode; }
   return new AST.BlockNode(mustacheNode, nestedContentProgramNode, nestedContentProgramNode.inverse, mustacheNode.id);

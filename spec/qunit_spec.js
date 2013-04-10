@@ -430,6 +430,22 @@ test("empty first line", function() {
   return shouldCompileTo(emblem, "");
 });
 
+test("on same line as html content", function() {
+  var emblem;
+  emblem = ".container / This comment doesn't show up\n  .row / Nor does this\n    p Hello";
+  return shouldCompileTo(emblem, '<div class="container"><div class="row"><p>Hello</p></div></div>');
+});
+
+test("on same line as mustache content", function() {
+  return shouldCompileTo('frank text="YES" text2="NO" / omg', 'WOO: YES NO');
+});
+
+test("on same line as colon syntax", function() {
+  var emblem;
+  emblem = "ul: li: span / omg\n  | Hello";
+  return shouldCompileTo(emblem, '<ul><li><span>Hello</span></li></ul>');
+});
+
 suite("indentation");
 
 test("it doesn't throw when indenting after a line with inline content", function() {

@@ -563,6 +563,26 @@ test "empty first line", ->
   """
   shouldCompileTo emblem, ""
 
+test "on same line as html content", ->
+  emblem = 
+  """
+  .container / This comment doesn't show up
+    .row / Nor does this
+      p Hello
+  """
+  shouldCompileTo emblem, '<div class="container"><div class="row"><p>Hello</p></div></div>'
+
+test "on same line as mustache content", ->
+  shouldCompileTo 'frank text="YES" text2="NO" / omg', 'WOO: YES NO'
+
+test "on same line as colon syntax", ->
+  emblem =
+  """
+  ul: li: span / omg
+    | Hello
+  """
+  shouldCompileTo emblem, '<ul><li><span>Hello</span></li></ul>'
+
 suite "indentation"
 
 # This test used to make sure the emblem code threw, but now we

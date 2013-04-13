@@ -363,10 +363,10 @@ hashSegment
         / key '=' stringNode ) { return [h[0], h[2]]; }
 
 param
-  = pathIdNode
-  / stringNode
+  = booleanNode 
   / integerNode 
-  / booleanNode 
+  / pathIdNode
+  / stringNode
 
 path = first:pathIdent tail:(seperator p:pathIdent { return p; })* 
 {

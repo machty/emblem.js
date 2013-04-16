@@ -91,18 +91,14 @@ This will also automatically run the test suite.
 
 ## Syntax Highlighting
 
-For now, please refer to syntax highlighting solutions for
+Check out [vim-emblem](https://github.com/heartsentwined/vim-emblem)
+for Vim editor support for Emblem.
+
+Otherwise, for now, please refer to syntax highlighting solutions for
 [Slim](http://slim-lang.com/), which is not much different
 from Ember's. At some point, we'll have something even more
 custom tailored to Emblem (feel free to take a swing at it
 and send in a PR).
-
-Vim users with Slim syntax highlighting can set this in
-their `.vimrc`s:
-
-```
-au BufNewFile,BufRead *.emblem set filetype=slim
-```
 
 ## TODO / Contribute
 

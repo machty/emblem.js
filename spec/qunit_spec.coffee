@@ -708,7 +708,6 @@ test "with mustache calling helper", ->
   """
   shouldCompileTo emblem, '<p class="foo ECHO BORF">Hello</p>'
   
-
 suite "html nested"
 
 test "basic", ->
@@ -791,9 +790,12 @@ Handlebars.registerHelper 'booltest', (options) ->
   else "neither"
   result
 
-Handlebars.registerHelper 'typetest', (options) ->
+Handlebars.registerHelper 'hashtypetest', (options) ->
   hash = options.hash
   typeof hash.what
+
+Handlebars.registerHelper 'typetest', (num, options) ->
+  typeof num
 
 Handlebars.registerHelper 'frank', ->
   options = arguments[arguments.length - 1]
@@ -816,14 +818,17 @@ test "hashed parameters should work", ->
   shouldCompileTo 'frank text="YES" text2="NO"', 'WOO: YES NO'
 
 test "booleans", ->
+  shouldCompileToString 'typetest true', 'boolean'
+  shouldCompileToString 'typetest false', 'boolean'
   shouldCompileTo 'booltest what=false', 'false'
   shouldCompileTo 'booltest what=true',  'true'
   shouldCompileTo 'booltest what="false"',  'neither'
   shouldCompileTo 'booltest what="true"',  'neither'
 
 test "integers", ->
-  shouldCompileTo 'typetest what=1', 'number'
-  shouldCompileTo 'typetest what=200', 'number'
+  shouldCompileToString 'typetest 200', 'number'
+  shouldCompileTo 'hashtypetest what=1', 'number'
+  shouldCompileTo 'hashtypetest what=200', 'number'
 
 test "nesting", ->
   emblem =

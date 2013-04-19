@@ -59,6 +59,11 @@ with Emblem.js.
 Also, check out the [demo app](https://github.com/machty/emblem-rails-demo)
 which uses the above configuration.
 
+Updates to Emblem syntax do not require an update to `emblem-rails`. To
+update to the latest Emblem, you can run:
+    
+    bundle update emblem-source
+
 ### Via Rake Pipeline
 
 Coming extremely soon.
@@ -71,6 +76,7 @@ Coming extremely soon.
 1. [emblem-brunch](https://github.com/machty/emblem-brunch), Emblem
    support for Brunch.io
 1. [Mimosa (support for Emblem since v 0.10.1)](https://github.com/dbashford/mimosa)
+1. [grunt-emblem](https://github.com/wordofchristian/grunt-emblem), Emblem support for Grunt (and Yeoman)
 
 # Building Emblem.js
 
@@ -85,18 +91,14 @@ This will also automatically run the test suite.
 
 ## Syntax Highlighting
 
-For now, please refer to syntax highlighting solutions for
+Check out [vim-emblem](https://github.com/heartsentwined/vim-emblem)
+for Vim editor support for Emblem.
+
+Otherwise, for now, please refer to syntax highlighting solutions for
 [Slim](http://slim-lang.com/), which is not much different
 from Ember's. At some point, we'll have something even more
 custom tailored to Emblem (feel free to take a swing at it
 and send in a PR).
-
-Vim users with Slim syntax highlighting can set this in
-their `.vimrc`s:
-
-```
-au BufNewFile,BufRead *.emblem set filetype=slim
-```
 
 ## TODO / Contribute
 

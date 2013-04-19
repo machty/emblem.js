@@ -650,10 +650,14 @@ Handlebars.registerHelper('booltest', function(options) {
   return result;
 });
 
-Handlebars.registerHelper('typetest', function(options) {
+Handlebars.registerHelper('hashtypetest', function(options) {
   var hash;
   hash = options.hash;
   return typeof hash.what;
+});
+
+Handlebars.registerHelper('typetest', function(num, options) {
+  return typeof num;
 });
 
 Handlebars.registerHelper('frank', function() {
@@ -687,6 +691,8 @@ test("hashed parameters should work", function() {
 });
 
 test("booleans", function() {
+  shouldCompileToString('typetest true', 'boolean');
+  shouldCompileToString('typetest false', 'boolean');
   shouldCompileTo('booltest what=false', 'false');
   shouldCompileTo('booltest what=true', 'true');
   shouldCompileTo('booltest what="false"', 'neither');
@@ -694,8 +700,9 @@ test("booleans", function() {
 });
 
 test("integers", function() {
-  shouldCompileTo('typetest what=1', 'number');
-  return shouldCompileTo('typetest what=200', 'number');
+  shouldCompileToString('typetest 200', 'number');
+  shouldCompileTo('hashtypetest what=1', 'number');
+  return shouldCompileTo('hashtypetest what=200', 'number');
 });
 
 test("nesting", function() {

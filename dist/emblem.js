@@ -178,7 +178,7 @@ this.Emblem = {};
 
 Emblem = this.Emblem;
 
-Emblem.VERSION = "0.2.2";
+Emblem.VERSION = "0.2.4";
 
 
 
@@ -2362,13 +2362,13 @@ Emblem.Parser = (function() {
     function peg$parseparam() {
       var s0;
 
-      s0 = peg$parsepathIdNode();
+      s0 = peg$parsebooleanNode();
       if (s0 === null) {
-        s0 = peg$parsestringNode();
+        s0 = peg$parseintegerNode();
         if (s0 === null) {
-          s0 = peg$parseintegerNode();
+          s0 = peg$parsepathIdNode();
           if (s0 === null) {
-            s0 = peg$parsebooleanNode();
+            s0 = peg$parsestringNode();
           }
         }
       }

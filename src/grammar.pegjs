@@ -478,12 +478,21 @@ attributeTextNodesInnerSingle = first:preAttrMustacheTextSingle? tail:(rawMustac
 
 rawMustache = rawMustacheUnescaped / rawMustacheEscaped
 
+recursivelyParsedMustacheContent
+  = !'{' text:$[^}]*
+{
+  // Force interpretation as mustache.
+  // TODO: change to just parse with a specific rule?
+  text = "=" + text;
+  return Emblem.parse(text).statements[0];
+}
+
 rawMustacheEscaped   
- = doubleOpen _ m:inMustache _ doubleClose { m.escaped = true; return m; }
- / hashStacheOpen _ m:inMustache _ hashStacheClose { m.escaped = true; return m; }
+ = doubleOpen _ m:recursivelyParsedMustacheContent _ doubleClose { m.escaped = true; return m; }
+ / hashStacheOpen _ m:recursivelyParsedMustacheContent _ hashStacheClose { m.escaped = true; return m; }
 
 rawMustacheUnescaped 
- = tripleOpen _ m:inMustache _ tripleClose { m.escaped = false; return m; }
+ = tripleOpen _ m:recursivelyParsedMustacheContent _ tripleClose { m.escaped = false; return m; }
 
 preAttrMustacheText = a:$preAttrMustacheUnit+ { return new AST.ContentNode(a); }
 preAttrMustacheTextSingle = a:$preAttrMustacheUnitSingle+ { return new AST.ContentNode(a); }
@@ -501,7 +510,7 @@ nonMustacheUnit
 
 // Support for div#id.whatever{ bindAttr whatever="asd" }
 rawMustacheSingle
- = singleOpen _ m:inMustache _ singleClose { m.escaped = true; return m; }
+ = singleOpen _ m:recursivelyParsedMustacheContent _ singleClose { m.escaped = true; return m; }
 inTagMustache 
   = rawMustacheSingle / rawMustacheUnescaped / rawMustacheEscaped
 

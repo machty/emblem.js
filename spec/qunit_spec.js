@@ -178,8 +178,10 @@ test("w/ mustaches", function() {
 
 test("w/ block mustaches", function() {
   var emblem;
-  emblem = 'p Hello, #{ sally | Hello },\n  and {{sally: span Hello}}!';
-  return shouldCompileTo(emblem, '<p>Hello <sally class="none">Hello</sally>, and <sally class="none"><span>Hello</span></sally></p>');
+  emblem = 'p Hello, #{ sally | Hello},\n  and {{sally: span Hello}}!';
+  shouldCompileTo(emblem, '<p>Hello, <sally class="none">Hello</sally>, and <sally class="none"><span>Hello</span></sally>!</p>');
+  emblem = 'p Hello, #{ sally: span: a Hello}!';
+  return shouldCompileTo(emblem, '<p>Hello, <sally class="none"><span><a>Hello</a></span></sally>!</p>');
 });
 
 test("with followup", function() {

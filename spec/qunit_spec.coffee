@@ -183,12 +183,19 @@ test "w/ mustaches", ->
 test "w/ block mustaches", ->
   emblem =
   '''
-  p Hello, #{ sally | Hello },
+  p Hello, #{ sally | Hello},
     and {{sally: span Hello}}!
   '''
 
   shouldCompileTo emblem, 
-                  '<p>Hello <sally class="none">Hello</sally>, and <sally class="none"><span>Hello</span></sally></p>'
+                  '<p>Hello, <sally class="none">Hello</sally>, and <sally class="none"><span>Hello</span></sally>!</p>'
+
+  emblem =
+  '''
+  p Hello, #{ sally: span: a Hello}!
+  '''
+  shouldCompileTo emblem, 
+                  '<p>Hello, <sally class="none"><span><a>Hello</a></span></sally>!</p>'
 
 test "with followup", ->
   emblem =

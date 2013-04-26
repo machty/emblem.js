@@ -696,7 +696,7 @@ indentation
 INDENT "INDENT" = "\uEFEF" { return ''; }
 DEDENT "DEDENT" = "\uEFFE" { return ''; }
 UNMATCHED_DEDENT "Unmatched DEDENT" = "\uEFEE" { return ''; }
-TERM  "LineEnd" = "\uEFFF" "\n" { return false; }
+TERM  "LineEnd" = "\r"? "\uEFFF" "\n" { return false; }
 
 anyDedent "ANYDEDENT" = (DEDENT / UNMATCHED_DEDENT)
 

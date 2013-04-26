@@ -1603,3 +1603,9 @@ test("numbers in shorthand", function() {
 test("Emblem has a VERSION defined", function() {
   return ok(Emblem.VERSION, "Emblem.VERSION should be defined");
 });
+
+test("Windows line endings", function() {
+  var emblem;
+  emblem = ".navigation\r\n  p Hello\r\n#main\r\n  | hi";
+  return shouldCompileToString(emblem, '<div class="navigation"><p>Hello</p></div><div id="main">hi</div>');
+});

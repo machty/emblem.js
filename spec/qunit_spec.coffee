@@ -1787,3 +1787,8 @@ test "numbers in shorthand", ->
 test "Emblem has a VERSION defined", ->
   ok(Emblem.VERSION, "Emblem.VERSION should be defined")
 
+test "Windows line endings", ->
+  emblem = ".navigation\r\n  p Hello\r\n#main\r\n  | hi"
+  shouldCompileToString emblem, '<div class="navigation"><p>Hello</p></div><div id="main">hi</div>'
+
+

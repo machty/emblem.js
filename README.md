@@ -111,3 +111,7 @@ and send in a PR).
 
 Pull Requests absolutely welcome and encouraged, just don't send me
 non-trivial changes without the test cases to back them up.
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/machty/emblem.js/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+

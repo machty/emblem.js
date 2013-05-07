@@ -4,7 +4,11 @@
   "version":  "0.2.6",
   "homepage": "http://www.emblemjs.com/",
   "keywords": [
-    "ember handlebars template html indentation"
+    "ember",
+    "handlebars",
+    "template",
+    "html",
+    "indentation"
   ],
   "repository": {
     "type": "git",
@@ -21,7 +25,7 @@
   },
   "devDependencies": {
     "pegjs": "git://github.com/dmajda/pegjs.git#8759d4899e3853689a783258ed6c93ffa1436170",
-		"mocha": "*",
+    "mocha": "*",
     "coffee-script": "~1.3"
   },
   "main": "lib/emblem.js",

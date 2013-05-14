@@ -11,9 +11,14 @@ to Handlebars. It is therefore
 Check out the Emblem.js docs site
 [http://www.emblemjs.com](http://www.emblemjs.com).
 
+Also check out the 
+[Embercast on Emblem.js](http://www.embercasts.com/episodes/2)
+
 ## Syntax Examples
 
 - [Read the syntax documentation](http://www.emblemjs.com/syntax).
+- [Watch the Embercast](http://www.embercasts.com/episodes/2)
+
 - [Check out this JSBin.](http://jsbin.com/ulegec/47/edit)
 - Check out this [demo](http://emblem-test.herokuapp.com/) of 
   an [ember-rails](https://github.com/machty/ember-rails) site

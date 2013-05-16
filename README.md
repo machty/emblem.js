@@ -113,8 +113,12 @@ and send in a PR).
 - Refactor the code to be cross-platform (browser/Node/etc).
   It currently is now, it's just mad ugly.
 
-Pull Requests absolutely welcome and encouraged, just don't send me
-non-trivial changes without the test cases to back them up.
+## Reporting Bugs
+
+If you find a bug in Emblem syntax, please try to reproduce it in
+its simplest form with 
+[this JSBin](http://jsbin.com/ulegec/179/edit) before reporting an
+issue, which will help me nail down the source of the issue.
 
 
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/machty/emblem.js/trend.png)](https://bitdeli.com/free "Bitdeli Badge")

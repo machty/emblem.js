@@ -1627,3 +1627,9 @@ test("backslash doesn't cause infinite loop with letter", function() {
   emblem = '| \\a';
   return shouldCompileTo(emblem, "\\a");
 });
+
+test("self closing tag with forward slash", function() {
+  var emblem;
+  emblem = 'p/\n%bork/\n.omg/\n#hello.boo/\np/ class="asdasd"';
+  return shouldCompileTo(emblem, '<p /><bork /><div class="omg" /><div id="hello" class="boo" /><p class="asdasd" />');
+});

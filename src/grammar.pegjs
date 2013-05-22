@@ -536,7 +536,7 @@ equalSign = "==" ' '? { return false; } / "=" ' '? { return true; }
 // span.combo#of.stuff
 // NOTE: this returns a 2 element array of [h,s].
 // The return is used to reject a when both h an s are falsy.
-htmlStart = h:htmlTagName? s:shorthandAttributes? &{ return h || s; } 
+htmlStart = h:htmlTagName? s:shorthandAttributes? '/'? &{ return h || s; } 
 
 // Everything that goes in the angle brackets of an html tag. Examples:
 // p#some-id class="asdasd"
@@ -570,7 +570,8 @@ inHtmlTag = h:htmlStart inTagMustaches:inTagMustache* fullAttributes:fullAttribu
     tagOpenContent = tagOpenContent.concat(fullAttributes[i]);
   }
 
-  if(SELF_CLOSING_TAG[tagName]) {
+  var closingTagSlashPresent = !!h[2];
+  if(SELF_CLOSING_TAG[tagName] || closingTagSlashPresent) {
     tagOpenContent.push(new AST.ContentNode(' />'));
     return [tagOpenContent];
   } else {

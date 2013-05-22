@@ -1820,6 +1820,19 @@ test "backslash doesn't cause infinite loop with letter", ->
   '''
   shouldCompileTo emblem, "\\a"
 
+test "self closing tag with forward slash", ->
+  emblem =
+  '''
+  p/
+  %bork/
+  .omg/
+  #hello.boo/
+  p/ class="asdasd"
+  '''
+  shouldCompileTo emblem, '<p /><bork /><div class="omg" /><div id="hello" class="boo" /><p class="asdasd" />'
+
+
+
 
 
 

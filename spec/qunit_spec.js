@@ -883,6 +883,12 @@ test("unless", function() {
   }, 'FooWootHooray');
 });
 
+test("else followed by newline doesn't gobble else content", function() {
+  var emblem;
+  emblem = "if something\n  p something\nelse\n\n  if nothing\n    p nothing\n  else\n    p not nothing";
+  return shouldCompileTo(emblem, {}, '<p>not nothing</p>');
+});
+
 bindAttrHelper = function() {
   var bindingString, k, options, param, params, v, _ref;
   options = arguments[arguments.length - 1];

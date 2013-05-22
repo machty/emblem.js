@@ -261,7 +261,7 @@ mustacheOrBlock = mustacheNode:inMustache _ inlineComment? nestedContentProgramN
   return new AST.BlockNode(mustacheNode, nestedContentProgramNode, nestedContentProgramNode.inverse, mustacheNode.id);
 }
 
-invertibleContent = c:content i:( DEDENT else _ TERM indentation c:content {return c;})?
+invertibleContent = c:content i:( DEDENT else _ TERM blankLine* indentation c:content {return c;})?
 { 
   return new AST.ProgramNode(c, i || []);
 }

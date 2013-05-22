@@ -1659,7 +1659,7 @@ Emblem.Parser = (function() {
     }
 
     function peg$parseinvertibleContent() {
-      var s0, s1, s2, s3, s4, s5, s6, s7, s8;
+      var s0, s1, s2, s3, s4, s5, s6, s7, s8, s9;
 
       s0 = peg$currPos;
       s1 = peg$parsecontent();
@@ -1673,17 +1673,28 @@ Emblem.Parser = (function() {
             if (s5 !== null) {
               s6 = peg$parseTERM();
               if (s6 !== null) {
-                s7 = peg$parseindentation();
+                s7 = [];
+                s8 = peg$parseblankLine();
+                while (s8 !== null) {
+                  s7.push(s8);
+                  s8 = peg$parseblankLine();
+                }
                 if (s7 !== null) {
-                  s8 = peg$parsecontent();
+                  s8 = peg$parseindentation();
                   if (s8 !== null) {
-                    peg$reportedPos = s2;
-                    s3 = peg$c2(s8);
-                    if (s3 === null) {
-                      peg$currPos = s2;
-                      s2 = s3;
+                    s9 = peg$parsecontent();
+                    if (s9 !== null) {
+                      peg$reportedPos = s2;
+                      s3 = peg$c2(s9);
+                      if (s3 === null) {
+                        peg$currPos = s2;
+                        s2 = s3;
+                      } else {
+                        s2 = s3;
+                      }
                     } else {
-                      s2 = s3;
+                      peg$currPos = s2;
+                      s2 = peg$c0;
                     }
                   } else {
                     peg$currPos = s2;

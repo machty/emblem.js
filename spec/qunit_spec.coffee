@@ -1059,6 +1059,21 @@ test "unless", ->
   """
   shouldCompileTo emblem, {foo: true, bar: false}, 'FooWootHooray'
 
+test "else followed by newline doesn't gobble else content", ->
+  emblem =
+  """
+  if something
+    p something
+  else
+  
+    if nothing
+      p nothing
+    else
+      p not nothing
+  """
+  shouldCompileTo emblem, {}, '<p>not nothing</p>'
+
+
 bindAttrHelper = ->
   options = arguments[arguments.length - 1]
   params = Array::slice.call arguments, 0, -1

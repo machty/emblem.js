@@ -144,7 +144,7 @@ Emblem.Preprocessor = class Preprocessor
                   @indents.push s
 
           # scan safe characters (anything that doesn't *introduce* context)
-          @scan /[^\n\\]+/
+          @scan /[^\n]+/
 
           if @discard /\n/
             @p "#{TERM}\n" 

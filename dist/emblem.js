@@ -5916,7 +5916,7 @@ Emblem.Preprocessor = Preprocessor = (function() {
                 }
               }
             }
-            this.scan(/[^\n\\]+/);
+            this.scan(/[^\n]+/);
             if (this.discard(/\n/)) {
               this.p("" + TERM + "\n");
             }

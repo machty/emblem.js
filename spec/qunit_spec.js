@@ -1609,3 +1609,15 @@ test("Windows line endings", function() {
   emblem = ".navigation\r\n  p Hello\r\n#main\r\n  | hi";
   return shouldCompileToString(emblem, '<div class="navigation"><p>Hello</p></div><div id="main">hi</div>');
 });
+
+test("backslash doesn't cause infinite loop", function() {
+  var emblem;
+  emblem = '| \\';
+  return shouldCompileTo(emblem, "\\");
+});
+
+test("backslash doesn't cause infinite loop with letter", function() {
+  var emblem;
+  emblem = '| \\a';
+  return shouldCompileTo(emblem, "\\a");
+});

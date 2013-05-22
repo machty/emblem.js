@@ -1791,4 +1791,23 @@ test "Windows line endings", ->
   emblem = ".navigation\r\n  p Hello\r\n#main\r\n  | hi"
   shouldCompileToString emblem, '<div class="navigation"><p>Hello</p></div><div id="main">hi</div>'
 
+test "backslash doesn't cause infinite loop", ->
+  emblem =
+  '''
+  | \\
+  '''
+  shouldCompileTo emblem, "\\"
+
+test "backslash doesn't cause infinite loop with letter", ->
+  emblem =
+  '''
+  | \\a
+  '''
+  shouldCompileTo emblem, "\\a"
+
+
+
+
+
+
 

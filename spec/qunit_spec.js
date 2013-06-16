@@ -1483,7 +1483,7 @@ test("mixture of colon and indentation", function() {
   }, '<li data-foo="abc"><a>Hello</a></li>');
 });
 
-test("mixture of colon and indentation", function() {
+test("mixture of colon and indentation pt.2", function() {
   var emblem, result;
   emblem = "ul\n  li data-foo=bar: a quux\n  li data-foo='bar': a quux\n  li data-foo=bar href='#': a quux";
   result = precompileEmber(emblem);
@@ -1632,4 +1632,10 @@ test("self closing tag with forward slash", function() {
   var emblem;
   emblem = 'p/\n%bork/\n.omg/\n#hello.boo/\np/ class="asdasd"';
   return shouldCompileTo(emblem, '<p /><bork /><div class="omg" /><div id="hello" class="boo" /><p class="asdasd" />');
+});
+
+test("tagnames and attributes with colons", function() {
+  var emblem;
+  emblem = '%al:ex match:neer="snork" Hello!';
+  return shouldCompileTo(emblem, '<al:ex match:neer="snork">Hello!</al:ex>');
 });

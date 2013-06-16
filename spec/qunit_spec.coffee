@@ -1658,7 +1658,7 @@ test "mixture of colon and indentation", ->
   """
   shouldCompileTo emblem, { bar: "abc", baz: "Hello" }, '<li data-foo="abc"><a>Hello</a></li>'
 
-test "mixture of colon and indentation", ->
+test "mixture of colon and indentation pt.2", ->
   emblem = """
   ul
     li data-foo=bar: a quux
@@ -1831,11 +1831,11 @@ test "self closing tag with forward slash", ->
   '''
   shouldCompileTo emblem, '<p /><bork /><div class="omg" /><div id="hello" class="boo" /><p class="asdasd" />'
 
-
-
-
-
-
-
+test "tagnames and attributes with colons", ->
+  emblem =
+  '''
+  %al:ex match:neer="snork" Hello!
+  '''
+  shouldCompileTo emblem, '<al:ex match:neer="snork">Hello!</al:ex>'
 
 

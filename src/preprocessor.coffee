@@ -10,8 +10,8 @@ Emblem.Preprocessor = class Preprocessor
   TERM   = '\uEFFF'
 
   # Convenience names for regex's
-  anyWhitespaceAndNewlinesTouchingEOF = /// [#{ws}\n]* $ ///
-  any_whitespaceFollowedByNewlines_ = /// (?:[#{ws}]* \n)+ ///
+  anyWhitespaceAndNewlinesTouchingEOF = /// [#{ws}\r?\n]* $ ///
+  any_whitespaceFollowedByNewlines_ = /// (?:[#{ws}]* \r?\n)+ ///
 
   constructor: ->
     # `base` is either `null` or a regexp that matches the base indentation
@@ -32,6 +32,11 @@ Emblem.Preprocessor = class Preprocessor
           @push c
         when DEDENT
           (@err c) unless top is INDENT
+          do @pop
+        when '\r'
+          # TODO
+          oiasoijdoiaj.asdasd.asdasd
+          (@err c) unless top is '/'
           do @pop
         when '\n'
           (@err c) unless top is '/'
@@ -81,7 +86,7 @@ Emblem.Preprocessor = class Preprocessor
             # We're at the beginning of a line, 
 
             # Check for empty line.
-            if @discard /// [#{ws}]*\n ///
+            if @discard /// [#{ws}]*\r?\n ///
               @p "#{TERM}\n" 
               continue
 
@@ -144,9 +149,9 @@ Emblem.Preprocessor = class Preprocessor
                   @indents.push s
 
           # scan safe characters (anything that doesn't *introduce* context)
-          @scan /[^\n]+/
+          @scan /[^\r\n]+/
 
-          if @discard /\n/
+          if @discard /\r?\n/
             @p "#{TERM}\n" 
 
     # Done scanning. Check if we're at the end of the file.

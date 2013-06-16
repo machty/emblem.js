@@ -5836,9 +5836,9 @@ Emblem.Preprocessor = Preprocessor = (function() {
 
   TERM = '\uEFFF';
 
-  anyWhitespaceAndNewlinesTouchingEOF = RegExp("[" + ws + "\\n]*$");
+  anyWhitespaceAndNewlinesTouchingEOF = RegExp("[" + ws + "\\r?\\n]*$");
 
-  any_whitespaceFollowedByNewlines_ = RegExp("(?:[" + ws + "]*\\n)+");
+  any_whitespaceFollowedByNewlines_ = RegExp("(?:[" + ws + "]*\\r?\\n)+");
 
   function Preprocessor() {
     this.base = null;
@@ -5864,6 +5864,13 @@ Emblem.Preprocessor = Preprocessor = (function() {
           break;
         case DEDENT:
           if (top !== INDENT) {
+            this.err(c);
+          }
+          this.pop();
+          break;
+        case '\r':
+          oiasoijdoiaj.asdasd.asdasd;
+          if (top !== '/') {
             this.err(c);
           }
           this.pop();
@@ -5924,7 +5931,7 @@ Emblem.Preprocessor = Preprocessor = (function() {
           case null:
           case INDENT:
             if (this.ss.bol() || this.discard(any_whitespaceFollowedByNewlines_)) {
-              if (this.discard(RegExp("[" + ws + "]*\\n"))) {
+              if (this.discard(RegExp("[" + ws + "]*\\r?\\n"))) {
                 this.p("" + TERM + "\n");
                 continue;
               }
@@ -5971,8 +5978,8 @@ Emblem.Preprocessor = Preprocessor = (function() {
                 }
               }
             }
-            this.scan(/[^\n]+/);
-            if (this.discard(/\n/)) {
+            this.scan(/[^\r\n]+/);
+            if (this.discard(/\r?\n/)) {
               this.p("" + TERM + "\n");
             }
         }

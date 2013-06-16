@@ -1639,3 +1639,9 @@ test("tagnames and attributes with colons", function() {
   emblem = '%al:ex match:neer="snork" Hello!';
   return shouldCompileTo(emblem, '<al:ex match:neer="snork">Hello!</al:ex>');
 });
+
+test("windows newlines", function() {
+  var emblem;
+  emblem = "\r\n  \r\n  p Hello\r\n\r\n";
+  return shouldCompileTo(emblem, '<p>Hello</p>');
+});

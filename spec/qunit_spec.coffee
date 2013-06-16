@@ -1838,4 +1838,7 @@ test "tagnames and attributes with colons", ->
   '''
   shouldCompileTo emblem, '<al:ex match:neer="snork">Hello!</al:ex>'
 
+test "windows newlines", ->
+  emblem = "\r\n  \r\n  p Hello\r\n\r\n"
+  shouldCompileTo emblem, '<p>Hello</p>'
 

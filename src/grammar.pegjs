@@ -39,7 +39,7 @@
     span: true, samp: true, ruby: true, nobr: true, meta: true, menu: true, 
     mark: true, main: true, link: true, html: true, head: true, form: true, 
     font: true, data: true, code: true, cite: true, body: true, base: true, 
-    area: true, abbr: true, xmp: true, wbr: true, var: true, sup: true, 
+    area: true, abbr: true, xmp: true, wbr: true, 'var': true, sup: true, 
     sub: true, pre: true, nav: true, map: true, kbd: true, ins: true, 
     img: true, div: true, dir: true, dfn: true, del: true, col: true, 
     big: true, bdo: true, bdi: true, ul: true, tt: true, tr: true, th: true, td: true, 

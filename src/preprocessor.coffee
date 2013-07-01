@@ -34,8 +34,7 @@ Emblem.Preprocessor = class Preprocessor
           (@err c) unless top is INDENT
           do @pop
         when '\r'
-          # TODO
-          oiasoijdoiaj.asdasd.asdasd
+          # TODO: remove this. Pretty certain it's unused.
           (@err c) unless top is '/'
           do @pop
         when '\n'

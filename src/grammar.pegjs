@@ -73,7 +73,7 @@
     }
 
     var params = [mustacheNode.id].concat(mustacheNode.params);
-    params.unshift(new AST.IdNode([helperName]));
+    params.unshift(new AST.IdNode([{ part: helperName}]));
     return new AST.MustacheNode(params, hash, !mustacheNode.escaped);
   }
 
@@ -163,7 +163,7 @@ legacyPartialInvocation
 }
 
 legacyPartialName
-  = s:$[a-zA-Z0-9_$-/]+ { return new AST.PartialNameNode(s); }
+  = s:$[a-zA-Z0-9_$-/]+ { return new AST.PartialNameNode(new AST.StringNode(s)); }
 
 // Returns [MustacheNode] or [BlockNode]
 mustache 
@@ -284,7 +284,7 @@ inMustache
   = isPartial:'>'? _ path:pathIdNode params:inMustacheParam* hash:hash? 
 { 
   if(isPartial) {
-    var n = new AST.PartialNameNode(path.string);
+    var n = new AST.PartialNameNode(new AST.StringNode(path.string));
     return new AST.PartialNode(n, params[0]);
   }
 
@@ -368,11 +368,10 @@ param
   / pathIdNode
   / stringNode
 
-path = first:pathIdent tail:(seperator p:pathIdent { return p; })* 
+path = first:pathIdent tail:(s:seperator p:pathIdent { return { part: p, separator: s }; })* 
 {
-  var ret = [first];
+  var ret = [{ part: first }];
   for(var i = 0; i < tail.length; ++i) {
-    //ret = ret.concat(tail[i]);
     ret.push(tail[i]);
   }
   return ret;
@@ -380,14 +379,14 @@ path = first:pathIdent tail:(seperator p:pathIdent { return p; })*
 
 seperator "PathSeparator" = [\/.]
 
-pathIdNode  = v:path    
+pathIdNode = v:path    
 { 
   var last = v[v.length - 1];
   var match;
   var suffixModifier;
-  if(match = last.match(/[!\?\^]$/)) {
+  if(match = last.part.match(/[!\?\^]$/)) {
     suffixModifier = match[0];
-    v[v.length - 1] = last.slice(0, -1);
+    last.part = last.part.slice(0, -1);
   }
 
   var idNode = new AST.IdNode(v); 
@@ -629,7 +628,7 @@ boundAttribute
   = key:key '=' value:boundAttributeValue !'!' &{ return IS_EMBER; }
 { 
   var hashNode = new AST.HashNode([[key, new AST.StringNode(value)]]);
-  var params = [new AST.IdNode(['bindAttr'])];
+  var params = [new AST.IdNode([{part: 'bindAttr'}])];
   var mustacheNode = new AST.MustacheNode(params, hashNode);
 
   return [mustacheNode];

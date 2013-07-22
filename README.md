@@ -14,6 +14,15 @@ Check out the Emblem.js docs site
 Also check out the 
 [Embercast on Emblem.js](http://www.embercasts.com/episodes/2)
 
+## Handlebars Version Dependencies (UPDATE: July 2013)
+
+In the push to Handlebars 1.0.0, some changes were made to the Handlebars 
+internals that broke Emblem, but Emblem's been fixed as of July 1, 2013.
+Here are the versions you should be using:
+
+- Handlebars 1.0.0: Use Emblem >= 0.3.0
+- Handlebars <= 1.0.0.rc4: Use Emblem <= 0.2.9
+
 ## Syntax Examples
 
 - [Read the syntax documentation](http://www.emblemjs.com/syntax).

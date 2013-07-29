@@ -2,7 +2,7 @@
 this.Emblem = {}
 Emblem = this.Emblem
 
-Emblem.VERSION = "0.2.9"
+Emblem.VERSION = "0.3.1"
 
 module.exports = Emblem
 

@@ -178,7 +178,7 @@ this.Emblem = {};
 
 Emblem = this.Emblem;
 
-Emblem.VERSION = "0.2.9";
+Emblem.VERSION = "0.3.1";
 
 
 
@@ -6013,7 +6013,7 @@ Emblem.Preprocessor = Preprocessor = (function() {
 })();
 ;
 // lib/emberties.js
-var ENV, Emblem, _base;
+var ENV, Emblem, _base, _base1;
 
 
 
@@ -6041,8 +6041,20 @@ ENV.EMBER_LOAD_HOOKS || (ENV.EMBER_LOAD_HOOKS = {});
 
 (_base = ENV.EMBER_LOAD_HOOKS).application || (_base.application = []);
 
-ENV.EMBER_LOAD_HOOKS.application.push(function() {
-  return Emblem.compileScriptTags();
+(_base1 = ENV.EMBER_LOAD_HOOKS)['Ember.Application'] || (_base1['Ember.Application'] = []);
+
+ENV.EMBER_LOAD_HOOKS.application.push(Emblem.compileScriptTags);
+
+ENV.EMBER_LOAD_HOOKS['Ember.Application'].push(function(Application) {
+  if (Application.initializer) {
+    return Application.initializer({
+      name: 'emblemDomTemplates',
+      before: 'registerComponents',
+      initialize: Emblem.compileScriptTags
+    });
+  } else {
+    return Ember.onLoad('application', Emblem.compileScriptTags);
+  }
 });
 ;
 

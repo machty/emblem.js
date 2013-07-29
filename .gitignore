@@ -8,3 +8,5 @@ lib/coffee-script/bootstrap
 lib/coffee-script/*.tmp
 
 *gem
+
+.DS_Store

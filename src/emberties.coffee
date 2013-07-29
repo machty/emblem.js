@@ -23,15 +23,21 @@ Emblem.compileScriptTags = () ->
       Ember.TEMPLATES[templateName] = Emblem.compile(handlebarsVariant, script.html())
       script.remove()
 
-# Register hook. If this functionality isn't in the present version of Ember,
-# must mqnually put the following code after Ember has been included:
-#
-#   Ember.onLoad('application', function() { 
-#     Emblem.enableEmber();
-#   });
-
 this.ENV ||= {}
 ENV = this.ENV
 ENV.EMBER_LOAD_HOOKS ||= {}
+
+# Support old and new styles.
+# Note: New style (Ember.Application) is necessary for Ember.Component support.
 ENV.EMBER_LOAD_HOOKS.application ||= []
-ENV.EMBER_LOAD_HOOKS.application.push -> Emblem.compileScriptTags()
+ENV.EMBER_LOAD_HOOKS['Ember.Application'] ||= []
+ENV.EMBER_LOAD_HOOKS.application.push Emblem.compileScriptTags
+ENV.EMBER_LOAD_HOOKS['Ember.Application'].push (Application) -> 
+  if Application.initializer
+    Application.initializer
+      name: 'emblemDomTemplates'
+      before: 'registerComponents'
+      initialize: Emblem.compileScriptTags
+  else 
+    Ember.onLoad 'application', Emblem.compileScriptTags
+

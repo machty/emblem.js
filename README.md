@@ -126,7 +126,7 @@ and send in a PR).
 
 If you find a bug in Emblem syntax, please try to reproduce it in
 its simplest form with 
-[this JSBin](http://jsbin.com/ucanam/429/edit) before reporting an
+[this JSBin](http://jsbin.com/ucanam/527/edit) before reporting an
 issue, which will help me nail down the source of the issue.
 
 

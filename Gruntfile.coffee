@@ -17,7 +17,6 @@ module.exports = (grunt) ->
     clean: ["tmp"]
 
     coffee:
-      #'snog/shlort.js': 'src/*coffee'
       foo:
         'snog/shlort.js': 'src/compiler.coffee'
       bar:
@@ -34,20 +33,10 @@ module.exports = (grunt) ->
     concat:
       grammar:
         src: "tmp/grammar.js"
-        dest: "tmp/grammar-final.js"
+        dest: "lib/parser.js"
         options:
           banner: "var Emblem = require('./emblem');\n\n"
           footer: "\n\nmodule.exports = Emblem.Parser;\n"
-      
-    #coffeeify:
-      #options: {}
-
-      #files: [
-        #{
-          #src: ['src/**/*.coffee', 'path/to/src/**/*.js']
-          #dest: 'dist/myApp.js'
-        #}
-      #]
 
   grunt.registerTask 'compileParser', 'Compile PegJS grammar file', 
                      ['peg', 'concat:grammar']
@@ -64,7 +53,6 @@ module.exports = (grunt) ->
   grunt.registerTask 'default', ['build']
 
   # We need to:
-  # 1) Compile parser.pegjs into a js file
   # 2) Compile *.coffee into *.js
   #    -- At this point, everything should be in lib/ with proper requires that you'd expect.
   # 3) Create dist/emblem.js

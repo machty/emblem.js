@@ -1,2 +1,0 @@
-var Emblem = require('./emblem');
-

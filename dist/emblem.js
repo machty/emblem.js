@@ -1,178 +1,103 @@
-  (function(root) {
-
-    
-(function(root) {
-  var StringScanner;
-  StringScanner = (function() {
-    function StringScanner(str) {
-      this.str = str != null ? str : '';
-      this.str = '' + this.str;
-      this.pos = 0;
-      this.lastMatch = {
-        reset: function() {
-          this.str = null;
-          this.captures = [];
-          return this;
-        }
-      }.reset();
-      this;
-    }
-    StringScanner.prototype.bol = function() {
-      return this.pos <= 0 || (this.str[this.pos - 1] === "\n");
-    };
-    StringScanner.prototype.captures = function() {
-      return this.lastMatch.captures;
-    };
-    StringScanner.prototype.check = function(pattern) {
-      var matches;
-      if (this.str.substr(this.pos).search(pattern) !== 0) {
-        this.lastMatch.reset();
-        return null;
-      }
-      matches = this.str.substr(this.pos).match(pattern);
-      this.lastMatch.str = matches[0];
-      this.lastMatch.captures = matches.slice(1);
-      return this.lastMatch.str;
-    };
-    StringScanner.prototype.checkUntil = function(pattern) {
-      var matches, patternPos;
-      patternPos = this.str.substr(this.pos).search(pattern);
-      if (patternPos < 0) {
-        this.lastMatch.reset();
-        return null;
-      }
-      matches = this.str.substr(this.pos + patternPos).match(pattern);
-      this.lastMatch.captures = matches.slice(1);
-      return this.lastMatch.str = this.str.substr(this.pos, patternPos) + matches[0];
-    };
-    StringScanner.prototype.clone = function() {
-      var clone, prop, value, _ref;
-      clone = new this.constructor(this.str);
-      clone.pos = this.pos;
-      clone.lastMatch = {};
-      _ref = this.lastMatch;
-      for (prop in _ref) {
-        value = _ref[prop];
-        clone.lastMatch[prop] = value;
-      }
-      return clone;
-    };
-    StringScanner.prototype.concat = function(str) {
-      this.str += str;
-      return this;
-    };
-    StringScanner.prototype.eos = function() {
-      return this.pos === this.str.length;
-    };
-    StringScanner.prototype.exists = function(pattern) {
-      var matches, patternPos;
-      patternPos = this.str.substr(this.pos).search(pattern);
-      if (patternPos < 0) {
-        this.lastMatch.reset();
-        return null;
-      }
-      matches = this.str.substr(this.pos + patternPos).match(pattern);
-      this.lastMatch.str = matches[0];
-      this.lastMatch.captures = matches.slice(1);
-      return patternPos;
-    };
-    StringScanner.prototype.getch = function() {
-      return this.scan(/./);
-    };
-    StringScanner.prototype.match = function() {
-      return this.lastMatch.str;
-    };
-    StringScanner.prototype.matches = function(pattern) {
-      this.check(pattern);
-      return this.matchSize();
-    };
-    StringScanner.prototype.matched = function() {
-      return this.lastMatch.str != null;
-    };
-    StringScanner.prototype.matchSize = function() {
-      if (this.matched()) {
-        return this.match().length;
-      } else {
-        return null;
-      }
-    };
-    StringScanner.prototype.peek = function(len) {
-      return this.str.substr(this.pos, len);
-    };
-    StringScanner.prototype.pointer = function() {
-      return this.pos;
-    };
-    StringScanner.prototype.setPointer = function(pos) {
-      pos = +pos;
-      if (pos < 0) {
-        pos = 0;
-      }
-      if (pos > this.str.length) {
-        pos = this.str.length;
-      }
-      return this.pos = pos;
-    };
-    StringScanner.prototype.reset = function() {
-      this.lastMatch.reset();
-      this.pos = 0;
-      return this;
-    };
-    StringScanner.prototype.rest = function() {
-      return this.str.substr(this.pos);
-    };
-    StringScanner.prototype.scan = function(pattern) {
-      var chk;
-      chk = this.check(pattern);
-      if (chk != null) {
-        this.pos += chk.length;
-      }
-      return chk;
-    };
-    StringScanner.prototype.scanUntil = function(pattern) {
-      var chk;
-      chk = this.checkUntil(pattern);
-      if (chk != null) {
-        this.pos += chk.length;
-      }
-      return chk;
-    };
-    StringScanner.prototype.skip = function(pattern) {
-      this.scan(pattern);
-      return this.matchSize();
-    };
-    StringScanner.prototype.skipUntil = function(pattern) {
-      this.scanUntil(pattern);
-      return this.matchSize();
-    };
-    StringScanner.prototype.string = function() {
-      return this.str;
-    };
-    StringScanner.prototype.terminate = function() {
-      this.pos = this.str.length;
-      this.lastMatch.reset();
-      return this;
-    };
-    StringScanner.prototype.toString = function() {
-      return "#<StringScanner " + (this.eos() ? 'fin' : "" + this.pos + "/" + this.str.length + " @ " + (this.str.length > 8 ? "" + (this.str.substr(0, 5)) + "..." : this.str)) + ">";
-    };
-    return StringScanner;
-  })();
-  StringScanner.prototype.beginningOfLine = StringScanner.prototype.bol;
-  StringScanner.prototype.clear = StringScanner.prototype.terminate;
-  StringScanner.prototype.dup = StringScanner.prototype.clone;
-  StringScanner.prototype.endOfString = StringScanner.prototype.eos;
-  StringScanner.prototype.exist = StringScanner.prototype.exists;
-  StringScanner.prototype.getChar = StringScanner.prototype.getch;
-  StringScanner.prototype.position = StringScanner.prototype.pointer;
-  StringScanner.StringScanner = StringScanner;
-  this.StringScanner = StringScanner;
-})(this);
-
-var StringScanner = this.StringScanner;
-
-
-// lib/emblem.js
+;(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var Emblem;
+
+Emblem = require('./emblem');
+
+Emblem.throwCompileError = function(line, msg) {
+  throw new Error("Emblem syntax error, line " + line + ": " + msg);
+};
+
+Emblem.registerPartial = function(handlebarsVariant, partialName, text) {
+  if (!text) {
+    text = partialName;
+    partialName = handlebarsVariant;
+    handlebarsVariant = Handlebars;
+  }
+  return handlebarsVariant.registerPartial(partialName, Emblem.compile(handlebarsVariant, text));
+};
+
+Emblem.parse = function(string) {
+  var e, line, lines, msg, processed;
+  try {
+    processed = Emblem.Preprocessor.processSync(string);
+    return Emblem.Parser.parse(processed);
+  } catch (_error) {
+    e = _error;
+    if (e instanceof Emblem.Parser.SyntaxError) {
+      lines = string.split("\n");
+      line = lines[e.line - 1];
+      msg = "" + e.message + "\n" + line + "\n";
+      msg += new Array(e.column).join("-");
+      msg += "^";
+      return Emblem.throwCompileError(e.line, msg);
+    } else {
+      throw e;
+    }
+  }
+};
+
+Emblem.precompile = function(handlebarsVariant, string, options) {
+  var ast;
+  if (options == null) {
+    options = {};
+  }
+  Emblem.handlebarsVariant = handlebarsVariant;
+  ast = Emblem.parse(string);
+  return handlebarsVariant.precompile(ast, options);
+};
+
+Emblem.compile = function(handlebarsVariant, string, options) {
+  var ast;
+  if (options == null) {
+    options = {};
+  }
+  Emblem.handlebarsVariant = handlebarsVariant;
+  ast = Emblem.parse(string);
+  return handlebarsVariant.compile(ast, options);
+};
+
+},{"./emblem":3}],2:[function(require,module,exports){
+var ENV, Emblem, _base, _base1;
+
+Emblem = require('./emblem');
+
+if (typeof window !== "undefined" && window !== null) {
+  Emblem.compileScriptTags = function() {
+    if (typeof Ember === "undefined" || Ember === null) {
+      throw new Error("Can't run Emblem.enableEmber before Ember has been defined");
+    }
+    if (typeof document !== "undefined" && document !== null) {
+      return Ember.$('script[type="text/x-emblem"], script[type="text/x-raw-emblem"]', Ember.$(document)).each(function() {
+        var handlebarsVariant, script, templateName;
+        script = Ember.$(this);
+        handlebarsVariant = script.attr('type') === 'text/x-raw-handlebars' ? Handlebars : Ember.Handlebars;
+        templateName = script.attr('data-template-name') || script.attr('id') || 'application';
+        Ember.TEMPLATES[templateName] = Emblem.compile(handlebarsVariant, script.html());
+        return script.remove();
+      });
+    }
+  };
+  window.ENV || (window.ENV = {});
+  ENV = window.ENV;
+  ENV.EMBER_LOAD_HOOKS || (ENV.EMBER_LOAD_HOOKS = {});
+  (_base = ENV.EMBER_LOAD_HOOKS).application || (_base.application = []);
+  (_base1 = ENV.EMBER_LOAD_HOOKS)['Ember.Application'] || (_base1['Ember.Application'] = []);
+  ENV.EMBER_LOAD_HOOKS.application.push(Emblem.compileScriptTags);
+  ENV.EMBER_LOAD_HOOKS['Ember.Application'].push(function(Application) {
+    if (Application.initializer) {
+      return Application.initializer({
+        name: 'emblemDomTemplates',
+        before: 'registerComponents',
+        initialize: Emblem.compileScriptTags
+      });
+    } else {
+      return Ember.onLoad('application', Emblem.compileScriptTags);
+    }
+  });
+}
+
+},{"./emblem":3}],3:[function(require,module,exports){
+var global=self;var Emblem;
 
 this.Emblem = {};
 
@@ -180,18 +105,24 @@ Emblem = this.Emblem;
 
 Emblem.VERSION = "0.3.1";
 
+module.exports = Emblem;
 
+if (typeof window !== "undefined" && window !== null) {
+  window.Emblem = Emblem;
+}
 
+global.Emblem = Emblem;
 
+require('./parser');
 
+require('./compiler');
 
+require('./preprocessor');
 
+require('./emberties');
 
-
-
-;
-// lib/parser.js
-
+},{"./compiler":1,"./emberties":2,"./parser":4,"./preprocessor":5}],4:[function(require,module,exports){
+var Emblem = require('./emblem');
 
 Emblem.Parser = (function() {
   /*
@@ -760,10 +691,10 @@ Emblem.Parser = (function() {
     }
 
     function peg$computePosDetails(pos) {
-      function advance(details, pos) {
+      function advance(details, startPos, endPos) {
         var p, ch;
 
-        for (p = 0; p < pos; p++) {
+        for (p = startPos; p < endPos; p++) {
           ch = input.charAt(p);
           if (ch === "\n") {
             if (!details.seenCR) { details.line++; }
@@ -785,8 +716,8 @@ Emblem.Parser = (function() {
           peg$cachedPos = 0;
           peg$cachedPosDetails = { line: 1, column: 1, seenCR: false };
         }
+        advance(peg$cachedPosDetails, peg$cachedPos, pos);
         peg$cachedPos = pos;
-        advance(peg$cachedPosDetails, peg$cachedPos);
       }
 
       return peg$cachedPosDetails;
@@ -881,7 +812,7 @@ Emblem.Parser = (function() {
         }
         if (s2 !== null) {
           peg$reportedPos = s0;
-          s1 = peg$c3(s1,s2);
+          s1 = peg$c3(s1, s2);
           if (s1 === null) {
             peg$currPos = s0;
             s0 = s1;
@@ -1076,7 +1007,7 @@ Emblem.Parser = (function() {
                   s7 = peg$parseTERM();
                   if (s7 !== null) {
                     peg$reportedPos = s0;
-                    s1 = peg$c15(s3,s5);
+                    s1 = peg$c15(s3, s5);
                     if (s1 === null) {
                       peg$currPos = s0;
                       s0 = s1;
@@ -1444,7 +1375,7 @@ Emblem.Parser = (function() {
           }
           if (s3 !== null) {
             peg$reportedPos = s0;
-            s1 = peg$c27(s2,s3);
+            s1 = peg$c27(s2, s3);
             if (s1 === null) {
               peg$currPos = s0;
               s0 = s1;
@@ -1596,7 +1527,7 @@ Emblem.Parser = (function() {
         s2 = peg$parsehtmlTerminator();
         if (s2 !== null) {
           peg$reportedPos = s0;
-          s1 = peg$c30(s1,s2);
+          s1 = peg$c30(s1, s2);
           if (s1 === null) {
             peg$currPos = s0;
             s0 = s1;
@@ -1631,7 +1562,7 @@ Emblem.Parser = (function() {
             s4 = peg$parsemustacheNestedContent();
             if (s4 !== null) {
               peg$reportedPos = s0;
-              s1 = peg$c31(s1,s4);
+              s1 = peg$c31(s1, s4);
               if (s1 === null) {
                 peg$currPos = s0;
                 s0 = s1;
@@ -1725,7 +1656,7 @@ Emblem.Parser = (function() {
         }
         if (s2 !== null) {
           peg$reportedPos = s0;
-          s1 = peg$c3(s1,s2);
+          s1 = peg$c3(s1, s2);
           if (s1 === null) {
             peg$currPos = s0;
             s0 = s1;
@@ -1872,7 +1803,7 @@ Emblem.Parser = (function() {
         s2 = peg$parsemustacheOrBlock();
         if (s2 !== null) {
           peg$reportedPos = s0;
-          s1 = peg$c36(s1,s2);
+          s1 = peg$c36(s1, s2);
           if (s1 === null) {
             peg$currPos = s0;
             s0 = s1;
@@ -1923,7 +1854,7 @@ Emblem.Parser = (function() {
               }
               if (s5 !== null) {
                 peg$reportedPos = s0;
-                s1 = peg$c37(s1,s3,s4,s5);
+                s1 = peg$c37(s1, s3, s4, s5);
                 if (s1 === null) {
                   peg$currPos = s0;
                   s0 = s1;
@@ -2026,7 +1957,7 @@ Emblem.Parser = (function() {
         }
         if (s2 !== null) {
           peg$reportedPos = s0;
-          s1 = peg$c41(s1,s2);
+          s1 = peg$c41(s1, s2);
           if (s1 === null) {
             peg$currPos = s0;
             s0 = s1;
@@ -2438,7 +2369,7 @@ Emblem.Parser = (function() {
           s5 = peg$parsepathIdent();
           if (s5 !== null) {
             peg$reportedPos = s3;
-            s4 = peg$c57(s4,s5);
+            s4 = peg$c57(s4, s5);
             if (s4 === null) {
               peg$currPos = s3;
               s3 = s4;
@@ -2461,7 +2392,7 @@ Emblem.Parser = (function() {
             s5 = peg$parsepathIdent();
             if (s5 !== null) {
               peg$reportedPos = s3;
-              s4 = peg$c57(s4,s5);
+              s4 = peg$c57(s4, s5);
               if (s4 === null) {
                 peg$currPos = s3;
                 s3 = s4;
@@ -2479,7 +2410,7 @@ Emblem.Parser = (function() {
         }
         if (s2 !== null) {
           peg$reportedPos = s0;
-          s1 = peg$c58(s1,s2);
+          s1 = peg$c58(s1, s2);
           if (s1 === null) {
             peg$currPos = s0;
             s0 = s1;
@@ -2944,7 +2875,7 @@ Emblem.Parser = (function() {
             s4 = peg$parseanyDedent();
             if (s4 !== null) {
               peg$reportedPos = s0;
-              s1 = peg$c86(s1,s2,s3);
+              s1 = peg$c86(s1, s2, s3);
               if (s1 === null) {
                 peg$currPos = s0;
                 s0 = s1;
@@ -3085,7 +3016,7 @@ Emblem.Parser = (function() {
           }
           if (s3 !== null) {
             peg$reportedPos = s0;
-            s1 = peg$c92(s1,s2,s3);
+            s1 = peg$c92(s1, s2, s3);
             if (s1 === null) {
               peg$currPos = s0;
               s0 = s1;
@@ -3161,7 +3092,7 @@ Emblem.Parser = (function() {
           s3 = peg$parseTERM();
           if (s3 !== null) {
             peg$reportedPos = s0;
-            s1 = peg$c93(s1,s2);
+            s1 = peg$c93(s1, s2);
             if (s1 === null) {
               peg$currPos = s0;
               s0 = s1;
@@ -3322,7 +3253,7 @@ Emblem.Parser = (function() {
         }
         if (s2 !== null) {
           peg$reportedPos = s0;
-          s1 = peg$c94(s1,s2);
+          s1 = peg$c94(s1, s2);
           if (s1 === null) {
             peg$currPos = s0;
             s0 = s1;
@@ -3392,7 +3323,7 @@ Emblem.Parser = (function() {
         }
         if (s2 !== null) {
           peg$reportedPos = s0;
-          s1 = peg$c94(s1,s2);
+          s1 = peg$c94(s1, s2);
           if (s1 === null) {
             peg$currPos = s0;
             s0 = s1;
@@ -4213,7 +4144,7 @@ Emblem.Parser = (function() {
           }
           if (s3 !== null) {
             peg$reportedPos = peg$currPos;
-            s4 = peg$c128(s1,s2);
+            s4 = peg$c128(s1, s2);
             if (s4) {
               s4 = peg$c1;
             } else {
@@ -4263,7 +4194,7 @@ Emblem.Parser = (function() {
           }
           if (s3 !== null) {
             peg$reportedPos = s0;
-            s1 = peg$c129(s1,s2,s3);
+            s1 = peg$c129(s1, s2, s3);
             if (s1 === null) {
               peg$currPos = s0;
               s0 = s1;
@@ -4564,7 +4495,7 @@ Emblem.Parser = (function() {
           s3 = peg$parseactionValue();
           if (s3 !== null) {
             peg$reportedPos = s0;
-            s1 = peg$c137(s1,s3);
+            s1 = peg$c137(s1, s3);
             if (s1 === null) {
               peg$currPos = s0;
               s0 = s1;
@@ -4728,7 +4659,7 @@ Emblem.Parser = (function() {
             }
             if (s4 !== null) {
               peg$reportedPos = peg$currPos;
-              s5 = peg$c141(s1,s3);
+              s5 = peg$c141(s1, s3);
               if (s5) {
                 s5 = peg$c1;
               } else {
@@ -4736,7 +4667,7 @@ Emblem.Parser = (function() {
               }
               if (s5 !== null) {
                 peg$reportedPos = s0;
-                s1 = peg$c142(s1,s3);
+                s1 = peg$c142(s1, s3);
                 if (s1 === null) {
                   peg$currPos = s0;
                   s0 = s1;
@@ -4784,7 +4715,7 @@ Emblem.Parser = (function() {
           s3 = peg$parsepathIdNode();
           if (s3 !== null) {
             peg$reportedPos = s0;
-            s1 = peg$c143(s1,s3);
+            s1 = peg$c143(s1, s3);
             if (s1 === null) {
               peg$currPos = s0;
               s0 = s1;
@@ -4824,7 +4755,7 @@ Emblem.Parser = (function() {
           s3 = peg$parseattributeTextNodes();
           if (s3 !== null) {
             peg$reportedPos = s0;
-            s1 = peg$c144(s1,s3);
+            s1 = peg$c144(s1, s3);
             if (s1 === null) {
               peg$currPos = s0;
               s0 = s1;
@@ -5756,71 +5687,14 @@ Emblem.Parser = (function() {
   };
 })();
 
+module.exports = Emblem.Parser;
 
-;
-// lib/compiler.js
-var Emblem;
-
-
-
-Emblem.throwCompileError = function(line, msg) {
-  throw new Error("Emblem syntax error, line " + line + ": " + msg);
-};
-
-Emblem.registerPartial = function(handlebarsVariant, partialName, text) {
-  if (!text) {
-    text = partialName;
-    partialName = handlebarsVariant;
-    handlebarsVariant = Handlebars;
-  }
-  return handlebarsVariant.registerPartial(partialName, Emblem.compile(handlebarsVariant, text));
-};
-
-Emblem.parse = function(string) {
-  var line, lines, msg, processed;
-  try {
-    processed = Emblem.Preprocessor.processSync(string);
-    return Emblem.Parser.parse(processed);
-  } catch (e) {
-    if (e instanceof Emblem.Parser.SyntaxError) {
-      lines = string.split("\n");
-      line = lines[e.line - 1];
-      msg = "" + e.message + "\n" + line + "\n";
-      msg += new Array(e.column).join("-");
-      msg += "^";
-      return Emblem.throwCompileError(e.line, msg);
-    } else {
-      throw e;
-    }
-  }
-};
-
-Emblem.precompile = function(handlebarsVariant, string, options) {
-  var ast;
-  if (options == null) {
-    options = {};
-  }
-  Emblem.handlebarsVariant = handlebarsVariant;
-  ast = Emblem.parse(string);
-  return handlebarsVariant.precompile(ast, options);
-};
-
-Emblem.compile = function(handlebarsVariant, string, options) {
-  var ast;
-  if (options == null) {
-    options = {};
-  }
-  Emblem.handlebarsVariant = handlebarsVariant;
-  ast = Emblem.parse(string);
-  return handlebarsVariant.compile(ast, options);
-};
-;
-// lib/preprocessor.js
+},{"./emblem":3}],5:[function(require,module,exports){
 var Emblem, Preprocessor, StringScanner;
 
+StringScanner = require('StringScanner');
 
-
-
+Emblem = require('./emblem');
 
 Emblem.Preprocessor = Preprocessor = (function() {
   var DEDENT, INDENT, TERM, UNMATCHED_DEDENT, anyWhitespaceAndNewlinesTouchingEOF, any_whitespaceFollowedByNewlines_, processInput, ws;
@@ -6011,53 +5885,174 @@ Emblem.Preprocessor = Preprocessor = (function() {
   return Preprocessor;
 
 })();
+
+},{"./emblem":3,"StringScanner":6}],6:[function(require,module,exports){
+(function() {
+  var StringScanner;
+  StringScanner = (function() {
+    function StringScanner(str) {
+      this.str = str != null ? str : '';
+      this.str = '' + this.str;
+      this.pos = 0;
+      this.lastMatch = {
+        reset: function() {
+          this.str = null;
+          this.captures = [];
+          return this;
+        }
+      }.reset();
+      this;
+    }
+    StringScanner.prototype.bol = function() {
+      return this.pos <= 0 || (this.str[this.pos - 1] === "\n");
+    };
+    StringScanner.prototype.captures = function() {
+      return this.lastMatch.captures;
+    };
+    StringScanner.prototype.check = function(pattern) {
+      var matches;
+      if (this.str.substr(this.pos).search(pattern) !== 0) {
+        this.lastMatch.reset();
+        return null;
+      }
+      matches = this.str.substr(this.pos).match(pattern);
+      this.lastMatch.str = matches[0];
+      this.lastMatch.captures = matches.slice(1);
+      return this.lastMatch.str;
+    };
+    StringScanner.prototype.checkUntil = function(pattern) {
+      var matches, patternPos;
+      patternPos = this.str.substr(this.pos).search(pattern);
+      if (patternPos < 0) {
+        this.lastMatch.reset();
+        return null;
+      }
+      matches = this.str.substr(this.pos + patternPos).match(pattern);
+      this.lastMatch.captures = matches.slice(1);
+      return this.lastMatch.str = this.str.substr(this.pos, patternPos) + matches[0];
+    };
+    StringScanner.prototype.clone = function() {
+      var clone, prop, value, _ref;
+      clone = new this.constructor(this.str);
+      clone.pos = this.pos;
+      clone.lastMatch = {};
+      _ref = this.lastMatch;
+      for (prop in _ref) {
+        value = _ref[prop];
+        clone.lastMatch[prop] = value;
+      }
+      return clone;
+    };
+    StringScanner.prototype.concat = function(str) {
+      this.str += str;
+      return this;
+    };
+    StringScanner.prototype.eos = function() {
+      return this.pos === this.str.length;
+    };
+    StringScanner.prototype.exists = function(pattern) {
+      var matches, patternPos;
+      patternPos = this.str.substr(this.pos).search(pattern);
+      if (patternPos < 0) {
+        this.lastMatch.reset();
+        return null;
+      }
+      matches = this.str.substr(this.pos + patternPos).match(pattern);
+      this.lastMatch.str = matches[0];
+      this.lastMatch.captures = matches.slice(1);
+      return patternPos;
+    };
+    StringScanner.prototype.getch = function() {
+      return this.scan(/./);
+    };
+    StringScanner.prototype.match = function() {
+      return this.lastMatch.str;
+    };
+    StringScanner.prototype.matches = function(pattern) {
+      this.check(pattern);
+      return this.matchSize();
+    };
+    StringScanner.prototype.matched = function() {
+      return this.lastMatch.str != null;
+    };
+    StringScanner.prototype.matchSize = function() {
+      if (this.matched()) {
+        return this.match().length;
+      } else {
+        return null;
+      }
+    };
+    StringScanner.prototype.peek = function(len) {
+      return this.str.substr(this.pos, len);
+    };
+    StringScanner.prototype.pointer = function() {
+      return this.pos;
+    };
+    StringScanner.prototype.setPointer = function(pos) {
+      pos = +pos;
+      if (pos < 0) {
+        pos = 0;
+      }
+      if (pos > this.str.length) {
+        pos = this.str.length;
+      }
+      return this.pos = pos;
+    };
+    StringScanner.prototype.reset = function() {
+      this.lastMatch.reset();
+      this.pos = 0;
+      return this;
+    };
+    StringScanner.prototype.rest = function() {
+      return this.str.substr(this.pos);
+    };
+    StringScanner.prototype.scan = function(pattern) {
+      var chk;
+      chk = this.check(pattern);
+      if (chk != null) {
+        this.pos += chk.length;
+      }
+      return chk;
+    };
+    StringScanner.prototype.scanUntil = function(pattern) {
+      var chk;
+      chk = this.checkUntil(pattern);
+      if (chk != null) {
+        this.pos += chk.length;
+      }
+      return chk;
+    };
+    StringScanner.prototype.skip = function(pattern) {
+      this.scan(pattern);
+      return this.matchSize();
+    };
+    StringScanner.prototype.skipUntil = function(pattern) {
+      this.scanUntil(pattern);
+      return this.matchSize();
+    };
+    StringScanner.prototype.string = function() {
+      return this.str;
+    };
+    StringScanner.prototype.terminate = function() {
+      this.pos = this.str.length;
+      this.lastMatch.reset();
+      return this;
+    };
+    StringScanner.prototype.toString = function() {
+      return "#<StringScanner " + (this.eos() ? 'fin' : "" + this.pos + "/" + this.str.length + " @ " + (this.str.length > 8 ? "" + (this.str.substr(0, 5)) + "..." : this.str)) + ">";
+    };
+    return StringScanner;
+  })();
+  StringScanner.prototype.beginningOfLine = StringScanner.prototype.bol;
+  StringScanner.prototype.clear = StringScanner.prototype.terminate;
+  StringScanner.prototype.dup = StringScanner.prototype.clone;
+  StringScanner.prototype.endOfString = StringScanner.prototype.eos;
+  StringScanner.prototype.exist = StringScanner.prototype.exists;
+  StringScanner.prototype.getChar = StringScanner.prototype.getch;
+  StringScanner.prototype.position = StringScanner.prototype.pointer;
+  StringScanner.StringScanner = StringScanner;
+  module.exports = StringScanner;
+}).call(this);
+
+},{}]},{},[3])
 ;
-// lib/emberties.js
-var ENV, Emblem, _base, _base1;
-
-
-
-Emblem.compileScriptTags = function() {
-  if (typeof Ember === "undefined" || Ember === null) {
-    throw new Error("Can't run Emblem.enableEmber before Ember has been defined");
-  }
-  if (typeof document !== "undefined" && document !== null) {
-    return Ember.$('script[type="text/x-emblem"], script[type="text/x-raw-emblem"]', Ember.$(document)).each(function() {
-      var handlebarsVariant, script, templateName;
-      script = Ember.$(this);
-      handlebarsVariant = script.attr('type') === 'text/x-raw-handlebars' ? Handlebars : Ember.Handlebars;
-      templateName = script.attr('data-template-name') || script.attr('id') || 'application';
-      Ember.TEMPLATES[templateName] = Emblem.compile(handlebarsVariant, script.html());
-      return script.remove();
-    });
-  }
-};
-
-this.ENV || (this.ENV = {});
-
-ENV = this.ENV;
-
-ENV.EMBER_LOAD_HOOKS || (ENV.EMBER_LOAD_HOOKS = {});
-
-(_base = ENV.EMBER_LOAD_HOOKS).application || (_base.application = []);
-
-(_base1 = ENV.EMBER_LOAD_HOOKS)['Ember.Application'] || (_base1['Ember.Application'] = []);
-
-ENV.EMBER_LOAD_HOOKS.application.push(Emblem.compileScriptTags);
-
-ENV.EMBER_LOAD_HOOKS['Ember.Application'].push(function(Application) {
-  if (Application.initializer) {
-    return Application.initializer({
-      name: 'emblemDomTemplates',
-      before: 'registerComponents',
-      initialize: Emblem.compileScriptTags
-    });
-  } else {
-    return Ember.onLoad('application', Emblem.compileScriptTags);
-  }
-});
-;
-
-    root.Emblem = Emblem;
-
-  }(this));

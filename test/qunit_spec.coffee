@@ -1,20 +1,27 @@
 
-Ember = @Emblem
+# Test Setup: Set up an environment that'll work for both Node and Qunit tests.
 
-unless Emblem?
-  # Setup for Node package testing
-  Handlebars = require('handlebars')
-  EmberHandlebars = require('./support/ember-template-compiler.js').emberHandlebars
-  Emblem = require('../lib/emblem')
+Ember = window?.Emblem || @Emblem
 
-  assert = require("assert")
-  {equal, equals, ok, throws} = assert
-
-else
+if Emblem?
+  # Qunit testing
   _equal = equal
   equals = equal = (a, b, msg) ->
     # Allow exec with missing message params
     _equal(a, b, msg || '')
+
+  # In QUnit, we use module() instead of nonexistent suite()
+  window.suite = module
+else
+  # Setup for Node package testing
+  Handlebars = require('handlebars')
+  EmberHandlebars = require('./resources/ember-template-compiler.js').EmberHandlebars
+  Emblem = require('../lib/emblem')
+
+  # TODO: replace with real expect()
+  `expect = function() {};`
+
+  {equal, equals, ok, throws} = require("assert")
 
 unless CompilerContext?
   # Note that this doesn't have the same context separation as the rspec test.
@@ -22,9 +29,6 @@ unless CompilerContext?
   CompilerContext = 
     compile: (template, options) ->
       Emblem.compile(Handlebars, template, options)
-      #templateSpec = Emblem.precompile(Handlebars, template, options)
-      #Handlebars.template eval "(#{templateSpec})"  
-      #compileWithPartial: (template, options) ->
 
 precompileEmber = (emblem) ->
   Emblem.precompile(EmberHandlebars, emblem).toString()
@@ -353,6 +357,7 @@ runTextLineSuite = (ch) ->
       'Bork YEAH <span>NO</span>!\n\t'
 
   test "indented, then in a row", ->
+    expect(0)
     return "PENDING"
     emblem =
     """
@@ -366,6 +371,7 @@ runTextLineSuite = (ch) ->
     sct emblem, "Good\n  riddance2\n  dude\n  gnar\n  foo\n\t"
 
   test "indented, then in a row, then indented", ->
+    expect(0)
     return "PENDING"
     emblem =
     """
@@ -383,6 +389,7 @@ runTextLineSuite = (ch) ->
 
 
   test "uneven indentation megatest", ->
+    expect(0)
     return "PENDING"
     emblem =
     """
@@ -1085,6 +1092,7 @@ bindAttrHelper = ->
   "bindAttr#{bindingString}"
 
 Handlebars.registerHelper 'bindAttr', bindAttrHelper
+
 EmberHandlebars.registerHelper 'bindAttr', bindAttrHelper
 
 suite "bindAttr behavior for unquoted attribute values"
@@ -1576,6 +1584,7 @@ test "flatlina", ->
   shouldCompileToString emblem, '<p><span>This be some text</span><title>Basic HTML Sample Page</title></p>'
 
 test "bigass", ->
+  expect(0)
   return "PENDING"
   emblem =
   """
@@ -1740,6 +1749,7 @@ test "shouldn't be necessary to insert a space", ->
 suite "misc."
 
 test "end with indent", ->
+  expect(0)
   return "PENDING"
   emblem =
   """

@@ -42,8 +42,8 @@
     "emblem": "bin/emblem"
   },
   "scripts": {
-    "build": "make -j build",
-    "test": "node_modules/.bin/mocha -u qunit spec/qunit_spec.js"
+    "build": "./node_modules/grunt-cli/bin/grunt build",
+    "test": "./node_modules/grunt-cli/bin/grunt test"
   },
   "optionalDependencies": {}
 }

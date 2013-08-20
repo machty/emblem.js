@@ -28,14 +28,14 @@
     "grunt-contrib-jshint": "~0.6.0",
     "grunt-contrib-nodeunit": "~0.2.0",
     "grunt-contrib-uglify": "~0.2.2",
-    "mocha": "*",
     "grunt-contrib-coffee": "~0.7.0",
     "grunt-peg": "git://github.com/machty/grunt-peg.git#bff7e9145104f9f75117f082f7e43df43c99572a",
     "grunt-contrib-clean": "~0.5.0",
     "grunt-contrib-concat": "~0.3.0",
     "grunt-browserify": "~1.2.3",
     "grunt-contrib-qunit": "~0.2.2",
-    "grunt-simple-mocha": "~0.4.0"
+    "grunt-simple-mocha": "~0.4.0",
+    "grunt-cli": "~0.1.6"
   },
   "main": "lib/emblem.js",
   "bin": {

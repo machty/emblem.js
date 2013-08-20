@@ -10,3 +10,5 @@ lib/coffee-script/*.tmp
 *gem
 
 .DS_Store
+
+tmp

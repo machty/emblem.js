@@ -1,7 +1,7 @@
 {
   "name": "emblem",
   "description": "Templating language targeting Handlebars with default Ember.js conventions",
-  "version":  "0.3.1",
+  "version": "0.3.1",
   "homepage": "http://www.emblemjs.com/",
   "keywords": [
     "ember",
@@ -24,9 +24,17 @@
     "StringScanner": "~0.0.3"
   },
   "devDependencies": {
-    "pegjs": "git://github.com/dmajda/pegjs.git#8759d4899e3853689a783258ed6c93ffa1436170",
+    "grunt": "~0.4.1",
+    "grunt-contrib-jshint": "~0.6.0",
+    "grunt-contrib-nodeunit": "~0.2.0",
+    "grunt-contrib-uglify": "~0.2.2",
     "mocha": "*",
-    "coffee-script": "~1.3"
+    "coffee-script": "~1.3",
+    "grunt-contrib-coffee": "~0.7.0",
+    "grunt-coffeeify": "~0.1.3",
+    "grunt-peg": "git://github.com/machty/grunt-peg.git#bff7e9145104f9f75117f082f7e43df43c99572a",
+    "grunt-contrib-clean": "~0.5.0",
+    "grunt-contrib-concat": "~0.3.0"
   },
   "main": "lib/emblem.js",
   "bin": {

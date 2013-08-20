@@ -14,13 +14,17 @@ module.exports = (grunt) ->
         src: 'src/<%= pkg.name %>.js'
         dest: 'build/<%= pkg.name %>.min.js'
 
-    clean: ["tmp"]
+    clean: ["tmp", "dist"]
 
     coffee:
-      foo:
-        'snog/shlort.js': 'src/compiler.coffee'
-      bar:
-        'snog/shlort2.js': 'src/emberties.coffee'
+      lib:
+        files:
+          'lib/compiler.js':     'src/compiler.coffee'
+          'lib/emberties.js':    'src/emberties.coffee'
+          'lib/emblem.js':       'src/emblem.coffee'
+          'lib/preprocessor.js': 'src/preprocessor.coffee'
+      options:
+        bare: true
          
     peg:
       grammar: 
@@ -28,7 +32,6 @@ module.exports = (grunt) ->
         dest: "tmp/grammar.js"
         options: 
           exportVar: 'Emblem.Parser'
-          footer: "window.Conductor = requireModule('conductor');"
 
     concat:
       grammar:
@@ -47,7 +50,7 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-contrib-clean'
   grunt.loadNpmTasks 'grunt-contrib-concat'
 
-  grunt.registerTask 'build', ['clean', 'compileParser']#, 'coffee', 'browserify']
+  grunt.registerTask 'build', ['clean', 'compileParser', 'coffee'] #, 'browserify']
 
   # Default task is to build and test.
   grunt.registerTask 'default', ['build']

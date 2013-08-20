@@ -79,10 +79,6 @@ update to the latest Emblem, you can run:
     
     bundle update emblem-source
 
-### Via Rake Pipeline
-
-Coming extremely soon.
-
 ### All Emblem Plugins
 
 1. [emblem-rails](https://github.com/alexspeller/emblem-rails)
@@ -98,8 +94,8 @@ Coming extremely soon.
 Clone the repo, then run:
 
 ```
-bundle
-rake
+npm install
+grunt
 ```
 
 This will also automatically run the test suite. 
@@ -115,22 +111,12 @@ from Ember's. At some point, we'll have something even more
 custom tailored to Emblem (feel free to take a swing at it
 and send in a PR).
 
-## TODO / Contribute
-
-- Syntax suggestions / improvements
-- Syntax highlighting
-- Rake pipeline
-- Plugins for all sorts of frameworks
-- Refactor the code to be cross-platform (browser/Node/etc).
-  It currently is now, it's just mad ugly.
-
 ## Reporting Bugs
 
 If you find a bug in Emblem syntax, please try to reproduce it in
 its simplest form with 
 [this JSBin](http://jsbin.com/ucanam/527/edit) before reporting an
 issue, which will help me nail down the source of the issue.
-
 
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/machty/emblem.js/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 

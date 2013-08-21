@@ -1,17 +1,20 @@
-## Emblem: Handlebars + Indentation + Ember-compatibility
-
 [![Build Status](https://travis-ci.org/machty/emblem.js.png)](https://travis-ci.org/machty/emblem.js)
 
+# Emblem.js
+
 Emblem.js is an indentation-based templating language that compiles
-down to the Handlebars runtime. It is therefore
+down to the [Handlebars.js](https://github.com/wycats/handlebars.js/)
+runtime. It is therefore:
 
 1. Efficiently/easily precompilable
 1. Compilable in the browser
-1. Fully compatible with Ember.js's auto-updating templates
-1. Way more fun to write/maintain than `{{mustached}}`'d HTML
+1. Fully compatible with Ember.js's auto-updating templates (with
+   Ember-targeting/friendly syntax)
 
-Check out the Emblem.js docs site
-[http://www.emblemjs.com](http://www.emblemjs.com).
+Emblem's syntax most closely resembles that of the 
+[Slim templating language](http://slim-lang.com/). Please see the 
+[Emblem docs site](http://www.emblemjs.com) for a full explanation 
+of the syntax.
 
 Also check out the 
 [Embercast on Emblem.js](http://www.embercasts.com/episodes/2)

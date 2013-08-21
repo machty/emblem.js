@@ -12,6 +12,7 @@ Gem::Specification.new do |gem|
   gem.summary       = %q{Emblem.js source code wrapper}
   gem.homepage      = "https://github.com/machty/emblem.js/"
   gem.version       = package["version"]
+  gem.license       = 'MIT'
 
   gem.files = [
     'dist/emblem.js',

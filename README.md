@@ -94,7 +94,7 @@ update to the latest Emblem, you can run:
 1. [Mimosa (support for Emblem since v 0.10.1)](https://github.com/dbashford/mimosa)
 1. [grunt-emblem](https://github.com/wordofchristian/grunt-emblem), Emblem support for Grunt (and Yeoman)
 
-# Building Emblem.js
+## Building Emblem.js
 
 Clone the repo, then run:
 

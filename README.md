@@ -19,7 +19,9 @@ of the syntax.
 Also check out the 
 [Embercast on Emblem.js](http://www.embercasts.com/episodes/2)
 
-## Handlebars Version Dependencies (UPDATE: July 2013)
+## Handlebars Version Dependencies 
+
+_Updated: July 2013_
 
 In the push to Handlebars 1.0.0, some changes were made to the Handlebars 
 internals that broke Emblem, but Emblem's been fixed as of July 1, 2013.

@@ -597,9 +597,13 @@ shorthandAttributes
 }
 
 fullAttribute
-  = ' '+ a:(actionAttribute / boundAttribute / rawMustacheAttribute / normalAttribute)  
+  = ' '+ a:(actionAttribute / booleanAttribute / boundAttribute / rawMustacheAttribute / normalAttribute)  
 {
-  return [new AST.ContentNode(' ')].concat(a); 
+  if (a.length) {
+    return [new AST.ContentNode(' ')].concat(a); 
+  } else {
+    return [];
+  }
 }
 
 boundAttributeValueChar = [A-Za-z.0-9_\-] / nonSeparatorColon
@@ -616,6 +620,16 @@ actionAttribute
 {
   // Unshift the action helper and augment the hash
   return [unshiftParam(mustacheNode, 'action', [['on', new AST.StringNode(event)]])];
+}
+
+booleanAttribute
+  = key:key '=' boolValue:('true'/'false')
+{ 
+  if (boolValue === 'true') {
+    return [ new AST.ContentNode(key) ];
+  } else {
+    return [];
+  }
 }
 
 boundAttributeValue

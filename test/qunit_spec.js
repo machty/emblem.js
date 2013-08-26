@@ -63,7 +63,7 @@ shouldCompileToWithPartials = function(string, hashOrArray, partials, expected, 
     options.stringParams = true;
   }
   result = compileWithPartials(string, hashOrArray, partials, options);
-  return equal(expected, result, "'" + expected + "' should === '" + result + "': " + message);
+  return equal(expected, result, "'" + result + "' should === '" + expected + "': " + message);
 };
 
 compileWithPartials = function(string, hashOrArray, partials, options) {
@@ -591,6 +591,16 @@ test("with mustache calling helper", function() {
   shouldCompileTo('p class="foo #{echo "NO"} and {{{echo "YES"}}}" Hello', '<p class="foo ECHO NO and ECHO YES">Hello</p>');
   emblem = "p class=\"foo {{echo \"BORF\"}}\"\n  | Hello";
   return shouldCompileTo(emblem, '<p class="foo ECHO BORF">Hello</p>');
+});
+
+suite("boolean attributes");
+
+test("static", function() {
+  shouldCompileTo('p borf=true', '<p borf></p>');
+  shouldCompileTo('p borf=true Woot', '<p borf>Woot</p>');
+  shouldCompileTo('p borf=false', '<p></p>');
+  shouldCompileTo('p borf=false Nork', '<p>Nork</p>');
+  return shouldCompileTo('option selected=true Thingeroo', '<option selected>Thingeroo</option>');
 });
 
 suite("html nested");

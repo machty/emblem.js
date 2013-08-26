@@ -58,7 +58,7 @@ shouldCompileToWithPartials = (string, hashOrArray, partials, expected, message,
     options.stringParams = true
 
   result = compileWithPartials(string, hashOrArray, partials, options)
-  equal(expected, result, "'" + expected + "' should === '" + result + "': " + message)
+  equal(expected, result, "'" + result + "' should === '" + expected + "': " + message)
 
 compileWithPartials = (string, hashOrArray, partials, options = {}) ->
   template = CompilerContext.compile(string, options)
@@ -721,6 +721,25 @@ test "with mustache calling helper", ->
     | Hello
   """
   shouldCompileTo emblem, '<p class="foo ECHO BORF">Hello</p>'
+
+suite "boolean attributes"
+
+test "static", ->
+  shouldCompileTo 'p borf=true',  '<p borf></p>'
+  shouldCompileTo 'p borf=true Woot', '<p borf>Woot</p>'
+  shouldCompileTo 'p borf=false', '<p></p>'
+  shouldCompileTo 'p borf=false Nork', '<p>Nork</p>'
+  shouldCompileTo 'option selected=true Thingeroo', '<option selected>Thingeroo</option>'
+
+#test "dynamic", ->
+  ## TODO
+  #shouldCompileTo 'p borf=foo',      { foo: true },  '<p borf></p>'
+  #shouldCompileTo 'p borf=foo',      { foo: false }, '<p></p>'
+  #shouldCompileTo 'p borf=foo Yeah', { foo: true },  '<p borf>Yeah</p>'
+  #shouldCompileTo 'p borf=foo Naww', { foo: false }, '<p>Naww</p>'
+  #shouldCompileTo 'p borf=foo Naww', { foo: null },  '<p>Naww</p>'
+  #shouldCompileTo 'p borf=foo Naww', { foo: undefined }, '<p>Naww</p>'
+  #shouldCompileTo 'p borf=foo Naww', { foo: 0 },     '<p borf="0">Naww</p>'
   
 suite "html nested"
 

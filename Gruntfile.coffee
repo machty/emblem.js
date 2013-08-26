@@ -1,8 +1,8 @@
 module.exports = (grunt) ->
 
-  ['browserify', 'contrib-coffee', 'contrib-uglify', 'peg', 'contrib-clean', 'contrib-concat', 'contrib-qunit', 'simple-mocha']
-    .map((s) -> "grunt-#{s}")
-    .forEach(grunt.loadNpmTasks)
+  require('matchdep').filterDev('grunt-*')
+                     .filter((n) -> n != 'grunt-cli')
+                     .forEach(grunt.loadNpmTasks);
 
   # Project configuration.
   grunt.initConfig

@@ -63,7 +63,7 @@ shouldCompileToWithPartials = function(string, hashOrArray, partials, expected, 
     options.stringParams = true;
   }
   result = compileWithPartials(string, hashOrArray, partials, options);
-  return equal(expected, result, "'" + result + "' should === '" + expected + "': " + message);
+  return equal(result, expected, "'" + result + "' should === '" + expected + "': " + message);
 };
 
 compileWithPartials = function(string, hashOrArray, partials, options) {

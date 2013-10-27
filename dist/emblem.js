@@ -97,7 +97,7 @@ if (typeof window !== "undefined" && window !== null) {
 }
 
 },{"./emblem":3}],3:[function(require,module,exports){
-var global=self;var Emblem;
+var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};var Emblem;
 
 this.Emblem = {};
 

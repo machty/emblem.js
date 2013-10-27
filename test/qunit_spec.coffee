@@ -58,7 +58,7 @@ shouldCompileToWithPartials = (string, hashOrArray, partials, expected, message,
     options.stringParams = true
 
   result = compileWithPartials(string, hashOrArray, partials, options)
-  equal(expected, result, "'" + result + "' should === '" + expected + "': " + message)
+  equal(result, expected, "'" + result + "' should === '" + expected + "': " + message)
 
 compileWithPartials = (string, hashOrArray, partials, options = {}) ->
   template = CompilerContext.compile(string, options)

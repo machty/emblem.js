@@ -401,7 +401,7 @@ booleanNode = v:boolean { return new AST.BooleanNode(v); }
 
 boolean "Boolean" = 'true' / 'false'
 
-integer "Integer" = s:$[0-9]+ { return parseInt(s); }
+integer "Integer" = s:$('-'? [0-9]+) { return parseInt(s); }
 
 string = p:('"' hashDoubleQuoteStringValue '"' / "'" hashSingleQuoteStringValue "'") { return p[1]; }
 

@@ -850,6 +850,13 @@ test "basic", -> shouldCompileTo 'echo foo', {foo: "YES"}, 'ECHO YES'
 test "hashed parameters should work", ->
   shouldCompileTo 'frank text="YES" text2="NO"', 'WOO: YES NO'
 
+Handlebars.registerHelper 'concatenator', ->
+  options = arguments[arguments.length - 1]
+  new Handlebars.SafeString ("'#{key}'='#{value}'" for key, value of options.hash).sort().join( " " )
+
+test "negative integers should work", ->
+  shouldCompileTo 'concatenator positive=100 negative=-100', "'negative'='-100' 'positive'='100'"
+
 test "booleans", ->
   shouldCompileToString 'typetest true', 'boolean'
   shouldCompileToString 'typetest false', 'boolean'

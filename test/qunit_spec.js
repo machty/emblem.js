@@ -706,6 +706,25 @@ test("hashed parameters should work", function() {
   return shouldCompileTo('frank text="YES" text2="NO"', 'WOO: YES NO');
 });
 
+Handlebars.registerHelper('concatenator', function() {
+  var key, options, value;
+  options = arguments[arguments.length - 1];
+  return new Handlebars.SafeString(((function() {
+    var _ref1, _results;
+    _ref1 = options.hash;
+    _results = [];
+    for (key in _ref1) {
+      value = _ref1[key];
+      _results.push("'" + key + "'='" + value + "'");
+    }
+    return _results;
+  })()).sort().join(" "));
+});
+
+test("negative integers should work", function() {
+  return shouldCompileTo('concatenator positive=100 negative=-100', "'negative'='-100' 'positive'='100'");
+});
+
 test("booleans", function() {
   shouldCompileToString('typetest true', 'boolean');
   shouldCompileToString('typetest false', 'boolean');

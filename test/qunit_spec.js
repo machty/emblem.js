@@ -1114,7 +1114,7 @@ test("basic (click) followed by attr", function() {
   emblem = "button click=\"submitComment\" class=\"foo\" Submit Comment";
   shouldCompileToString(emblem, '<button action submitComment on=click class="foo">Submit Comment</button>');
   emblem = "button click=\"submitComment 'omg'\" class=\"foo\" Submit Comment";
-  return shouldCompileToString(emblem, '<button action submitComment omg on=click class="foo">Submit Comment</button>');
+  return shouldCompileToString(emblem, '<button action submitComment|omg on=click class="foo">Submit Comment</button>');
 });
 
 test("nested (mouseEnter)", function() {

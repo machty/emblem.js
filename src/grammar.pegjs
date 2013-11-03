@@ -157,7 +157,7 @@ contentStatement "ContentStatement"
 blankLine = _ TERM { return []; } 
 
 legacyPartialInvocation
-  = '>' _ n:legacyPartialName _ params:inMustacheParam* _ TERM 
+  = '>' _ n:legacyPartialName params:inMustacheParam* _ TERM 
 { 
   return [new AST.PartialNode(n, params[0])]; 
 }
@@ -331,9 +331,12 @@ inMustache
 
 // %div converts to tagName="div", .foo.thing converts to class="foo thing", #id converst to id="id"
 htmlMustacheAttribute
-  = t:tagNameShorthand  { return ['tagName', t]; }
-  / i:idShorthand       { return ['elementId', i]; }
-  / c:classShorthand    { return ['class', c]; }
+  = _ a:( t:tagNameShorthand  { return ['tagName', t]; }
+        / i:idShorthand       { return ['elementId', i]; }
+        / c:classShorthand    { return ['class', c]; })
+{
+  return a;
+}
 
 shorthandAttributes 
   = attributesAtLeastID / attributesAtLeastClass
@@ -345,7 +348,7 @@ attributesAtLeastClass
   = classes:classShorthand+ { return [null, classes]; }
 
 inMustacheParam
-  = _ a:(htmlMustacheAttribute / param) { return a; }
+  = a:(htmlMustacheAttribute / param) { return a; }
 
 hash 
   = h:hashSegment+ { return new AST.HashNode(h); }
@@ -357,16 +360,16 @@ key "Key"
   = $((nmchar / ':')*)
 
 hashSegment
-  = _ h:( key '=' booleanNode 
+  = __ h:( key '=' booleanNode 
         / key '=' integerNode
         / key '=' pathIdNode
         / key '=' stringNode ) { return [h[0], h[2]]; }
 
 param
-  = booleanNode 
-  / integerNode 
-  / pathIdNode
-  / stringNode
+  = __ n:(booleanNode 
+          / integerNode 
+          / pathIdNode
+          / stringNode) { return n; }
 
 path = first:pathIdent tail:(s:seperator p:pathIdent { return { part: p, separator: s }; })* 
 {
@@ -674,7 +677,6 @@ normalAttribute
 }
 
 attributeName = $attributeChar*
-attributeValue = string / param 
 attributeChar = alpha / [0-9] /'_' / '-'
 
 tagNameShorthand = '%' c:cssIdentifier { return c; }

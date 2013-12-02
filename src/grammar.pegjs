@@ -58,6 +58,32 @@
     "dragOver": true, "drop": true, "dragEnd": true
   };
 
+  // Ridiculous that we have to do this, but PEG doesn't
+  // support unmatched closing braces in JS code,
+  // so we have to construct.
+  var closeBrace = String.fromCharCode(125);
+  var twoBrace = closeBrace + closeBrace;
+  var threeBrace = twoBrace + closeBrace;
+
+  var use11AST = handlebarsVariant.VERSION.indexOf('1.1') === 0;
+  function createMustacheNode(params, hash, escaped) {
+    if (use11AST) {
+      var open = escaped ? twoBrace : threeBrace;
+      return new AST.MustacheNode(params, hash, open, { left: false, right: false });
+    } else {
+      // old style
+      return new AST.MustacheNode(params, hash, !escaped);
+    }
+  }
+
+  function createProgramNode(statements, inverse) {
+    if (use11AST) {
+      return new AST.ProgramNode(statements, { left: false, right: false}, inverse);
+    } else {
+      return new AST.ProgramNode(statements, inverse);
+    }
+  }
+
   // Returns a new MustacheNode with a new preceding param (id).
   function unshiftParam(mustacheNode, helperName, newHashPairs) {
 
@@ -74,7 +100,7 @@
 
     var params = [mustacheNode.id].concat(mustacheNode.params);
     params.unshift(new AST.IdNode([{ part: helperName}]));
-    return new AST.MustacheNode(params, hash, !mustacheNode.escaped);
+    return createMustacheNode(params, hash, mustacheNode.escaped);
   }
 
   function textNodesResult(first, tail) {
@@ -98,7 +124,7 @@ start = invertibleContent
 
 invertibleContent = c:content i:( DEDENT else _ TERM indentation c:content {return c;})?
 { 
-  return new AST.ProgramNode(c, i || []);
+  return createProgramNode(c, i || []);
 }
 
 else
@@ -258,19 +284,31 @@ htmlElement = h:inHtmlTag nested:htmlTerminator
 mustacheOrBlock = mustacheNode:inMustache _ inlineComment? nestedContentProgramNode:mustacheNestedContent
 { 
   if (!nestedContentProgramNode) { return mustacheNode; }
-  return new AST.BlockNode(mustacheNode, nestedContentProgramNode, nestedContentProgramNode.inverse, mustacheNode.id);
+
+  var close = mustacheNode.id;
+  if (use11AST) {
+    close.path = mustacheNode.id;
+    close.strip = {
+      left: false,
+      right: false
+    };
+  }
+
+  var block = new AST.BlockNode(mustacheNode, nestedContentProgramNode, nestedContentProgramNode.inverse, close);
+  block.path = mustacheNode.id;
+  return block;
 }
 
 invertibleContent = c:content i:( DEDENT else _ TERM blankLine* indentation c:content {return c;})?
 { 
-  return new AST.ProgramNode(c, i || []);
+  return createProgramNode(c, i || []);
 }
 
 colonContent = ': ' _ c:contentStatement { return c; }
 
 // Returns a ProgramNode
 mustacheNestedContent
-  = statements:(colonContent / textLine) { return new AST.ProgramNode(statements, []); }
+  = statements:(colonContent / textLine) { return createProgramNode(statements, []); }
   / TERM block:(blankLine* indentation invertibleContent DEDENT)? { return block && block[2]; }
 
 explicitMustache = e:equalSign ret:mustacheOrBlock
@@ -315,7 +353,7 @@ inMustache
 
   actualParams.unshift(path);
 
-  var mustacheNode = new AST.MustacheNode(actualParams, hash); 
+  var mustacheNode = createMustacheNode(actualParams, hash, true);
 
   var tm = path._emblemSuffixModifier;
   if(tm === '!') {
@@ -614,7 +652,7 @@ boundAttributeValueChar = [A-Za-z.0-9_\-] / nonSeparatorColon
 // Value of an action can be an unwrapped string, or a single or double quoted string
 actionValue
   = quotedActionValue
-  / id:pathIdNode { return new AST.MustacheNode([id]); }
+  / id:pathIdNode { return createMustacheNode([id], null, true); }
 
 quotedActionValue = p:('"' inMustache '"' / "'" inMustache "'") { return p[1]; }
 
@@ -646,7 +684,7 @@ boundAttribute
 { 
   var hashNode = new AST.HashNode([[key, new AST.StringNode(value)]]);
   var params = [new AST.IdNode([{part: 'bindAttr'}])];
-  var mustacheNode = new AST.MustacheNode(params, hashNode);
+  var mustacheNode = createMustacheNode(params, hashNode);
 
   return [mustacheNode];
 }
@@ -656,7 +694,7 @@ boundAttribute
 rawMustacheAttribute
   = key:key '=' id:pathIdNode 
 { 
-  var mustacheNode = new AST.MustacheNode([id]);
+  var mustacheNode = createMustacheNode([id], null, true);
 
   if(IS_EMBER && id._emblemSuffixModifier === '!') {
     mustacheNode = unshiftParam(mustacheNode, 'unbound');

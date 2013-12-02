@@ -200,7 +200,7 @@ Emblem.Parser = (function() {
         peg$c1 = "",
         peg$c2 = function(c) {return c;},
         peg$c3 = function(c, i) { 
-          return new AST.ProgramNode(c, i || []);
+          return createProgramNode(c, i || []);
         },
         peg$c4 = "=",
         peg$c5 = "\"=\"",
@@ -307,11 +307,23 @@ Emblem.Parser = (function() {
         },
         peg$c31 = function(mustacheNode, nestedContentProgramNode) { 
           if (!nestedContentProgramNode) { return mustacheNode; }
-          return new AST.BlockNode(mustacheNode, nestedContentProgramNode, nestedContentProgramNode.inverse, mustacheNode.id);
+
+          var close = mustacheNode.id;
+          if (use11AST) {
+            close.path = mustacheNode.id;
+            close.strip = {
+              left: false,
+              right: false
+            };
+          }
+
+          var block = new AST.BlockNode(mustacheNode, nestedContentProgramNode, nestedContentProgramNode.inverse, close);
+          block.path = mustacheNode.id;
+          return block;
         },
         peg$c32 = ": ",
         peg$c33 = "\": \"",
-        peg$c34 = function(statements) { return new AST.ProgramNode(statements, []); },
+        peg$c34 = function(statements) { return createProgramNode(statements, []); },
         peg$c35 = function(block) { return block && block[2]; },
         peg$c36 = function(e, ret) {
           var mustache = ret.mustache || ret;
@@ -351,7 +363,7 @@ Emblem.Parser = (function() {
 
           actualParams.unshift(path);
 
-          var mustacheNode = new AST.MustacheNode(actualParams, hash); 
+          var mustacheNode = createMustacheNode(actualParams, hash, true);
 
           var tm = path._emblemSuffixModifier;
           if(tm === '!') {
@@ -588,7 +600,7 @@ Emblem.Parser = (function() {
         },
         peg$c138 = /^[A-Za-z.0-9_\-]/,
         peg$c139 = "[A-Za-z.0-9_\\-]",
-        peg$c140 = function(id) { return new AST.MustacheNode([id]); },
+        peg$c140 = function(id) { return createMustacheNode([id], null, true); },
         peg$c141 = function(event, mustacheNode) {
           // Unshift the action helper and augment the hash
           return [unshiftParam(mustacheNode, 'action', [['on', new AST.StringNode(event)]])];
@@ -607,12 +619,12 @@ Emblem.Parser = (function() {
         peg$c147 = function(key, value) { 
           var hashNode = new AST.HashNode([[key, new AST.StringNode(value)]]);
           var params = [new AST.IdNode([{part: 'bindAttr'}])];
-          var mustacheNode = new AST.MustacheNode(params, hashNode);
+          var mustacheNode = createMustacheNode(params, hashNode);
 
           return [mustacheNode];
         },
         peg$c148 = function(key, id) { 
-          var mustacheNode = new AST.MustacheNode([id]);
+          var mustacheNode = createMustacheNode([id], null, true);
 
           if(IS_EMBER && id._emblemSuffixModifier === '!') {
             mustacheNode = unshiftParam(mustacheNode, 'unbound');
@@ -5737,6 +5749,32 @@ Emblem.Parser = (function() {
         "dragOver": true, "drop": true, "dragEnd": true
       };
 
+      // Ridiculous that we have to do this, but PEG doesn't
+      // support unmatched closing braces in JS code,
+      // so we have to construct.
+      var closeBrace = String.fromCharCode(125);
+      var twoBrace = closeBrace + closeBrace;
+      var threeBrace = twoBrace + closeBrace;
+
+      var use11AST = handlebarsVariant.VERSION.indexOf('1.1') === 0;
+      function createMustacheNode(params, hash, escaped) {
+        if (use11AST) {
+          var open = escaped ? twoBrace : threeBrace;
+          return new AST.MustacheNode(params, hash, open, { left: false, right: false });
+        } else {
+          // old style
+          return new AST.MustacheNode(params, hash, !escaped);
+        }
+      }
+
+      function createProgramNode(statements, inverse) {
+        if (use11AST) {
+          return new AST.ProgramNode(statements, { left: false, right: false}, inverse);
+        } else {
+          return new AST.ProgramNode(statements, inverse);
+        }
+      }
+
       // Returns a new MustacheNode with a new preceding param (id).
       function unshiftParam(mustacheNode, helperName, newHashPairs) {
 
@@ -5753,7 +5791,7 @@ Emblem.Parser = (function() {
 
         var params = [mustacheNode.id].concat(mustacheNode.params);
         params.unshift(new AST.IdNode([{ part: helperName}]));
-        return new AST.MustacheNode(params, hash, !mustacheNode.escaped);
+        return createMustacheNode(params, hash, mustacheNode.escaped);
       }
 
       function textNodesResult(first, tail) {

@@ -12,3 +12,6 @@ lib/coffee-script/*.tmp
 .DS_Store
 
 tmp
+
+sauce_connect.log
+

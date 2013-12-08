@@ -87,7 +87,7 @@ if (typeof window !== "undefined" && window !== null) {
     if (Application.initializer) {
       return Application.initializer({
         name: 'emblemDomTemplates',
-        before: 'registerComponents',
+        before: 'registerComponentLookup',
         initialize: Emblem.compileScriptTags
       });
     } else {

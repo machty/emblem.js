@@ -38,7 +38,7 @@ if window?
     if Application.initializer
       Application.initializer
         name: 'emblemDomTemplates'
-        before: 'registerComponents'
+        before: 'registerComponentLookup'
         initialize: Emblem.compileScriptTags
     else 
       Ember.onLoad 'application', Emblem.compileScriptTags

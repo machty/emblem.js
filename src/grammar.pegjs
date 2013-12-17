@@ -57,7 +57,7 @@
     "drag": true, "dragEnter": true, "dragLeave": true, 
     "dragOver": true, "drop": true, "dragEnd": true
   };
-
+  
   // Ridiculous that we have to do this, but PEG doesn't
   // support unmatched closing braces in JS code,
   // so we have to construct.
@@ -587,27 +587,80 @@ inHtmlTag = h:htmlStart inTagMustaches:inTagMustache* fullAttributes:fullAttribu
   var tagName = h[0] || 'div',
       shorthandAttributes = h[1] || [],
       id = shorthandAttributes[0],
-      classes = shorthandAttributes[1];
+      classes = shorthandAttributes[1] || [],
+      tagOpenContent = [],
+      updateMustacheNode;
 
-  var tagOpenContent = [];
+  updateMustacheNode = function (node) {
+    var pairs, pair, stringNode, original;
+    if (!classes.length) {
+      return;
+    }
+    if (node.hash && node.hash.pairs && (pairs = node.hash.pairs)) {
+      for (var i2 in pairs) {
+        pair = pairs[i2];
+        if (pair[0] === 'class' && pair[1] instanceof AST.StringNode) {
+          stringNode = pair[1];
+          original = stringNode.original;
+          stringNode.original = stringNode.string = stringNode.stringModeValue = ':' + classes.join(' :') + ' ' + original;
+          classes = [];
+        }
+      }
+    }
+  };
+
   tagOpenContent.push(new AST.ContentNode('<' + tagName));
 
   if(id) {
     tagOpenContent.push(new AST.ContentNode(' id="' + id + '"'));
   }
 
-  if(classes && classes.length) {
-    tagOpenContent.push(new AST.ContentNode(' class="' + classes.join(' ') + '"'));
-  }
-
   // Pad in tag mustaches with spaces.
   for(var i = 0; i < inTagMustaches.length; ++i) {
+    // Check if given mustache node has class bindings and prepend shorthand classes
+    updateMustacheNode(inTagMustaches[i]);
     tagOpenContent.push(new AST.ContentNode(' '));
     tagOpenContent.push(inTagMustaches[i]);
   }
-
+  
   for(var i = 0; i < fullAttributes.length; ++i) {
+    for (var i2 in fullAttributes[i]) {
+      if (fullAttributes[i][i2] instanceof AST.MustacheNode) {
+        updateMustacheNode(fullAttributes[i][i2]);
+      }
+    }
+    
+    if (classes.length) {
+      var isClassAttr = fullAttributes[i][1] && fullAttributes[i][1].string === 'class="';
+  
+      // Check if attribute is class attribute and has content
+      if (isClassAttr && fullAttributes[i].length === 4) {
+        if (fullAttributes[i][2].type == 'mustache') {
+          var mustacheNode, classesContent, hash, params;
+          // If class was mustache binding, transform attribute into bind-attr MustacheNode
+          // In case of 'div.shorthand class=varBinding' will transform into '<div {{bind-attr class=":shorthand varBinding"}}'
+          mustacheNode = fullAttributes[i][2];
+          classesContent = ':' + classes.join(' :') + ' ' + mustacheNode.id.original;
+          hash = new AST.HashNode([
+              ['class', new AST.StringNode(classesContent)]
+          ]);
+          
+          params = [new AST.IdNode([{ part: 'bind-attr'}])].concat(mustacheNode.params);
+          fullAttributes[i] = [fullAttributes[i][0], createMustacheNode(params, hash, true)];
+        } else {
+          // Else prepend shorthand classes to attribute 
+          classes.push(fullAttributes[i][2].string);
+          fullAttributes[i][2].string = classes.join(' ');
+        }
+        classes = [];
+      }
+    }
+    
     tagOpenContent = tagOpenContent.concat(fullAttributes[i]);
+  }
+
+  if(classes && classes.length) {
+    tagOpenContent.push(new AST.ContentNode(' class="' + classes.join(' ') + '"'));
   }
 
   var closingTagSlashPresent = !!h[2];
@@ -647,7 +700,7 @@ fullAttribute
   }
 }
 
-boundAttributeValueChar = [A-Za-z.0-9_\-] / nonSeparatorColon
+boundAttributeValueChar = [A-Za-z\.0-9_\-] / nonSeparatorColon
 
 // Value of an action can be an unwrapped string, or a single or double quoted string
 actionValue

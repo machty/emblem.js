@@ -1106,6 +1106,33 @@ test "else followed by newline doesn't gobble else content", ->
   """
   shouldCompileTo emblem, {}, '<p>not nothing</p>'
 
+suite "class shorthand and explicit declaration is coalesced"
+
+test "when literal class is used", ->
+  shouldCompileTo 'p.foo class="bar"', '<p class="foo bar"></p>'
+
+test "when ember expression is used with variable", ->
+  shouldCompileTo 'p.foo class=bar', {bar: 'baz'}, '<p bind-attr class to :foo bar></p>'
+
+test "when ember expression is used with variable in braces", ->
+  result = shouldEmberPrecompileToHelper 'p.foo class={ bar }'
+  ok -1  != result.indexOf '\'class\': (":foo bar")'
+
+test "when ember expression is used with constant in braces", ->
+  result = shouldEmberPrecompileToHelper 'p.foo class={ :bar }'
+  ok -1  != result.indexOf '\'class\': (":foo :bar")'
+
+test "when ember expression is used with constant and variable in braces", ->
+  result = shouldEmberPrecompileToHelper 'p.foo class={ :bar bar }'
+  ok -1  != result.indexOf '\'class\': (":foo :bar bar")'
+
+test "when ember expression is used with bind-attr", ->
+  result = shouldEmberPrecompileToHelper 'p.foo{ bind-attr class="bar" }'
+  ok -1  != result.indexOf '\'class\': (":foo bar")'
+  
+test "when ember expression is used with bind-attr and multiple attrs", ->
+  result = shouldEmberPrecompileToHelper 'p.foo{ bind-attr something=bind class="bar" }'
+  ok -1 != result.indexOf '\'class\': (":foo bar")'
 
 bindAttrHelper = ->
   options = arguments[arguments.length - 1]

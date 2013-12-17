@@ -922,6 +922,48 @@ test("else followed by newline doesn't gobble else content", function() {
   return shouldCompileTo(emblem, {}, '<p>not nothing</p>');
 });
 
+suite("class shorthand and explicit declaration is coalesced");
+
+test("when literal class is used", function() {
+  return shouldCompileTo('p.foo class="bar"', '<p class="foo bar"></p>');
+});
+
+test("when ember expression is used with variable", function() {
+  return shouldCompileTo('p.foo class=bar', {
+    bar: 'baz'
+  }, '<p bind-attr class to :foo bar></p>');
+});
+
+test("when ember expression is used with variable in braces", function() {
+  var result;
+  result = shouldEmberPrecompileToHelper('p.foo class={ bar }');
+  return ok(-1 !== result.indexOf('\'class\': (":foo bar")'));
+});
+
+test("when ember expression is used with constant in braces", function() {
+  var result;
+  result = shouldEmberPrecompileToHelper('p.foo class={ :bar }');
+  return ok(-1 !== result.indexOf('\'class\': (":foo :bar")'));
+});
+
+test("when ember expression is used with constant and variable in braces", function() {
+  var result;
+  result = shouldEmberPrecompileToHelper('p.foo class={ :bar bar }');
+  return ok(-1 !== result.indexOf('\'class\': (":foo :bar bar")'));
+});
+
+test("when ember expression is used with bind-attr", function() {
+  var result;
+  result = shouldEmberPrecompileToHelper('p.foo{ bind-attr class="bar" }');
+  return ok(-1 !== result.indexOf('\'class\': (":foo bar")'));
+});
+
+test("when ember expression is used with bind-attr and multiple attrs", function() {
+  var result;
+  result = shouldEmberPrecompileToHelper('p.foo{ bind-attr something=bind class="bar" }');
+  return ok(-1 !== result.indexOf('\'class\': (":foo bar")'));
+});
+
 bindAttrHelper = function() {
   var bindingString, k, options, param, params, v, _ref1;
   options = arguments[arguments.length - 1];

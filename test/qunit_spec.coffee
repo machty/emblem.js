@@ -1134,6 +1134,11 @@ test "when ember expression is used with bind-attr and multiple attrs", ->
   result = shouldEmberPrecompileToHelper 'p.foo{ bind-attr something=bind class="bar" }'
   ok -1 != result.indexOf '\'class\': (":foo bar")'
 
+test "only with bind-attr helper", ->
+  result = shouldEmberPrecompileToHelper 'p.foo{ someHelper class="bar" }', 'someHelper'
+  ok -1 != result.indexOf '\'class\': ("bar")'
+  ok -1 != result.indexOf 'class=\\"foo\\"'
+
 bindAttrHelper = ->
   options = arguments[arguments.length - 1]
   params = Array::slice.call arguments, 0, -1

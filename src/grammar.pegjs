@@ -596,6 +596,9 @@ inHtmlTag = h:htmlStart inTagMustaches:inTagMustache* fullAttributes:fullAttribu
     if (!classes.length) {
       return;
     }
+    if (!node.id || node.id.string !== BIND_ATTR_TAG) {
+      return;
+    }
     if (node.hash && node.hash.pairs && (pairs = node.hash.pairs)) {
       for (var i2 in pairs) {
         pair = pairs[i2];

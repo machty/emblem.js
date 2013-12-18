@@ -964,6 +964,13 @@ test("when ember expression is used with bind-attr and multiple attrs", function
   return ok(-1 !== result.indexOf('\'class\': (":foo bar")'));
 });
 
+test("only with bind-attr helper", function() {
+  var result;
+  result = shouldEmberPrecompileToHelper('p.foo{ someHelper class="bar" }', 'someHelper');
+  ok(-1 !== result.indexOf('\'class\': ("bar")'));
+  return ok(-1 !== result.indexOf('class=\\"foo\\"'));
+});
+
 bindAttrHelper = function() {
   var bindingString, k, options, param, params, v, _ref1;
   options = arguments[arguments.length - 1];

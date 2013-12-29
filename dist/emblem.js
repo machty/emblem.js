@@ -97,7 +97,7 @@ if (typeof window !== "undefined" && window !== null) {
 }
 
 },{"./emblem":3}],3:[function(require,module,exports){
-var global=self;var Emblem;
+var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};var Emblem;
 
 this.Emblem = {};
 
@@ -618,7 +618,7 @@ Emblem.Parser = (function() {
         peg$c146 = function(key, value) { return IS_EMBER; },
         peg$c147 = function(key, value) { 
           var hashNode = new AST.HashNode([[key, new AST.StringNode(value)]]);
-          var params = [new AST.IdNode([{part: 'bindAttr'}])];
+          var params = [new AST.IdNode([{part: 'bind-attr'}])];
           var mustacheNode = createMustacheNode(params, hashNode);
 
           return [mustacheNode];
@@ -5756,7 +5756,7 @@ Emblem.Parser = (function() {
       var twoBrace = closeBrace + closeBrace;
       var threeBrace = twoBrace + closeBrace;
 
-      var use11AST = handlebarsVariant.VERSION.indexOf('1.1') === 0;
+      var use11AST = handlebarsVariant.VERSION.slice(0, 3) >= 1.1;
       function createMustacheNode(params, hash, escaped) {
         if (use11AST) {
           var open = escaped ? twoBrace : threeBrace;

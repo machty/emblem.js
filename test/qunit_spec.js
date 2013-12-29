@@ -32,10 +32,10 @@ precompileEmber = function(emblem) {
 shouldEmberPrecompileToHelper = function(emblem, helper) {
   var result;
   if (helper == null) {
-    helper = 'bindAttr';
+    helper = 'bind-attr';
   }
   result = precompileEmber(emblem);
-  ok(result.match("helpers." + helper));
+  ok((result.match("helpers." + helper)) || (result.match("helpers\\['" + helper + "'\\]")));
   return result;
 };
 
@@ -937,14 +937,14 @@ bindAttrHelper = function() {
     bindingString = " narf";
   }
   param = params[0] || 'none';
-  return "bindAttr" + bindingString;
+  return "bind-attr" + bindingString;
 };
 
-Handlebars.registerHelper('bindAttr', bindAttrHelper);
+Handlebars.registerHelper('bind-attr', bindAttrHelper);
 
-EmberHandlebars.registerHelper('bindAttr', bindAttrHelper);
+EmberHandlebars.registerHelper('bind-attr', bindAttrHelper);
 
-suite("bindAttr behavior for unquoted attribute values");
+suite("bind-attr behavior for unquoted attribute values");
 
 test("basic", function() {
   var emblem;
@@ -984,7 +984,7 @@ test("multiple", function() {
   }, '<p class="FOO" id="yup" data-thinger="YEAH">Hooray</p>');
 });
 
-test("class bindAttr special syntax", function() {
+test("class bind-attr special syntax", function() {
   var emblem;
   emblem = 'p class=foo:bar:baz';
   shouldEmberPrecompileToHelper(emblem);
@@ -993,7 +993,7 @@ test("class bindAttr special syntax", function() {
   }));
 });
 
-test("class bindAttr braced syntax w/ underscores and dashes", function() {
+test("class bind-attr braced syntax w/ underscores and dashes", function() {
   var emblem;
   shouldEmberPrecompileToHelper('p class={f-oo:bar :b_az}');
   shouldEmberPrecompileToHelper('p class={ f-oo:bar :b_az }');
@@ -1077,10 +1077,10 @@ test("multiple", function() {
 
 test("with nesting", function() {
   var emblem;
-  emblem = "p{{bindAttr class=\"foo\"}}\n  span Hello";
+  emblem = "p{{bind-attr class=\"foo\"}}\n  span Hello";
   return shouldCompileTo(emblem, {
     foo: "yar"
-  }, '<p bindAttr class to foo><span>Hello</span></p>');
+  }, '<p bind-attr class to foo><span>Hello</span></p>');
 });
 
 suite("actions");

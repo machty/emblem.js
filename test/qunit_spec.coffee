@@ -33,9 +33,9 @@ unless CompilerContext?
 precompileEmber = (emblem) ->
   Emblem.precompile(EmberHandlebars, emblem).toString()
 
-shouldEmberPrecompileToHelper = (emblem, helper = 'bindAttr') ->
+shouldEmberPrecompileToHelper = (emblem, helper = 'bind-attr') ->
   result = precompileEmber emblem
-  ok result.match "helpers.#{helper}"
+  ok (result.match "helpers.#{helper}") or (result.match "helpers\\['#{helper}'\\]")
   result
 
 shouldCompileToString = (string, hashOrArray, expected) ->
@@ -1115,13 +1115,13 @@ bindAttrHelper = ->
     bindingString += " #{k} to #{v}"
   bindingString = " narf" unless bindingString
   param = params[0] || 'none'
-  "bindAttr#{bindingString}"
+  "bind-attr#{bindingString}"
 
-Handlebars.registerHelper 'bindAttr', bindAttrHelper
+Handlebars.registerHelper 'bind-attr', bindAttrHelper
 
-EmberHandlebars.registerHelper 'bindAttr', bindAttrHelper
+EmberHandlebars.registerHelper 'bind-attr', bindAttrHelper
 
-suite "bindAttr behavior for unquoted attribute values"
+suite "bind-attr behavior for unquoted attribute values"
 
 test "basic", ->
   emblem = 'p class=foo'
@@ -1142,12 +1142,12 @@ test "multiple", ->
   shouldCompileTo 'p class=foo id="yup" data-thinger=yeah Hooray', { foo: "FOO", yeah: "YEAH" },
                   '<p class="FOO" id="yup" data-thinger="YEAH">Hooray</p>'
 
-test "class bindAttr special syntax", ->
+test "class bind-attr special syntax", ->
   emblem = 'p class=foo:bar:baz'
   shouldEmberPrecompileToHelper emblem
   shouldThrow (-> CompilerContext.compile emblem)
 
-test "class bindAttr braced syntax w/ underscores and dashes", ->
+test "class bind-attr braced syntax w/ underscores and dashes", ->
   shouldEmberPrecompileToHelper 'p class={f-oo:bar :b_az}'
   shouldEmberPrecompileToHelper 'p class={ f-oo:bar :b_az }'
   shouldEmberPrecompileToHelper 'p class={ f-oo:bar :b_az } Hello'
@@ -1210,11 +1210,11 @@ test "multiple", ->
 test "with nesting", ->
   emblem =
   """
-  p{{bindAttr class="foo"}}
+  p{{bind-attr class="foo"}}
     span Hello
   """
   shouldCompileTo emblem, {foo: "yar"}, 
-    '<p bindAttr class to foo><span>Hello</span></p>'
+    '<p bind-attr class to foo><span>Hello</span></p>'
 
 suite "actions"
 

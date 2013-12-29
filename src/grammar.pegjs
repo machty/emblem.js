@@ -596,7 +596,7 @@ inHtmlTag = h:htmlStart inTagMustaches:inTagMustache* fullAttributes:fullAttribu
     if (!classes.length) {
       return;
     }
-    if (!node.id || node.id.string !== BIND_ATTR_TAG) {
+    if (!node.id || node.id.string !== 'bind-attr') {
       return;
     }
     if (node.hash && node.hash.pairs && (pairs = node.hash.pairs)) {

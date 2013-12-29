@@ -129,7 +129,7 @@ module.exports = (grunt) ->
 
   grunt.registerTask 'build', ['clean', 'compileParser', 'coffee:lib', 'browserify', 'uglify']
 
-  grunt.registerTask 'test', ['coffee:test', 'qunit', 'simplemocha', 'saucelabs']
+  grunt.registerTask 'test', ['coffee:test', 'qunit', 'simplemocha']
 
   grunt.registerTask 'saucelabs', ['connect', 'saucelabs-qunit']
 

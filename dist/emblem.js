@@ -97,13 +97,13 @@ if (typeof window !== "undefined" && window !== null) {
 }
 
 },{"./emblem":3}],3:[function(require,module,exports){
-var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};var Emblem;
+var global=self;var Emblem;
 
 this.Emblem = {};
 
 Emblem = this.Emblem;
 
-Emblem.VERSION = "0.3.5";
+Emblem.VERSION = "0.3.6";
 
 module.exports = Emblem;
 

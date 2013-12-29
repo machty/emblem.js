@@ -2,6 +2,8 @@ language: node_js
 node_js:
 - '0.10'
 before_script: grunt build
+notifications:
+  email: false
 env:
   global:
   - secure: Oqr6tnsBraZQno/K1iQ8027tKhHI7iAVXqI8tw32kdOkFZn7zcZ+Vg6yCd+CSat+OGqCmIPq7fLU/sl9fvCg491N7jTnuDIrhy+8SWL8KhiZxSGxWIErSQm0PXt8Qlhak4n1hKuZZQE/M8bOZ3zEh9xbDPxAwXRoPF2wyjRwnVU=

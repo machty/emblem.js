@@ -1,7 +1,12 @@
 
 # Test Setup: Set up an environment that'll work for both Node and Qunit tests.
 
-Ember = window?.Emblem || @Emblem
+Ember = window?.Emblem || @Emblem || {}
+
+# These are needed for the full version ember to load properly
+LoadedEmber = LoadedEmber || {}
+Ember.Handlebars = LoadedEmber.Handlebars
+Ember.warn = LoadedEmber.warn
 
 if Emblem?
   # Qunit testing

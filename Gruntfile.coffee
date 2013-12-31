@@ -83,7 +83,7 @@ module.exports = (grunt) ->
 
     simplemocha:
       all: 
-        src: ['test/**/*.js']
+        src: ['test/*.js', 'test/resources/*.js']
 
       options:
         ui: 'qunit'

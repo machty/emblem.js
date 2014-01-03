@@ -103,7 +103,7 @@ this.Emblem = {};
 
 Emblem = this.Emblem;
 
-Emblem.VERSION = "0.3.8";
+Emblem.VERSION = "0.3.9";
 
 module.exports = Emblem;
 
@@ -558,6 +558,7 @@ Emblem.Parser = (function() {
             }
             if (node.hash && node.hash.pairs && (pairs = node.hash.pairs)) {
               for (var i2 in pairs) {
+                if (!pairs.hasOwnProperty(i2)) { continue; }
                 pair = pairs[i2];
                 if (pair[0] === 'class' && pair[1] instanceof AST.StringNode) {
                   stringNode = pair[1];

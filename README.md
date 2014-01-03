@@ -34,7 +34,7 @@ Here are the versions you should be using:
 
 - [Read the syntax documentation](http://www.emblemjs.com/syntax).
 - [Watch the Embercast](http://www.embercasts.com/episodes/2)
-- [Check out this JSBin.](http://jsbin.com/ulegec/47/edit)
+- [Check out this JSBin.](http://jsbin.com/ulegec/337/edit)
 - Check out this [demo](http://emblem-test.herokuapp.com/) of 
   an [ember-rails](https://github.com/machty/ember-rails) site
   with Emblem enabled.
@@ -49,7 +49,7 @@ for use with an Ember app.
 
 ### Compiling in the Browser 
 
-Follow the pattern in [this JSBin](http://jsbin.com/ulegec/47/edit):
+Follow the pattern in [this JSBin](http://jsbin.com/ulegec/337/edit):
 
 1. Include Handlebars
 1. Include Emblem
@@ -120,7 +120,7 @@ and send in a PR).
 
 If you find a bug in Emblem syntax, please try to reproduce it in
 its simplest form with 
-[this JSBin](http://jsbin.com/ucanam/527/edit) before reporting an
+[this JSBin](http://jsbin.com/ucanam/2787/edit) before reporting an
 issue, which will help me nail down the source of the issue.
 
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/machty/emblem.js/trend.png)](https://bitdeli.com/free "Bitdeli Badge")

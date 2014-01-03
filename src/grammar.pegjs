@@ -601,6 +601,7 @@ inHtmlTag = h:htmlStart inTagMustaches:inTagMustache* fullAttributes:fullAttribu
     }
     if (node.hash && node.hash.pairs && (pairs = node.hash.pairs)) {
       for (var i2 in pairs) {
+        if (!pairs.hasOwnProperty(i2)) { continue; }
         pair = pairs[i2];
         if (pair[0] === 'class' && pair[1] instanceof AST.StringNode) {
           stringNode = pair[1];

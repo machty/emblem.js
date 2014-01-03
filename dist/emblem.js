@@ -5825,7 +5825,7 @@ Emblem.Parser = (function() {
 
       function createProgramNode(statements, inverse) {
         if (use11AST) {
-          return new AST.ProgramNode(statements, { left: false, right: false}, inverse);
+          return new AST.ProgramNode(statements, { left: false, right: false}, inverse, null);
         } else {
           return new AST.ProgramNode(statements, inverse);
         }

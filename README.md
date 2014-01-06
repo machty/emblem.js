@@ -93,6 +93,7 @@ update to the latest Emblem, you can run:
    support for Brunch.io
 1. [Mimosa (support for Emblem since v 0.10.1)](https://github.com/dbashford/mimosa)
 1. [grunt-emblem](https://github.com/wordofchristian/grunt-emblem), Emblem support for Grunt (and Yeoman)
+1. [gulp-emblem](https://github.com/Aulito/gulp-emblem), Emblem support for gulp
 
 ## Building Emblem.js
 

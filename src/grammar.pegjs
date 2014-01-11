@@ -548,7 +548,7 @@ preMustacheUnit
 nonMustacheUnit
   = tripleOpen / doubleOpen / hashStacheOpen / anyDedent / TERM
 
-// Support for div#id.whatever{ bindAttr whatever="asd" }
+// Support for div#id.whatever{ bind-attr whatever="asd" }
 rawMustacheSingle
  = singleOpen _ m:recursivelyParsedMustacheContent _ singleClose { m.escaped = true; return m; }
 inTagMustache 
@@ -735,7 +735,7 @@ boundAttributeValue
   / $boundAttributeValueChar+
 
 // With Ember-Handlebars variant, 
-// p class=something -> <p {{bindAttr class="something"}}></p>
+// p class=something -> <p {{bind-attr class="something"}}></p>
 boundAttribute
   = key:key '=' value:boundAttributeValue !'!' &{ return IS_EMBER; }
 { 

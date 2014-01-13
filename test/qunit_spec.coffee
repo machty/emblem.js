@@ -30,6 +30,8 @@ unless CompilerContext?
     compile: (template, options) ->
       Emblem.compile(Handlebars, template, options)
 
+supportsSubexpressions = Handlebars.VERSION.slice(0, 3) >= 1.3
+
 precompileEmber = (emblem) ->
   Emblem.precompile(EmberHandlebars, emblem).toString()
 
@@ -1923,3 +1925,61 @@ test "windows newlines", ->
   emblem = "\r\n  \r\n  p Hello\r\n\r\n"
   shouldCompileTo emblem, '<p>Hello</p>'
 
+if supportsSubexpressions
+
+  suite "subexpressions"
+
+  Handlebars.registerHelper 'echo', (param) ->
+    "ECHO #{param}"
+
+  Handlebars.registerHelper 'echofun', ->
+    options = Array.prototype.pop.call(arguments)
+    "FUN = #{options.hash.fun}"
+
+  Handlebars.registerHelper 'hello', (param) ->
+    "hello"
+
+  Handlebars.registerHelper 'equal', (x, y) ->
+    x == y
+
+  test "arg-less helper", ->
+    emblem = 'p {{echo (hello)}}'
+    shouldCompileTo emblem, '<p>ECHO hello</p>'
+
+    emblem = '= echo (hello)'
+    shouldCompileTo emblem, 'ECHO hello'
+
+  test "helper w args", ->
+    emblem = 'p {{echo (equal 1 1)}}'
+    shouldCompileTo emblem, '<p>ECHO true</p>'
+
+    emblem = '= echo (equal 1 1)'
+    shouldCompileTo emblem, 'ECHO true'
+
+  test "supports much nesting", ->
+    emblem = 'p {{echo (equal (equal 1 1) true)}}'
+    shouldCompileTo emblem, '<p>ECHO true</p>'
+
+    emblem = '= echo (equal (equal 1 1) true)'
+    shouldCompileTo emblem, 'ECHO true'
+
+  test "with hashes", ->
+    emblem = 'p {{echo (equal (equal 1 1) true fun="yes")}}'
+    shouldCompileTo emblem, '<p>ECHO true</p>'
+
+    emblem = '= echo (equal (equal 1 1) true fun="yes")'
+    shouldCompileTo emblem, 'ECHO true'
+
+  test "as hashes", ->
+    emblem = 'p {{echofun fun=(equal 1 1)}}'
+    shouldCompileTo emblem, '<p>FUN = true</p>'
+
+    emblem = '= echofun fun=(equal 1 1)'
+    shouldCompileTo emblem, 'FUN = true'
+
+  test "complex expression", ->
+    emblem = 'p {{echofun true (hello how="are" you=false) 1 not=true fun=(equal "ECHO hello" (echo (hello))) win="yes"}}'
+    shouldCompileTo emblem, '<p>FUN = true</p>'
+
+    emblem = '= echofun true (hello how="are" you=false) 1 not=true fun=(equal "ECHO hello" (echo (hello))) win="yes"'
+    shouldCompileTo emblem, 'FUN = true'

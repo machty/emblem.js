@@ -66,6 +66,8 @@
   var threeBrace = twoBrace + closeBrace;
 
   var use11AST = handlebarsVariant.VERSION.slice(0, 3) >= 1.1;
+  var useSexprNodes = handlebarsVariant.VERSION.slice(0, 3) >= 1.3;
+
   function createMustacheNode(params, hash, escaped) {
     if (use11AST) {
       var open = escaped ? twoBrace : threeBrace;
@@ -319,13 +321,35 @@ explicitMustache = e:equalSign ret:mustacheOrBlock
 }
 
 inMustache
-  = isPartial:'>'? _ path:pathIdNode params:inMustacheParam* hash:hash? 
+  = isPartial:'>'? _ sexpr:sexpr
 { 
   if(isPartial) {
-    var n = new AST.PartialNameNode(new AST.StringNode(path.string));
-    return new AST.PartialNode(n, params[0]);
+    var n = new AST.PartialNameNode(new AST.StringNode(sexpr.id.string));
+    return new AST.PartialNode(n, sexpr.params[0]);
   }
 
+  var mustacheNode
+  if (useSexprNodes) {
+    mustacheNode = createMustacheNode(sexpr, null, true);
+  } else {
+    mustacheNode = createMustacheNode([sexpr.id].concat(sexpr.params), sexpr.hash, true);
+  }
+
+  var tm = sexpr.id._emblemSuffixModifier;
+  if(tm === '!') {
+    return unshiftParam(mustacheNode, 'unbound');
+  } else if(tm === '?') {
+    return unshiftParam(mustacheNode, 'if');
+  } else if(tm === '^') {
+    return unshiftParam(mustacheNode, 'unless');
+  }
+
+  return mustacheNode;
+}
+
+sexpr
+  = path:pathIdNode params:inMustacheParam* hash:hash?
+{
   var actualParams = [];
   var attrs = {};
   var hasAttrs = false;
@@ -353,18 +377,16 @@ inMustache
 
   actualParams.unshift(path);
 
-  var mustacheNode = createMustacheNode(actualParams, hash, true);
-
-  var tm = path._emblemSuffixModifier;
-  if(tm === '!') {
-    return unshiftParam(mustacheNode, 'unbound');
-  } else if(tm === '?') {
-    return unshiftParam(mustacheNode, 'if');
-  } else if(tm === '^') {
-    return unshiftParam(mustacheNode, 'unless');
+  if (useSexprNodes) {
+    return new AST.SexprNode(actualParams, hash);
+  } else {
+    // Stub a sexpr-like node for backwards compatibility with pre-1.3 AST.
+    return {
+      id: actualParams[0],
+      params: actualParams.slice(1),
+      hash: hash
+    };
   }
-
-  return mustacheNode;
 }
 
 // %div converts to tagName="div", .foo.thing converts to class="foo thing", #id converst to id="id"
@@ -386,7 +408,7 @@ attributesAtLeastClass
   = classes:classShorthand+ { return [null, classes]; }
 
 inMustacheParam
-  = a:(htmlMustacheAttribute / param) { return a; }
+  = a:(htmlMustacheAttribute / __ p:param { return p; } ) { return a; }
 
 hash 
   = h:hashSegment+ { return new AST.HashNode(h); }
@@ -398,16 +420,14 @@ key "Key"
   = $((nmchar / ':')*)
 
 hashSegment
-  = __ h:( key '=' booleanNode 
-        / key '=' integerNode
-        / key '=' pathIdNode
-        / key '=' stringNode ) { return [h[0], h[2]]; }
+  = __ h:(key '=' param) { return [h[0], h[2]]; }
 
 param
-  = __ n:(booleanNode 
-          / integerNode 
-          / pathIdNode
-          / stringNode) { return n; }
+  = booleanNode
+  / integerNode
+  / pathIdNode
+  / stringNode
+  / sexprOpen s:sexpr sexprClose { s.isHelper = true; return s; }
 
 path = first:pathIdent tail:(s:seperator p:pathIdent { return { part: p, separator: s }; })* 
 {
@@ -560,6 +580,9 @@ tripleOpen "TripleMustacheOpen" = '{{{'
 singleClose "SingleMustacheClose" = '}'
 doubleClose "DoubleMustacheClose" = '}}'
 tripleClose "TripleMustacheClose" = '}}}'
+
+sexprOpen "SubexpressionOpen" = '('
+sexprClose "SubexpressionClose" = ')'
 
 hashStacheOpen  "InterpolationOpen"  = '#{'
 hashStacheClose "InterpolationClose" = '}'

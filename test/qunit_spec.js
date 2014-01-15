@@ -1,7 +1,13 @@
-var CompilerContext, Ember, EmberHandlebars, Emblem, Handlebars, bindAttrHelper, compileWithPartials, equal, equals, ok, precompileEmber, runTextLineSuite, shouldCompileTo, shouldCompileToString, shouldCompileToWithPartials, shouldEmberPrecompileToHelper, shouldThrow, supportsSubexpressions, throws, _equal, _ref,
+var CompilerContext, Ember, EmberHandlebars, Emblem, Handlebars, LoadedEmber, bindAttrHelper, compileWithPartials, equal, equals, ok, precompileEmber, runTextLineSuite, shouldCompileTo, shouldCompileToString, shouldCompileToWithPartials, shouldEmberPrecompileToHelper, shouldThrow, supportsSubexpressions, throws, _equal, _ref,
   __hasProp = {}.hasOwnProperty;
 
-Ember = (typeof window !== "undefined" && window !== null ? window.Emblem : void 0) || this.Emblem;
+Ember = (typeof window !== "undefined" && window !== null ? window.Emblem : void 0) || this.Emblem || {};
+
+LoadedEmber = LoadedEmber || {};
+
+Ember.Handlebars = LoadedEmber.Handlebars;
+
+Ember.warn = LoadedEmber.warn;
 
 if (typeof Emblem !== "undefined" && Emblem !== null) {
   _equal = equal;

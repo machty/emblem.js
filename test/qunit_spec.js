@@ -768,6 +768,12 @@ test("recursive nesting pt 2", function() {
   }, '<sally class="none"><sally class="woot"><p>Hello</p></sally></sally>');
 });
 
+test("should handle subexpressions", function() {
+  var emblem;
+  emblem = "div class=(typetest 200) Hello";
+  return shouldCompileTo(emblem, '<div class="number">Hello</div>');
+});
+
 Handlebars.registerHelper('view', function(param, a, b, c) {
   var content, hashString, k, options, v, _ref1;
   options = arguments[arguments.length - 1];

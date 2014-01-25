@@ -904,6 +904,14 @@ test "recursive nesting pt 2", ->
   shouldCompileTo emblem, { thing: "woot" }, '<sally class="none"><sally class="woot"><p>Hello</p></sally></sally>'
 
 
+test "should handle subexpressions", ->
+  emblem =
+  """
+  div class=(typetest 200) Hello
+  """
+  shouldCompileTo emblem, '<div class="number">Hello</div>'
+
+
 Handlebars.registerHelper 'view', (param, a, b, c) ->
   options = arguments[arguments.length - 1]
   content = param
@@ -954,7 +962,6 @@ test "should not kick in explicit {{mustache}}", ->
   p Yeah {{SomeView}}
   """
   shouldCompileTo emblem, { SomeView: 'erp' }, '<p>Yeah erp</p>'
-
 
 # TODO test overriding the default helper name (instead of always "view")
 

@@ -30,6 +30,17 @@ Here are the versions you should be using:
 - Handlebars 1.0.0: Use Emblem >= 0.3.0
 - Handlebars <= 1.0.0.rc4: Use Emblem <= 0.2.9
 
+## Query params 
+
+_Updated: March 2014_
+
+Handlebars >= 1.3.0 is required to use query params.
+
+Emblem uses the following syntax:
+`= link-to 'index' (query-params foo="wat")`
+
+[Ember query params documentation](http://emberjs.com/guides/routing/query-params/)
+
 ## Syntax Examples
 
 - [Read the syntax documentation](http://www.emblemjs.com/syntax).

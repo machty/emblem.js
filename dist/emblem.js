@@ -97,7 +97,8 @@ if (typeof window !== "undefined" && window !== null) {
 }
 
 },{"./emblem":3}],3:[function(require,module,exports){
-var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};var Emblem;
+(function (global){
+var Emblem;
 
 this.Emblem = {};
 
@@ -121,6 +122,7 @@ require('./preprocessor');
 
 require('./emberties');
 
+}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./compiler":1,"./emberties":2,"./parser":4,"./preprocessor":5}],4:[function(require,module,exports){
 var Emblem = require('./emblem');
 
@@ -683,6 +685,9 @@ Emblem.Parser = (function() {
         peg$c147 = "[A-Za-z.0-9_\\-]",
         peg$c148 = function(id) { return createMustacheNode([id], null, true); },
         peg$c149 = function(event, mustacheNode) {
+          // Replace the IdNode with a StringNode to prevent unquoted action deprecation warnings
+          mustacheNode.id = new AST.StringNode(mustacheNode.id.string);
+
           // Unshift the action helper and augment the hash
           return [unshiftParam(mustacheNode, 'action', [['on', new AST.StringNode(event)]])];
         },

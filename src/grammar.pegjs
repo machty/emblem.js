@@ -739,6 +739,9 @@ quotedActionValue = p:('"' inMustache '"' / "'" inMustache "'") { return p[1]; }
 actionAttribute
   = event:knownEvent '=' mustacheNode:actionValue
 {
+  // Replace the IdNode with a StringNode to prevent unquoted action deprecation warnings
+  mustacheNode.id = new AST.StringNode(mustacheNode.id.string);
+
   // Unshift the action helper and augment the hash
   return [unshiftParam(mustacheNode, 'action', [['on', new AST.StringNode(event)]])];
 }

@@ -538,6 +538,17 @@ attributeTextNodesInnerSingle = first:preAttrMustacheTextSingle? tail:(rawMustac
 
 rawMustache = rawMustacheUnescaped / rawMustacheEscaped
 
+eachIndex
+= !'{' _ '@index'
+{
+
+  var params = {};
+  var idNode = new AST.IdNode([{part: "index"}]);
+  var dataNode = new AST.DataNode(idNode);
+  params = dataNode;
+  return new AST.MustacheNode([params], null, false);
+}
+
 recursivelyParsedMustacheContent
   = !'{' text:$[^}]*
 {
@@ -547,12 +558,15 @@ recursivelyParsedMustacheContent
   return Emblem.parse(text).statements[0];
 }
 
+mustacheContent
+ = eachIndex / recursivelyParsedMustacheContent
+
 rawMustacheEscaped   
- = doubleOpen _ m:recursivelyParsedMustacheContent _ doubleClose { m.escaped = true; return m; }
- / hashStacheOpen _ m:recursivelyParsedMustacheContent _ hashStacheClose { m.escaped = true; return m; }
+ = doubleOpen _ m:mustacheContent _ doubleClose { m.escaped = true; return m; }
+ / hashStacheOpen _ m:mustacheContent _ hashStacheClose { m.escaped = true; return m; }
 
 rawMustacheUnescaped 
- = tripleOpen _ m:recursivelyParsedMustacheContent _ tripleClose { m.escaped = false; return m; }
+ = tripleOpen _ m:mustacheContent _ tripleClose { m.escaped = false; return m; }
 
 preAttrMustacheText = a:$preAttrMustacheUnit+ { return new AST.ContentNode(a); }
 preAttrMustacheTextSingle = a:$preAttrMustacheUnitSingle+ { return new AST.ContentNode(a); }
@@ -570,7 +584,7 @@ nonMustacheUnit
 
 // Support for div#id.whatever{ bindAttr whatever="asd" }
 rawMustacheSingle
- = singleOpen _ m:recursivelyParsedMustacheContent _ singleClose { m.escaped = true; return m; }
+ = singleOpen _ m:mustacheContent _ singleClose { m.escaped = true; return m; }
 inTagMustache 
   = rawMustacheSingle / rawMustacheUnescaped / rawMustacheEscaped
 

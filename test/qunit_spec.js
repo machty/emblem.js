@@ -1443,6 +1443,20 @@ test("block as #each", function() {
   }, '<p>Woot 123</p><p>Woot 456</p>');
 });
 
+test("#each with @index", function() {
+  var emblem;
+  emblem = 'thangs\n  p #{@index} Woot #{yeah}';
+  return shouldCompileToString(emblem, {
+    thangs: [
+      {
+        yeah: 123
+      }, {
+        yeah: 456
+      }
+    ]
+  }, '<p>0 Woot 123</p><p>1 Woot 456</p>');
+});
+
 /*
 test "partial in block", ->
   emblem =

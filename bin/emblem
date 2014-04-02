@@ -4,7 +4,7 @@ var optimist = require('optimist')
     .usage('Precompile Emblem.js templates.\nUsage: $0 template...', {
       'v': {
         'type': 'boolean',
-        'description': 'Output File',
+        'description': 'Show the current version.',
         'alias': 'version'
       },
       'i': {

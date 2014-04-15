@@ -45,7 +45,7 @@
     big: true, bdo: true, bdi: true, ul: true, tt: true, tr: true, th: true, td: true, 
     rt: true, rp: true, ol: true, li: true, hr: true, h6: true, h5: true, h4: true, 
     h3: true, h2: true, h1: true, em: true, dt: true, dl: true, dd: true, br: true, 
-    u: true, s: true, q: true, p: true, i: true, b: true, a: true
+    u: true, s: true, q: true, p: true, i: true, b: true, a: true, svg: true
   };
 
   var KNOWN_EVENTS = {

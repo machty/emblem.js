@@ -1,4 +1,4 @@
-var CompilerContext, Ember, EmberHandlebars, Emblem, Handlebars, LoadedEmber, bindAttrHelper, compileWithPartials, equal, equals, ok, precompileEmber, runTextLineSuite, shouldCompileTo, shouldCompileToString, shouldCompileToWithPartials, shouldEmberPrecompileToHelper, shouldThrow, supportsSubexpressions, throws, _equal, _ref,
+var CompilerContext, Ember, EmberHandlebars, Emblem, Handlebars, LoadedEmber, bindAttrHelper, compileWithPartials, equal, equals, ok, precompileEmber, runTextLineSuite, shouldCompileTo, shouldCompileToString, shouldCompileToWithPartials, shouldEmberPrecompileToHelper, shouldThrow, supportsEachHelperDataKeywords, supportsSubexpressions, throws, _equal, _ref,
   __hasProp = {}.hasOwnProperty;
 
 Ember = (typeof window !== "undefined" && window !== null ? window.Emblem : void 0) || this.Emblem || {};
@@ -30,6 +30,8 @@ if (typeof CompilerContext === "undefined" || CompilerContext === null) {
     }
   };
 }
+
+supportsEachHelperDataKeywords = Handlebars.VERSION.slice(0, 3) >= 1.2;
 
 supportsSubexpressions = Handlebars.VERSION.slice(0, 3) >= 1.3;
 
@@ -1443,19 +1445,52 @@ test("block as #each", function() {
   }, '<p>Woot 123</p><p>Woot 456</p>');
 });
 
-test("#each with @index", function() {
-  var emblem;
-  emblem = 'thangs\n  p #{@index} Woot #{yeah}';
-  return shouldCompileToString(emblem, {
-    thangs: [
-      {
-        yeah: 123
-      }, {
-        yeah: 456
+if (supportsEachHelperDataKeywords) {
+  suite("each block helper keywords prefixed by @");
+  test("#each with @index", function() {
+    var emblem;
+    emblem = 'thangs\n  p #{@index} Woot #{yeah}';
+    return shouldCompileToString(emblem, {
+      thangs: [
+        {
+          yeah: 123
+        }, {
+          yeah: 456
+        }
+      ]
+    }, '<p>0 Woot 123</p><p>1 Woot 456</p>');
+  });
+  test("#each with @key", function() {
+    var emblem;
+    emblem = 'each thangs\n  p #{@key}: #{this}';
+    return shouldCompileTo(emblem, {
+      thangs: {
+        '@key': 123,
+        'works!': 456
       }
-    ]
-  }, '<p>0 Woot 123</p><p>1 Woot 456</p>');
-});
+    }, '<p>@key: 123</p><p>works!: 456</p>');
+  });
+  test("#each with @key, @index", function() {
+    var emblem;
+    emblem = 'each thangs\n  p #{@index} #{@key}: #{this}';
+    return shouldCompileTo(emblem, {
+      thangs: {
+        '@key': 123,
+        'works!': 456
+      }
+    }, '<p>0 @key: 123</p><p>1 works!: 456</p>');
+  });
+  test("#each with @key, @first", function() {
+    var emblem;
+    emblem = 'each thangs\n  if @first\n    p First item\n  else\n    p #{@key}: #{this}';
+    return shouldCompileTo(emblem, {
+      thangs: {
+        '@key': 123,
+        'works!': 456
+      }
+    }, '<p>First item</p><p>works!: 456</p>');
+  });
+}
 
 /*
 test "partial in block", ->

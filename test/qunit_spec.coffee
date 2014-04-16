@@ -35,6 +35,7 @@ unless CompilerContext?
     compile: (template, options) ->
       Emblem.compile(Handlebars, template, options)
 
+supportsEachHelperDataKeywords = Handlebars.VERSION.slice(0, 3) >= 1.2
 supportsSubexpressions = Handlebars.VERSION.slice(0, 3) >= 1.3
 
 precompileEmber = (emblem) ->
@@ -1579,14 +1580,44 @@ test "block as #each", ->
   '''
   shouldCompileToString emblem, { thangs: [{yeah: 123}, {yeah:456}] }, '<p>Woot 123</p><p>Woot 456</p>'
 
-test "#each with @index", ->
-  emblem =
-  '''
-  thangs
-    p #{@index} Woot #{yeah}
-  '''
-  shouldCompileToString emblem, { thangs: [{yeah: 123}, {yeah:456}] }, '<p>0 Woot 123</p><p>1 Woot 456</p>'
+if supportsEachHelperDataKeywords
 
+  suite "each block helper keywords prefixed by @"
+  
+  test "#each with @index", ->
+    emblem =
+    '''
+    thangs
+      p #{@index} Woot #{yeah}
+    '''
+    shouldCompileToString emblem, { thangs: [{yeah: 123}, {yeah:456}] }, '<p>0 Woot 123</p><p>1 Woot 456</p>'
+
+  test "#each with @key", ->
+    emblem =
+    '''
+    each thangs
+      p #{@key}: #{this}
+    '''
+    shouldCompileTo emblem, { thangs: {'@key': 123, 'works!':456} }, '<p>@key: 123</p><p>works!: 456</p>'
+
+  test "#each with @key, @index", ->
+    emblem =
+    '''
+    each thangs
+      p #{@index} #{@key}: #{this}
+    '''
+    shouldCompileTo emblem, { thangs: {'@key': 123, 'works!':456} }, '<p>0 @key: 123</p><p>1 works!: 456</p>'
+
+  test "#each with @key, @first", ->
+    emblem =
+    '''
+    each thangs
+      if @first
+        p First item
+      else
+        p #{@key}: #{this}
+    '''
+    shouldCompileTo emblem, { thangs: {'@key': 123, 'works!':456} }, '<p>First item</p><p>works!: 456</p>'
 
 ###
 test "partial in block", ->

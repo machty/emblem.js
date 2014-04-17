@@ -1431,6 +1431,26 @@ test("partials in mustaches", function() {
   }, 'Hello, <p>YES</p><p>Grr</p><p>Grr</p>');
 });
 
+test("handlebars dot-separated paths with segment-literal notation", function() {
+  var emblem;
+  emblem = 'p = articles.[3]';
+  return shouldCompileTo(emblem, {
+    articles: ['zero', 'one', 'two', 'three']
+  }, '<p>three</p>');
+});
+
+test("handlebars dot-separated paths with segment-literal notation, more nesting", function() {
+  var emblem;
+  emblem = 'p = articles.[3].[#comments].[0]';
+  return shouldCompileTo(emblem, {
+    articles: [
+      {}, {}, {}, {
+        '#comments': ['bazinga']
+      }
+    ]
+  }, '<p>bazinga</p>');
+});
+
 test("block as #each", function() {
   var emblem;
   emblem = 'thangs\n  p Woot #{yeah}';

@@ -1572,6 +1572,20 @@ test "partials in mustaches", ->
   """
   shouldCompileToString emblem, { foo: { a: "YES" } }, 'Hello, <p>YES</p><p>Grr</p><p>Grr</p>'
 
+test "handlebars dot-separated paths with segment-literal notation", ->
+  emblem =
+  '''
+  p = articles.[3]
+  '''
+  shouldCompileTo emblem, { articles: ['zero', 'one', 'two', 'three']}, '<p>three</p>'
+
+test "handlebars dot-separated paths with segment-literal notation, more nesting", ->
+  emblem =
+  '''
+  p = articles.[3].[#comments].[0]
+  '''
+  shouldCompileTo emblem, { articles: [{}, {}, {}, {'#comments': ['bazinga']}]}, '<p>bazinga</p>'
+
 test "block as #each", ->
   emblem =
   '''

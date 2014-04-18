@@ -97,14 +97,13 @@ if (typeof window !== "undefined" && window !== null) {
 }
 
 },{"./emblem":3}],3:[function(require,module,exports){
-(function (global){
-var Emblem;
+var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};var Emblem;
 
 this.Emblem = {};
 
 Emblem = this.Emblem;
 
-Emblem.VERSION = "0.3.14";
+Emblem.VERSION = "0.3.15";
 
 module.exports = Emblem;
 
@@ -122,7 +121,6 @@ require('./preprocessor');
 
 require('./emberties');
 
-}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./compiler":1,"./emberties":2,"./parser":4,"./preprocessor":5}],4:[function(require,module,exports){
 var Emblem = require('./emblem');
 

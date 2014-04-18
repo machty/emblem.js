@@ -414,7 +414,10 @@ hash
   = h:hashSegment+ { return new AST.HashNode(h); }
 
 pathIdent "PathIdent"
-  = '..' / '.' / s:$[a-zA-Z0-9_$\-!\?\^@]+ !'=' { return s; }
+  = '..'
+  / '.'
+  / s:$[a-zA-Z0-9_$\-!\?\^@]+ !'=' { return s; }
+  / '[' segmentLiteral:$[^\]]* ']' { return segmentLiteral; }
 
 key "Key"
   = $((nmchar / ':')*)

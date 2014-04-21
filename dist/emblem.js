@@ -97,7 +97,8 @@ if (typeof window !== "undefined" && window !== null) {
 }
 
 },{"./emblem":3}],3:[function(require,module,exports){
-var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};var Emblem;
+(function (global){
+var Emblem;
 
 this.Emblem = {};
 
@@ -121,6 +122,7 @@ require('./preprocessor');
 
 require('./emberties');
 
+}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./compiler":1,"./emberties":2,"./parser":4,"./preprocessor":5}],4:[function(require,module,exports){
 var Emblem = require('./emblem');
 
@@ -336,7 +338,7 @@ Emblem.Parser = (function() {
             return new AST.PartialNode(n, sexpr.params[0]);
           }
 
-          var mustacheNode
+          var mustacheNode;
           if (useSexprNodes) {
             mustacheNode = createMustacheNode(sexpr, null, true);
           } else {
@@ -5254,9 +5256,13 @@ Emblem.Parser = (function() {
       s0 = peg$currPos;
       s1 = [];
       s2 = peg$parsenmchar();
-      while (s2 !== null) {
-        s1.push(s2);
-        s2 = peg$parsenmchar();
+      if (s2 !== null) {
+        while (s2 !== null) {
+          s1.push(s2);
+          s2 = peg$parsenmchar();
+        }
+      } else {
+        s1 = peg$c0;
       }
       if (s1 !== null) {
         s1 = input.substring(s0, peg$currPos);

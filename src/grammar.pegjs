@@ -328,7 +328,7 @@ inMustache
     return new AST.PartialNode(n, sexpr.params[0]);
   }
 
-  var mustacheNode
+  var mustacheNode;
   if (useSexprNodes) {
     mustacheNode = createMustacheNode(sexpr, null, true);
   } else {
@@ -819,7 +819,7 @@ classShorthand = '.' c:cssIdentifier { return c; }
 
 cssIdentifier "CSSIdentifier" = ident
 
-ident = $nmchar* 
+ident = $nmchar+
 
 nmchar = [_a-zA-Z0-9-] / nonascii
 nmstart = [_a-zA-Z] / nonascii

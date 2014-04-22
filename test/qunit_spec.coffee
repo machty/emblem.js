@@ -1586,6 +1586,16 @@ test "handlebars dot-separated paths with segment-literal notation, more nesting
   '''
   shouldCompileTo emblem, { articles: [{}, {}, {}, {'#comments': ['bazinga']}]}, '<p>bazinga</p>'
 
+test "../path as inMustacheParam recognized correctly as pathIdNode instead of classShorthand", ->
+  Handlebars.registerHelper 'jumpToParent', (link) ->
+    new Handlebars.SafeString "<a href='#{link}'>Jump to parent top</a>"
+  emblem =
+  '''
+  each children
+    jumpToParent ../parentLink
+  '''
+  shouldCompileTo emblem, {parentLink: '#anchor', children: [{}]}, '<a href=\'#anchor\'>Jump to parent top</a>'
+
 test "block as #each", ->
   emblem =
   '''

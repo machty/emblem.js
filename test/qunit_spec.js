@@ -1451,6 +1451,18 @@ test("handlebars dot-separated paths with segment-literal notation, more nesting
   }, '<p>bazinga</p>');
 });
 
+test("../path as inMustacheParam recognized correctly as pathIdNode instead of classShorthand", function() {
+  var emblem;
+  Handlebars.registerHelper('jumpToParent', function(link) {
+    return new Handlebars.SafeString("<a href='" + link + "'>Jump to parent top</a>");
+  });
+  emblem = 'each children\n  jumpToParent ../parentLink';
+  return shouldCompileTo(emblem, {
+    parentLink: '#anchor',
+    children: [{}]
+  }, '<a href=\'#anchor\'>Jump to parent top</a>');
+});
+
 test("block as #each", function() {
   var emblem;
   emblem = 'thangs\n  p Woot #{yeah}';

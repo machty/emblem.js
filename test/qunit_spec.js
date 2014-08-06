@@ -541,6 +541,12 @@ test("class and id and embedded html one-liner", function() {
   return shouldCompileTo('p id="yes" class="no" One <b>asd</b>!', '<p id="yes" class="no">One <b>asd</b>!</p>');
 });
 
+test("bracketed attributes", function() {
+  var emblem;
+  emblem = "p [\n  id=\"yes\"\n  class=\"no\" ]\n  | Bracketed Attributes FTW!";
+  return shouldCompileTo(emblem, '<p id="yes" class="no">Bracketed Attributes FTW!</p>');
+});
+
 test("nesting", function() {
   var emblem;
   emblem = "p class=\"hello\" data-foo=\"gnarly\"\n  span Yes";
@@ -768,6 +774,18 @@ test("recursive nesting pt 2", function() {
   return shouldCompileTo(emblem, {
     thing: "woot"
   }, '<sally class="none"><sally class="woot"><p>Hello</p></sally></sally>');
+});
+
+test("bracketed nested statement", function() {
+  var emblem;
+  emblem = "sally [\n  'foo'\n  something=\"false\" ]\n  | Bracketed helper attrs!";
+  return shouldCompileTo(emblem, '<sally class="foo">Bracketed helper attrs!</sally>');
+});
+
+test("bracketed nested block", function() {
+  var emblem;
+  emblem = "sally [\n  'foo'\n  something=\"false\" ]\n  p Bracketed helper attrs!";
+  return shouldCompileTo(emblem, '<sally class="foo"><p>Bracketed helper attrs!</p></sally>');
 });
 
 Handlebars.registerHelper('view', function(param, a, b, c) {

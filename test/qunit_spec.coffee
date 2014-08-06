@@ -680,13 +680,23 @@ test "class and id", ->
 test "class and id and embedded html one-liner", ->
   shouldCompileTo 'p id="yes" class="no" One <b>asd</b>!', '<p id="yes" class="no">One <b>asd</b>!</p>'
 
+test "bracketed attributes", ->
+  emblem =
+  """
+  p [
+    id="yes"
+    class="no" ]
+    | Bracked Attributes FTW!
+  """
+  shouldCompileTo emblem, '<p id="yes" class="no">Bracked Attributes FTW!</p>'
+
 test "nesting", ->
   emblem =
   """
   p class="hello" data-foo="gnarly"
-    span Yes
+    | Yes
   """
-  shouldCompileTo emblem, '<p class="hello" data-foo="gnarly"><span>Yes</span></p>'
+  shouldCompileTo emblem, '<p class="hello" data-foo="gnarly">Yes</p>'
 
 suite "full attributes - mixed quotes"
 

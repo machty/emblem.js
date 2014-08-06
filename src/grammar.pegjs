@@ -354,6 +354,7 @@ htmlNestedTextNodes
 
 indentedContent = blankLine* indentation c:content DEDENT { return c; }
 
+// Only accessed from bracketed attributes
 unindentedContent = blankLine* c:content DEDENT { return c; }
 
 // The end of an HTML statement. Could be a bunch of
@@ -364,7 +365,7 @@ htmlTerminator
   = colonContent 
   / _ m:explicitMustache { return [m]; } 
   / _ inlineComment? TERM c:indentedContent? { return c; }
-  / _ inlineComment? ']' TERM  c:unindentedContent? { return c; }
+  / _ inlineComment? ']' TERM  c:unindentedContent? { return c; } // bracketed
   / h:htmlNestedTextNodes { return h;}
 
 

@@ -543,14 +543,14 @@ test("class and id and embedded html one-liner", function() {
 
 test("bracketed attributes", function() {
   var emblem;
-  emblem = "p [\n  id=\"yes\"\n  class=\"no\" ]\n  | Bracked Attributes FTW!";
-  return shouldCompileTo(emblem, '<p id="yes" class="no">Bracked Attributes FTW!</p>');
+  emblem = "p [\n  id=\"yes\"\n  class=\"no\" ]\n  | Bracketed Attributes FTW!";
+  return shouldCompileTo(emblem, '<p id="yes" class="no">Bracketed Attributes FTW!</p>');
 });
 
 test("nesting", function() {
   var emblem;
-  emblem = "p class=\"hello\" data-foo=\"gnarly\"\n  | Yes";
-  return shouldCompileTo(emblem, '<p class="hello" data-foo="gnarly">Yes</p>');
+  emblem = "p class=\"hello\" data-foo=\"gnarly\"\n  span Yes";
+  return shouldCompileTo(emblem, '<p class="hello" data-foo="gnarly"><span>Yes</span></p>');
 });
 
 suite("full attributes - mixed quotes");

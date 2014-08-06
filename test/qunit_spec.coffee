@@ -686,17 +686,17 @@ test "bracketed attributes", ->
   p [
     id="yes"
     class="no" ]
-    | Bracked Attributes FTW!
+    | Bracketed Attributes FTW!
   """
-  shouldCompileTo emblem, '<p id="yes" class="no">Bracked Attributes FTW!</p>'
+  shouldCompileTo emblem, '<p id="yes" class="no">Bracketed Attributes FTW!</p>'
 
 test "nesting", ->
   emblem =
   """
   p class="hello" data-foo="gnarly"
-    | Yes
+    span Yes
   """
-  shouldCompileTo emblem, '<p class="hello" data-foo="gnarly">Yes</p>'
+  shouldCompileTo emblem, '<p class="hello" data-foo="gnarly"><span>Yes</span></p>'
 
 suite "full attributes - mixed quotes"
 

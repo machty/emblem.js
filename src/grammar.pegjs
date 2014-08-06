@@ -22,7 +22,6 @@
     track: true,
     wbr: true
   };
-
   var KNOWN_TAGS = { 
     figcaption: true, blockquote: true, plaintext: true, textarea: true, progress: true, 
     optgroup: true, noscript: true, noframes: true, frameset: true, fieldset: true, 
@@ -120,6 +119,138 @@
   function log(msg) {
     handlebarsVariant.log(9, msg);
   }
+  function parseSexpr(path, params, hash){
+    var actualParams = [];
+    var attrs = {};
+    var hasAttrs = false;
+
+    // Convert shorthand html attributes (e.g. % = tagName, . = class, etc)
+    for(var i = 0; i < params.length; ++i) {
+      var p = params[i];
+      var attrKey = p[0];
+      if(attrKey == 'tagName' || attrKey == 'elementId' || attrKey == 'class') {
+        hasAttrs = true;
+        attrs[attrKey] = attrs[attrKey] || [];
+        attrs[attrKey].push(p[1]);
+      } else {
+        actualParams.push(p);
+      }
+    }
+
+    if(hasAttrs) {
+      hash = hash || new AST.HashNode([]);
+      for(var k in attrs) {
+        if(!attrs.hasOwnProperty(k)) continue;
+        hash.pairs.push([k, new AST.StringNode(attrs[k].join(' '))]);
+      }
+    }
+
+    actualParams.unshift(path);
+
+    if (useSexprNodes) {
+      return new AST.SexprNode(actualParams, hash);
+    } else {
+      // Stub a sexpr-like node for backwards compatibility with pre-1.3 AST.
+      return {
+        id: actualParams[0],
+        params: actualParams.slice(1),
+        hash: hash
+      };
+    }
+  }
+  function parseInHtml(h, inTagMustaches, fullAttributes) {
+  
+    var tagName = h[0] || 'div',
+        shorthandAttributes = h[1] || [],
+        id = shorthandAttributes[0],
+        classes = shorthandAttributes[1] || [],
+        tagOpenContent = [],
+        updateMustacheNode;
+
+    updateMustacheNode = function (node) {
+      var pairs, pair, stringNode, original;
+      if (!classes.length) {
+        return;
+      }
+      if (!node.id || node.id.string !== 'bind-attr') {
+        return;
+      }
+      if (node.hash && node.hash.pairs && (pairs = node.hash.pairs)) {
+        for (var i2 in pairs) {
+          if (!pairs.hasOwnProperty(i2)) { continue; }
+          pair = pairs[i2];
+          if (pair && pair[0] === 'class' && pair[1] instanceof AST.StringNode) {
+            stringNode = pair[1];
+            original = stringNode.original;
+            stringNode.original = stringNode.string = stringNode.stringModeValue = ':' + classes.join(' :') + ' ' + original;
+            classes = [];
+          }
+        }
+      }
+    };
+
+    tagOpenContent.push(new AST.ContentNode('<' + tagName));
+
+    if(id) {
+      tagOpenContent.push(new AST.ContentNode(' id="' + id + '"'));
+    }
+
+    // Pad in tag mustaches with spaces.
+    for(var i = 0; i < inTagMustaches.length; ++i) {
+      // Check if given mustache node has class bindings and prepend shorthand classes
+      updateMustacheNode(inTagMustaches[i]);
+      tagOpenContent.push(new AST.ContentNode(' '));
+      tagOpenContent.push(inTagMustaches[i]);
+    }
+    for(var i = 0; i < fullAttributes.length; ++i) {
+      for (var i2 in fullAttributes[i]) {
+        if (fullAttributes[i][i2] instanceof AST.MustacheNode) {
+          updateMustacheNode(fullAttributes[i][i2]);
+        }
+      }
+      if (classes.length) {
+        var isClassAttr = fullAttributes[i][1] && fullAttributes[i][1].string === 'class="';
+    
+        // Check if attribute is class attribute and has content
+        if (isClassAttr && fullAttributes[i].length === 4) {
+          if (fullAttributes[i][2].type == 'mustache') {
+            var mustacheNode, classesContent, hash, params;
+            // If class was mustache binding, transform attribute into bind-attr MustacheNode
+            // In case of 'div.shorthand class=varBinding' will transform into '<div {{bind-attr class=":shorthand varBinding"}}'
+            mustacheNode = fullAttributes[i][2];
+            classesContent = ':' + classes.join(' :') + ' ' + mustacheNode.id.original;
+            hash = new AST.HashNode([
+                ['class', new AST.StringNode(classesContent)]
+            ]);
+            
+            params = [new AST.IdNode([{ part: 'bind-attr'}])].concat(mustacheNode.params);
+            fullAttributes[i] = [fullAttributes[i][0], createMustacheNode(params, hash, true)];
+          } else {
+            // Else prepend shorthand classes to attribute 
+            classes.push(fullAttributes[i][2].string);
+            fullAttributes[i][2].string = classes.join(' ');
+          }
+          classes = [];
+        }
+      }
+      
+      tagOpenContent = tagOpenContent.concat(fullAttributes[i]);
+    }
+
+    if(classes && classes.length) {
+      tagOpenContent.push(new AST.ContentNode(' class="' + classes.join(' ') + '"'));
+    }
+    var closingTagSlashPresent = !!h[2];
+    if(SELF_CLOSING_TAG[tagName] || closingTagSlashPresent) {
+      tagOpenContent.push(new AST.ContentNode(' />'));
+      return [tagOpenContent];
+    } else {
+      
+      tagOpenContent.push(new AST.ContentNode('>'));
+
+      return [tagOpenContent, new AST.ContentNode('</' + tagName + '>')];
+    }
+  }
 }
 
 start = invertibleContent
@@ -181,6 +312,7 @@ contentStatement "ContentStatement"
   / htmlElement
   / textLine
   / mustache
+  
 
 blankLine = _ TERM { return []; } 
 
@@ -212,7 +344,7 @@ inlineComment
 
 lineStartingMustache 
   = capitalizedLineStarterMustache / mustacheOrBlock
-
+  
 capitalizedLineStarterMustache 
   = &[A-Z] ret:mustacheOrBlock 
 {
@@ -259,6 +391,9 @@ htmlNestedTextNodes
 
 indentedContent = blankLine* indentation c:content DEDENT { return c; }
 
+// Only accessed from bracketed attributes
+unindentedContent = blankLine* c:content DEDENT { return c; }
+
 // The end of an HTML statement. Could be a bunch of
 // text, a mustache, or a combination of html elements / mustaches
 // that get nested within the HTML element, or could just be a line
@@ -267,7 +402,9 @@ htmlTerminator
   = colonContent 
   / _ m:explicitMustache { return [m]; } 
   / _ inlineComment? TERM c:indentedContent? { return c; }
-  / htmlNestedTextNodes
+  / _ inlineComment? ']' TERM  c:unindentedContent? { return c; } // bracketed
+  / h:htmlNestedTextNodes { return h;}
+
 
 // A whole HTML element, including the html tag itself
 // and any nested content inside of it.
@@ -283,9 +420,12 @@ htmlElement = h:inHtmlTag nested:htmlTerminator
   return ret;
 }
 
-mustacheOrBlock = mustacheNode:inMustache _ inlineComment? nestedContentProgramNode:mustacheNestedContent
+mustacheOrBlock = mustacheNode:inMustache _ inlineComment?nestedContentProgramNode:mustacheNestedContent
 { 
-  if (!nestedContentProgramNode) { return mustacheNode; }
+  
+  if (!nestedContentProgramNode) {
+    return mustacheNode;
+  }
 
   var close = mustacheNode.id;
   if (use11AST) {
@@ -295,8 +435,8 @@ mustacheOrBlock = mustacheNode:inMustache _ inlineComment? nestedContentProgramN
       right: false
     };
   }
-
   var block = new AST.BlockNode(mustacheNode, nestedContentProgramNode, nestedContentProgramNode.inverse, close);
+
   block.path = mustacheNode.id;
   return block;
 }
@@ -311,7 +451,12 @@ colonContent = ': ' _ c:contentStatement { return c; }
 // Returns a ProgramNode
 mustacheNestedContent
   = statements:(colonContent / textLine) { return createProgramNode(statements, []); }
-  / TERM block:(blankLine* indentation invertibleContent DEDENT)? { return block && block[2]; }
+  / _ ']' TERM statements:(colonContent / textLine) DEDENT { return createProgramNode(statements, []); }
+  / TERM block:(blankLine* indentation invertibleContent DEDENT)? {return block && block[2]; }
+  / _ ']' TERM block:invertibleContent DEDENT {
+    return block;
+  }
+
 
 explicitMustache = e:equalSign ret:mustacheOrBlock
 {
@@ -321,7 +466,7 @@ explicitMustache = e:equalSign ret:mustacheOrBlock
 }
 
 inMustache
-  = isPartial:'>'? _ sexpr:sexpr
+  = isPartial:'>'? !('[' TERM) _ sexpr:sexpr
 { 
   if(isPartial) {
     var n = new AST.PartialNameNode(new AST.StringNode(sexpr.id.string));
@@ -343,51 +488,14 @@ inMustache
   } else if(tm === '^') {
     return unshiftParam(mustacheNode, 'unless');
   }
-
   return mustacheNode;
 }
 
 sexpr
-  = path:pathIdNode params:inMustacheParam* hash:hash?
-{
-  var actualParams = [];
-  var attrs = {};
-  var hasAttrs = false;
-
-  // Convert shorthand html attributes (e.g. % = tagName, . = class, etc)
-  for(var i = 0; i < params.length; ++i) {
-    var p = params[i];
-    var attrKey = p[0];
-    if(attrKey == 'tagName' || attrKey == 'elementId' || attrKey == 'class') {
-      hasAttrs = true;
-      attrs[attrKey] = attrs[attrKey] || [];
-      attrs[attrKey].push(p[1]);
-    } else {
-      actualParams.push(p);
-    }
-  }
-
-  if(hasAttrs) {
-    hash = hash || new AST.HashNode([]);
-    for(var k in attrs) {
-      if(!attrs.hasOwnProperty(k)) continue;
-      hash.pairs.push([k, new AST.StringNode(attrs[k].join(' '))]);
-    }
-  }
-
-  actualParams.unshift(path);
-
-  if (useSexprNodes) {
-    return new AST.SexprNode(actualParams, hash);
-  } else {
-    // Stub a sexpr-like node for backwards compatibility with pre-1.3 AST.
-    return {
-      id: actualParams[0],
-      params: actualParams.slice(1),
-      hash: hash
-    };
-  }
-}
+  = path:pathIdNode !' [' params:inMustacheParam* hash:hash?
+  { return parseSexpr(path, params, hash) }
+  / path:pathIdNode _ '[' _ TERM* INDENT* _ params:inMustacheBracketedParam* hash:bracketedHash?
+  { return parseSexpr(path, params, hash) }
 
 // %div converts to tagName="div", .foo.thing converts to class="foo thing", #id converst to id="id"
 htmlMustacheAttribute
@@ -410,8 +518,14 @@ attributesAtLeastClass
 inMustacheParam
   = a:(htmlMustacheAttribute / __ p:param { return p; } ) { return a; }
 
+inMustacheBracketedParam
+  = a:(htmlMustacheAttribute / p:param TERM* { return p; } ) { return a; }
+
 hash 
   = h:hashSegment+ { return new AST.HashNode(h); }
+
+bracketedHash
+  = INDENT* ' '* h:bracketedHashSegment+ { return new AST.HashNode(h); }
 
 pathIdent "PathIdent"
   = '..'
@@ -424,6 +538,9 @@ key "Key"
 
 hashSegment
   = __ h:(key '=' param) { return [h[0], h[2]]; }
+
+bracketedHashSegment
+  = INDENT* _ h:(key '=' param) TERM* { return [h[0], h[2]];}
 
 param
   = booleanNode
@@ -533,7 +650,6 @@ textLine = s:textLineStart nodes:textNodes indentedNodes:(indentation whitespace
   if(s === "'") {
     ret.push(new AST.ContentNode(" "));
   }
-
   return ret;
 }
 
@@ -618,99 +734,13 @@ htmlStart = h:htmlTagName? s:shorthandAttributes? '/'? &{ return h || s; }
 // p#some-id class="asdasd"
 // #some-id data-foo="sdsdf"
 // p{ action "click" target="view" }
-inHtmlTag = h:htmlStart inTagMustaches:inTagMustache* fullAttributes:fullAttribute*
-{
-  var tagName = h[0] || 'div',
-      shorthandAttributes = h[1] || [],
-      id = shorthandAttributes[0],
-      classes = shorthandAttributes[1] || [],
-      tagOpenContent = [],
-      updateMustacheNode;
-
-  updateMustacheNode = function (node) {
-    var pairs, pair, stringNode, original;
-    if (!classes.length) {
-      return;
-    }
-    if (!node.id || node.id.string !== 'bind-attr') {
-      return;
-    }
-    if (node.hash && node.hash.pairs && (pairs = node.hash.pairs)) {
-      for (var i2 in pairs) {
-        if (!pairs.hasOwnProperty(i2)) { continue; }
-        pair = pairs[i2];
-        if (pair && pair[0] === 'class' && pair[1] instanceof AST.StringNode) {
-          stringNode = pair[1];
-          original = stringNode.original;
-          stringNode.original = stringNode.string = stringNode.stringModeValue = ':' + classes.join(' :') + ' ' + original;
-          classes = [];
-        }
-      }
-    }
-  };
-
-  tagOpenContent.push(new AST.ContentNode('<' + tagName));
-
-  if(id) {
-    tagOpenContent.push(new AST.ContentNode(' id="' + id + '"'));
-  }
-
-  // Pad in tag mustaches with spaces.
-  for(var i = 0; i < inTagMustaches.length; ++i) {
-    // Check if given mustache node has class bindings and prepend shorthand classes
-    updateMustacheNode(inTagMustaches[i]);
-    tagOpenContent.push(new AST.ContentNode(' '));
-    tagOpenContent.push(inTagMustaches[i]);
-  }
-  
-  for(var i = 0; i < fullAttributes.length; ++i) {
-    for (var i2 in fullAttributes[i]) {
-      if (fullAttributes[i][i2] instanceof AST.MustacheNode) {
-        updateMustacheNode(fullAttributes[i][i2]);
-      }
-    }
-    
-    if (classes.length) {
-      var isClassAttr = fullAttributes[i][1] && fullAttributes[i][1].string === 'class="';
-  
-      // Check if attribute is class attribute and has content
-      if (isClassAttr && fullAttributes[i].length === 4) {
-        if (fullAttributes[i][2].type == 'mustache') {
-          var mustacheNode, classesContent, hash, params;
-          // If class was mustache binding, transform attribute into bind-attr MustacheNode
-          // In case of 'div.shorthand class=varBinding' will transform into '<div {{bind-attr class=":shorthand varBinding"}}'
-          mustacheNode = fullAttributes[i][2];
-          classesContent = ':' + classes.join(' :') + ' ' + mustacheNode.id.original;
-          hash = new AST.HashNode([
-              ['class', new AST.StringNode(classesContent)]
-          ]);
-          
-          params = [new AST.IdNode([{ part: 'bind-attr'}])].concat(mustacheNode.params);
-          fullAttributes[i] = [fullAttributes[i][0], createMustacheNode(params, hash, true)];
-        } else {
-          // Else prepend shorthand classes to attribute 
-          classes.push(fullAttributes[i][2].string);
-          fullAttributes[i][2].string = classes.join(' ');
-        }
-        classes = [];
-      }
-    }
-    
-    tagOpenContent = tagOpenContent.concat(fullAttributes[i]);
-  }
-
-  if(classes && classes.length) {
-    tagOpenContent.push(new AST.ContentNode(' class="' + classes.join(' ') + '"'));
-  }
-
-  var closingTagSlashPresent = !!h[2];
-  if(SELF_CLOSING_TAG[tagName] || closingTagSlashPresent) {
-    tagOpenContent.push(new AST.ContentNode(' />'));
-    return [tagOpenContent];
-  } else {
-    tagOpenContent.push(new AST.ContentNode('>'));
-    return [tagOpenContent, new AST.ContentNode('</' + tagName + '>')];
-  }
+inHtmlTag = h:htmlStart !' [' inTagMustaches:inTagMustache* fullAttributes:fullAttribute*
+{ 
+  return parseInHtml(h, inTagMustaches, fullAttributes)
+}
+/ h:htmlStart (' [' TERM*)* inTagMustaches:inTagMustache* fullAttributes:bracketedAttribute*
+{ 
+  return parseInHtml(h, inTagMustaches, fullAttributes)
 }
 
 shorthandAttributes 
@@ -731,7 +761,17 @@ shorthandAttributes
 }
 
 fullAttribute
-  = ' '+ a:(actionAttribute / booleanAttribute / boundAttribute / rawMustacheAttribute / normalAttribute)  
+  = ' '+ a:(actionAttribute / booleanAttribute / boundAttribute / rawMustacheAttribute / normalAttribute)
+{
+  if (a.length) {
+    return [new AST.ContentNode(' ')].concat(a); 
+  } else {
+    return [];
+  }
+}
+
+bracketedAttribute
+= INDENT* ' '* a:(actionAttribute / booleanAttribute / boundAttribute / rawMustacheAttribute / normalAttribute) TERM*
 {
   if (a.length) {
     return [new AST.ContentNode(' ')].concat(a); 

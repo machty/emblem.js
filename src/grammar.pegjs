@@ -345,7 +345,7 @@ inlineComment
 
 lineStartingMustache 
   = capitalizedLineStarterMustache / mustacheOrBlock
-
+  
 capitalizedLineStarterMustache 
   = &[A-Z] ret:mustacheOrBlock 
 {
@@ -421,9 +421,11 @@ htmlElement = h:inHtmlTag nested:htmlTerminator
   return ret;
 }
 
-mustacheOrBlock = mustacheNode:inMustache _ inlineComment? ']'? nestedContentProgramNode:mustacheNestedContent
+mustacheOrBlock = mustacheNode:inMustache _ inlineComment?nestedContentProgramNode:mustacheNestedContent
 { 
-  if (!nestedContentProgramNode) { return mustacheNode; }
+  if (!nestedContentProgramNode) {
+    return mustacheNode;
+  }
 
   var close = mustacheNode.id;
   if (use11AST) {
@@ -433,8 +435,8 @@ mustacheOrBlock = mustacheNode:inMustache _ inlineComment? ']'? nestedContentPro
       right: false
     };
   }
-
   var block = new AST.BlockNode(mustacheNode, nestedContentProgramNode, nestedContentProgramNode.inverse, close);
+
   block.path = mustacheNode.id;
   return block;
 }
@@ -449,7 +451,9 @@ colonContent = ': ' _ c:contentStatement { return c; }
 // Returns a ProgramNode
 mustacheNestedContent
   = statements:(colonContent / textLine) { return createProgramNode(statements, []); }
-  / TERM block:(blankLine* indentation invertibleContent DEDENT)? { return block && block[2]; }
+  / _ ']' TERM block:invertibleContent {return block;}
+  / TERM block:(blankLine* indentation invertibleContent DEDENT)? {return block && block[2]; }
+
 
 explicitMustache = e:equalSign ret:mustacheOrBlock
 {
@@ -461,7 +465,6 @@ explicitMustache = e:equalSign ret:mustacheOrBlock
 inMustache
   = isPartial:'>'? !('[' TERM) _ sexpr:sexpr
 { 
-  util = require('util')
   if(isPartial) {
     var n = new AST.PartialNameNode(new AST.StringNode(sexpr.id.string));
     return new AST.PartialNode(n, sexpr.params[0]);
@@ -482,7 +485,6 @@ inMustache
   } else if(tm === '^') {
     return unshiftParam(mustacheNode, 'unless');
   }
-
   return mustacheNode;
 }
 
@@ -532,7 +534,9 @@ hashSegment
   = __ h:(key '=' param) { return [h[0], h[2]]; }
 
 bracketedHashSegment
-  = _ h:(key '=' param) TERM* { return [h[0], h[2]]; }
+  = _ h:(key '=' param) TERM* {
+    return [h[0], h[2]];
+  }
 
 param
   = booleanNode
@@ -642,7 +646,6 @@ textLine = s:textLineStart nodes:textNodes indentedNodes:(indentation whitespace
   if(s === "'") {
     ret.push(new AST.ContentNode(" "));
   }
-
   return ret;
 }
 

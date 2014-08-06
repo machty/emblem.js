@@ -690,6 +690,7 @@ test "bracketed attributes", ->
   """
   shouldCompileTo emblem, '<p id="yes" class="no">Bracketed Attributes FTW!</p>'
 
+
 test "nesting", ->
   emblem =
   """

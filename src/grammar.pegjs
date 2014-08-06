@@ -120,7 +120,45 @@
   function log(msg) {
     handlebarsVariant.log(9, msg);
   }
+  function parseSexpr(path, params, hash){
+    var actualParams = [];
+    var attrs = {};
+    var hasAttrs = false;
 
+    // Convert shorthand html attributes (e.g. % = tagName, . = class, etc)
+    for(var i = 0; i < params.length; ++i) {
+      var p = params[i];
+      var attrKey = p[0];
+      if(attrKey == 'tagName' || attrKey == 'elementId' || attrKey == 'class') {
+        hasAttrs = true;
+        attrs[attrKey] = attrs[attrKey] || [];
+        attrs[attrKey].push(p[1]);
+      } else {
+        actualParams.push(p);
+      }
+    }
+
+    if(hasAttrs) {
+      hash = hash || new AST.HashNode([]);
+      for(var k in attrs) {
+        if(!attrs.hasOwnProperty(k)) continue;
+        hash.pairs.push([k, new AST.StringNode(attrs[k].join(' '))]);
+      }
+    }
+
+    actualParams.unshift(path);
+
+    if (useSexprNodes) {
+      return new AST.SexprNode(actualParams, hash);
+    } else {
+      // Stub a sexpr-like node for backwards compatibility with pre-1.3 AST.
+      return {
+        id: actualParams[0],
+        params: actualParams.slice(1),
+        hash: hash
+      };
+    }
+  }
   function parseInHtml(h, inTagMustaches, fullAttributes) {
   
     var tagName = h[0] || 'div',
@@ -383,7 +421,7 @@ htmlElement = h:inHtmlTag nested:htmlTerminator
   return ret;
 }
 
-mustacheOrBlock = mustacheNode:inMustache _ inlineComment? nestedContentProgramNode:mustacheNestedContent
+mustacheOrBlock = mustacheNode:inMustache _ inlineComment? ']'? nestedContentProgramNode:mustacheNestedContent
 { 
   if (!nestedContentProgramNode) { return mustacheNode; }
 
@@ -421,8 +459,9 @@ explicitMustache = e:equalSign ret:mustacheOrBlock
 }
 
 inMustache
-  = isPartial:'>'? _ sexpr:sexpr
+  = isPartial:'>'? !('[' TERM) _ sexpr:sexpr
 { 
+  util = require('util')
   if(isPartial) {
     var n = new AST.PartialNameNode(new AST.StringNode(sexpr.id.string));
     return new AST.PartialNode(n, sexpr.params[0]);
@@ -448,46 +487,10 @@ inMustache
 }
 
 sexpr
-  = path:pathIdNode params:inMustacheParam* hash:hash?
-{
-  var actualParams = [];
-  var attrs = {};
-  var hasAttrs = false;
-
-  // Convert shorthand html attributes (e.g. % = tagName, . = class, etc)
-  for(var i = 0; i < params.length; ++i) {
-    var p = params[i];
-    var attrKey = p[0];
-    if(attrKey == 'tagName' || attrKey == 'elementId' || attrKey == 'class') {
-      hasAttrs = true;
-      attrs[attrKey] = attrs[attrKey] || [];
-      attrs[attrKey].push(p[1]);
-    } else {
-      actualParams.push(p);
-    }
-  }
-
-  if(hasAttrs) {
-    hash = hash || new AST.HashNode([]);
-    for(var k in attrs) {
-      if(!attrs.hasOwnProperty(k)) continue;
-      hash.pairs.push([k, new AST.StringNode(attrs[k].join(' '))]);
-    }
-  }
-
-  actualParams.unshift(path);
-
-  if (useSexprNodes) {
-    return new AST.SexprNode(actualParams, hash);
-  } else {
-    // Stub a sexpr-like node for backwards compatibility with pre-1.3 AST.
-    return {
-      id: actualParams[0],
-      params: actualParams.slice(1),
-      hash: hash
-    };
-  }
-}
+  = path:pathIdNode !' [' params:inMustacheParam* hash:hash?
+  { return parseSexpr(path, params, hash) }
+  / path:pathIdNode ' [' TERM* params:inMustacheParam* hash:bracketedHash?
+  { return parseSexpr(path, params, hash) }
 
 // %div converts to tagName="div", .foo.thing converts to class="foo thing", #id converst to id="id"
 htmlMustacheAttribute
@@ -513,6 +516,9 @@ inMustacheParam
 hash 
   = h:hashSegment+ { return new AST.HashNode(h); }
 
+bracketedHash
+  = INDENT* ' '* h:bracketedHashSegment+ { return new AST.HashNode(h); }
+
 pathIdent "PathIdent"
   = '..'
   / '.'
@@ -524,6 +530,9 @@ key "Key"
 
 hashSegment
   = __ h:(key '=' param) { return [h[0], h[2]]; }
+
+bracketedHashSegment
+  = _ h:(key '=' param) TERM* { return [h[0], h[2]]; }
 
 param
   = booleanNode

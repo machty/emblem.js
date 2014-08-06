@@ -78,7 +78,7 @@ module.exports = (grunt) ->
           ascii_only : true
 
     qunit: 
-      all: ['test/**/*.html']
+      all: ['test/**/index-1.3.html']
 
 
     simplemocha:

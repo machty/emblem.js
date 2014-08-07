@@ -22,7 +22,7 @@
     track: true,
     wbr: true
   };
-
+  util = require('util');
   var KNOWN_TAGS = { 
     figcaption: true, blockquote: true, plaintext: true, textarea: true, progress: true, 
     optgroup: true, noscript: true, noframes: true, frameset: true, fieldset: true, 
@@ -450,9 +450,11 @@ colonContent = ': ' _ c:contentStatement { return c; }
 
 // Returns a ProgramNode
 mustacheNestedContent
-  = statements:(colonContent / textLine) { return createProgramNode(statements, []); }
-  / _ ']' TERM block:invertibleContent {return block;}
+  = (_ ']' TERM )* statements:(colonContent / textLine) { return createProgramNode(statements, []); }
   / TERM block:(blankLine* indentation invertibleContent DEDENT)? {return block && block[2]; }
+  / _ ']' TERM block:invertibleContent DEDENT {
+    return block;
+  }
 
 
 explicitMustache = e:equalSign ret:mustacheOrBlock

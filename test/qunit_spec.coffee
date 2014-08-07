@@ -688,8 +688,16 @@ test "bracketed attributes", ->
     class="no" ]
     | Bracketed Attributes FTW!
   """
-  shouldCompileTo emblem, '<p id="yes" class="no">Bracketed Attributes FTW!</p>'
-
+  shouldCompileTo emblem, '<p id="yes" class="no">Bracketed Attributes FTW!</p>'  
+# test "bracketed params", ->
+#   emblem =
+#   """
+#   foo [
+#     name="foo"
+#     something="false" ]
+#     p Bracketed params FTW!
+#   """
+#   shouldCompileTo emblem, '{{ #foo name="foo" something=false }} Bracketed Attributes FTW! {{/foo}}'
 
 test "nesting", ->
   emblem =

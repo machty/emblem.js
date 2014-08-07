@@ -776,6 +776,18 @@ test("recursive nesting pt 2", function() {
   }, '<sally class="none"><sally class="woot"><p>Hello</p></sally></sally>');
 });
 
+test("bracketed nested statement", function() {
+  var emblem;
+  emblem = "sally [\n  'foo'\n  something=\"false\" ]\n  | Bracketed helper attrs!";
+  return shouldCompileTo(emblem, '<sally class="foo">Bracketed helper attrs!</sally>');
+});
+
+test("bracketed nested block", function() {
+  var emblem;
+  emblem = "sally [\n  'foo'\n  something=\"false\" ]\n  p Bracketed helper attrs!";
+  return shouldCompileTo(emblem, '<sally class="foo"><p>Bracketed helper attrs!</p></sally>');
+});
+
 Handlebars.registerHelper('view', function(param, a, b, c) {
   var content, hashString, k, options, v, _ref1;
   options = arguments[arguments.length - 1];

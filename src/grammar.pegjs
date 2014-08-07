@@ -22,7 +22,6 @@
     track: true,
     wbr: true
   };
-  util = require('util');
   var KNOWN_TAGS = { 
     figcaption: true, blockquote: true, plaintext: true, textarea: true, progress: true, 
     optgroup: true, noscript: true, noframes: true, frameset: true, fieldset: true, 
@@ -423,6 +422,7 @@ htmlElement = h:inHtmlTag nested:htmlTerminator
 
 mustacheOrBlock = mustacheNode:inMustache _ inlineComment?nestedContentProgramNode:mustacheNestedContent
 { 
+  
   if (!nestedContentProgramNode) {
     return mustacheNode;
   }
@@ -450,7 +450,8 @@ colonContent = ': ' _ c:contentStatement { return c; }
 
 // Returns a ProgramNode
 mustacheNestedContent
-  = (_ ']' TERM )* statements:(colonContent / textLine) { return createProgramNode(statements, []); }
+  = statements:(colonContent / textLine) { return createProgramNode(statements, []); }
+  / _ ']' TERM statements:(colonContent / textLine) DEDENT { return createProgramNode(statements, []); }
   / TERM block:(blankLine* indentation invertibleContent DEDENT)? {return block && block[2]; }
   / _ ']' TERM block:invertibleContent DEDENT {
     return block;
@@ -493,7 +494,7 @@ inMustache
 sexpr
   = path:pathIdNode !' [' params:inMustacheParam* hash:hash?
   { return parseSexpr(path, params, hash) }
-  / path:pathIdNode ' [' TERM* params:inMustacheParam* hash:bracketedHash?
+  / path:pathIdNode _ '[' _ TERM* INDENT* _ params:inMustacheBracketedParam* hash:bracketedHash?
   { return parseSexpr(path, params, hash) }
 
 // %div converts to tagName="div", .foo.thing converts to class="foo thing", #id converst to id="id"
@@ -517,6 +518,9 @@ attributesAtLeastClass
 inMustacheParam
   = a:(htmlMustacheAttribute / __ p:param { return p; } ) { return a; }
 
+inMustacheBracketedParam
+  = a:(htmlMustacheAttribute / p:param TERM* { return p; } ) { return a; }
+
 hash 
   = h:hashSegment+ { return new AST.HashNode(h); }
 
@@ -536,9 +540,7 @@ hashSegment
   = __ h:(key '=' param) { return [h[0], h[2]]; }
 
 bracketedHashSegment
-  = _ h:(key '=' param) TERM* {
-    return [h[0], h[2]];
-  }
+  = INDENT* _ h:(key '=' param) TERM* { return [h[0], h[2]];}
 
 param
   = booleanNode

@@ -680,6 +680,16 @@ test "class and id", ->
 test "class and id and embedded html one-liner", ->
   shouldCompileTo 'p id="yes" class="no" One <b>asd</b>!', '<p id="yes" class="no">One <b>asd</b>!</p>'
 
+test "bracketed attributes", ->
+  emblem =
+  """
+  p [
+    id="yes"
+    class="no" ]
+    | Bracketed Attributes FTW!
+  """
+  shouldCompileTo emblem, '<p id="yes" class="no">Bracketed Attributes FTW!</p>'
+
 test "nesting", ->
   emblem =
   """
@@ -904,6 +914,25 @@ test "recursive nesting pt 2", ->
   """
   shouldCompileTo emblem, { thing: "woot" }, '<sally class="none"><sally class="woot"><p>Hello</p></sally></sally>'
 
+test "bracketed nested statement", ->
+  emblem =
+  """
+  sally [
+    'foo'
+    something="false" ]
+    | Bracketed helper attrs!
+  """
+  shouldCompileTo emblem, '<sally class="foo">Bracketed helper attrs!</sally>'
+
+test "bracketed nested block", ->
+  emblem =
+  """
+  sally [
+    'foo'
+    something="false" ]
+    p Bracketed helper attrs!
+  """
+  shouldCompileTo emblem, '<sally class="foo"><p>Bracketed helper attrs!</p></sally>'
 
 Handlebars.registerHelper 'view', (param, a, b, c) ->
   options = arguments[arguments.length - 1]

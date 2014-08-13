@@ -547,6 +547,18 @@ test("bracketed attributes", function() {
   return shouldCompileTo(emblem, '<p id="yes" class="no">Bracketed Attributes FTW!</p>');
 });
 
+test("bracketed text", function() {
+  var emblem;
+  emblem = "p [ Bracketed text is cool ]";
+  return shouldCompileTo(emblem, '<p>[ Bracketed text is cool ]</p>');
+});
+
+test("bracketed text indented", function() {
+  var emblem;
+  emblem = "p\n  | [ Bracketed text is cool ]";
+  return shouldCompileTo(emblem, '<p>[ Bracketed text is cool ]</p>');
+});
+
 test("nesting", function() {
   var emblem;
   emblem = "p class=\"hello\" data-foo=\"gnarly\"\n  span Yes";

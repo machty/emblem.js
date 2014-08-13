@@ -689,6 +689,20 @@ test "bracketed attributes", ->
     | Bracketed Attributes FTW!
   """
   shouldCompileTo emblem, '<p id="yes" class="no">Bracketed Attributes FTW!</p>'
+test "bracketed text", ->
+  emblem =
+  """
+  p [ Bracketed text is cool ]
+  """
+  shouldCompileTo emblem, '<p>[ Bracketed text is cool ]</p>'
+
+test "bracketed text indented", ->
+  emblem =
+  """
+  p
+    | [ Bracketed text is cool ]
+  """
+  shouldCompileTo emblem, '<p>[ Bracketed text is cool ]</p>'
 
 test "nesting", ->
   emblem =

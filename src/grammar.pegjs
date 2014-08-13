@@ -734,14 +734,16 @@ htmlStart = h:htmlTagName? s:shorthandAttributes? '/'? &{ return h || s; }
 // p#some-id class="asdasd"
 // #some-id data-foo="sdsdf"
 // p{ action "click" target="view" }
-inHtmlTag = h:htmlStart !' [' inTagMustaches:inTagMustache* fullAttributes:fullAttribute*
+inHtmlTag 
+= h:htmlStart ' [' TERM* inTagMustaches:inTagMustache* fullAttributes:bracketedAttribute+
 { 
   return parseInHtml(h, inTagMustaches, fullAttributes)
 }
-/ h:htmlStart (' [' TERM*)* inTagMustaches:inTagMustache* fullAttributes:bracketedAttribute*
+/ h:htmlStart inTagMustaches:inTagMustache* fullAttributes:fullAttribute*
 { 
   return parseInHtml(h, inTagMustaches, fullAttributes)
 }
+
 
 shorthandAttributes 
   = shorthands:(s:idShorthand    { return { shorthand: s, id: true}; } /

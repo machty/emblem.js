@@ -1,7 +1,7 @@
 {
   "name": "emblem",
   "description": "Templating language targeting Handlebars with default Ember.js conventions",
-  "version": "0.3.17",
+  "version": "0.3.18",
   "homepage": "http://www.emblemjs.com/",
   "keywords": [
     "ember",

@@ -97,7 +97,8 @@ if (typeof window !== "undefined" && window !== null) {
 }
 
 },{"./emblem":3}],3:[function(require,module,exports){
-var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};var Emblem;
+(function (global){
+var Emblem;
 
 this.Emblem = {};
 
@@ -121,6 +122,7 @@ require('./preprocessor');
 
 require('./emberties');
 
+}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./compiler":1,"./emberties":2,"./parser":4,"./preprocessor":5}],4:[function(require,module,exports){
 var Emblem = require('./emblem');
 
@@ -431,7 +433,13 @@ Emblem.Parser = (function() {
           return idNode;
         },
         peg$c79 = function(v) { return new AST.StringNode(v); },
-        peg$c80 = function(v) { return new AST.IntegerNode(v); },
+        peg$c80 = function(v) {
+          if (AST.IntegerNode) {
+            return new AST.IntegerNode(v);
+          } else {
+            return new AST.NumberNode(v);
+          }
+        },
         peg$c81 = function(v) { return new AST.BooleanNode(v); },
         peg$c82 = "Boolean",
         peg$c83 = "true",

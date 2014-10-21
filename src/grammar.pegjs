@@ -587,7 +587,13 @@ pathIdNode = v:path
 }
 
 stringNode  = v:string  { return new AST.StringNode(v); }
-integerNode = v:integer { return new AST.IntegerNode(v); }
+integerNode = v:integer {
+  if (AST.IntegerNode) {
+    return new AST.IntegerNode(v);
+  } else {
+    return new AST.NumberNode(v);
+  }
+}
 booleanNode = v:boolean { return new AST.BooleanNode(v); }
 
 boolean "Boolean" = 'true' / 'false'

@@ -64,25 +64,13 @@
   var twoBrace = closeBrace + closeBrace;
   var threeBrace = twoBrace + closeBrace;
 
-  var use11AST = handlebarsVariant.VERSION.slice(0, 3) >= 1.1;
-  var useSexprNodes = handlebarsVariant.VERSION.slice(0, 3) >= 1.3;
-
   function createMustacheNode(params, hash, escaped) {
-    if (use11AST) {
-      var open = escaped ? twoBrace : threeBrace;
-      return new AST.MustacheNode(params, hash, open, { left: false, right: false });
-    } else {
-      // old style
-      return new AST.MustacheNode(params, hash, !escaped);
-    }
+    var open = escaped ? twoBrace : threeBrace;
+    return new AST.MustacheNode(params, hash, open, { left: false, right: false });
   }
 
   function createProgramNode(statements, inverse) {
-    if (use11AST) {
-      return new AST.ProgramNode(statements, { left: false, right: false}, inverse, null);
-    } else {
-      return new AST.ProgramNode(statements, inverse);
-    }
+    return new AST.ProgramNode(statements, { left: false, right: false}, inverse, null);
   }
 
   // Returns a new MustacheNode with a new preceding param (id).
@@ -146,17 +134,7 @@
     }
 
     actualParams.unshift(path);
-
-    if (useSexprNodes) {
-      return new AST.SexprNode(actualParams, hash);
-    } else {
-      // Stub a sexpr-like node for backwards compatibility with pre-1.3 AST.
-      return {
-        id: actualParams[0],
-        params: actualParams.slice(1),
-        hash: hash
-      };
-    }
+    return new AST.SexprNode(actualParams, hash);
   }
   function parseInHtml(h, inTagMustaches, fullAttributes) {
   
@@ -428,13 +406,12 @@ mustacheOrBlock = mustacheNode:inMustache _ inlineComment?nestedContentProgramNo
   }
 
   var close = mustacheNode.id;
-  if (use11AST) {
-    close.path = mustacheNode.id;
-    close.strip = {
-      left: false,
-      right: false
-    };
-  }
+  close.path = mustacheNode.id;
+  close.strip = {
+    left: false,
+    right: false
+  };
+
   var block = new AST.BlockNode(mustacheNode, nestedContentProgramNode, nestedContentProgramNode.inverse, close);
 
   block.path = mustacheNode.id;
@@ -473,12 +450,7 @@ inMustache
     return new AST.PartialNode(n, sexpr.params[0]);
   }
 
-  var mustacheNode;
-  if (useSexprNodes) {
-    mustacheNode = createMustacheNode(sexpr, null, true);
-  } else {
-    mustacheNode = createMustacheNode([sexpr.id].concat(sexpr.params), sexpr.hash, true);
-  }
+  var mustacheNode = createMustacheNode(sexpr, null, true);
 
   var tm = sexpr.id._emblemSuffixModifier;
   if(tm === '!') {

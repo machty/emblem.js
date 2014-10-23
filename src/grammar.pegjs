@@ -234,7 +234,9 @@ start = invertibleContent
 
 invertibleContent = c:content i:( DEDENT else _ TERM blankLine* indentation c:content {return c;})?
 { 
-  return createProgramNode(c, i || []);
+  var programNode = createProgramNode(c);
+  if(i) { programNode.inverse = createProgramNode(i); }
+  return programNode;
 }
 
 else

@@ -194,7 +194,6 @@
           if (fullAttributes[i][2].type == 'mustache') {
             var mustacheNode, classesContent, hash, params;
             // If class was mustache binding, transform attribute into bind-attr MustacheNode
-            // In case of 'div.shorthand class=varBinding' will transform into '<div {{bind-attr class=":shorthand varBinding"}}'
             mustacheNode = fullAttributes[i][2];
             classesContent = ':' + classes.join(' :') + ' ' + mustacheNode.id.original;
             hash = new AST.HashNode([
@@ -233,7 +232,7 @@
 
 start = invertibleContent
 
-invertibleContent = c:content i:( DEDENT else _ TERM indentation c:content {return c;})?
+invertibleContent = c:content i:( DEDENT else _ TERM blankLine* indentation c:content {return c;})?
 { 
   return createProgramNode(c, i || []);
 }
@@ -290,7 +289,6 @@ contentStatement "ContentStatement"
   / htmlElement
   / textLine
   / mustache
-  
 
 blankLine = _ TERM { return []; } 
 
@@ -405,22 +403,15 @@ mustacheOrBlock = mustacheNode:inMustache _ inlineComment?nestedContentProgramNo
     return mustacheNode;
   }
 
-  var close = mustacheNode.id;
-  close.path = mustacheNode.id;
-  close.strip = {
+  var strip = {
     left: false,
     right: false
   };
 
-  var block = new AST.BlockNode(mustacheNode, nestedContentProgramNode, nestedContentProgramNode.inverse, close);
+  var block = new AST.BlockNode(mustacheNode, nestedContentProgramNode, nestedContentProgramNode.inverse, strip);
 
   block.path = mustacheNode.id;
   return block;
-}
-
-invertibleContent = c:content i:( DEDENT else _ TERM blankLine* indentation c:content {return c;})?
-{ 
-  return createProgramNode(c, i || []);
 }
 
 colonContent = ': ' _ c:contentStatement { return c; }
@@ -559,13 +550,7 @@ pathIdNode = v:path
 }
 
 stringNode  = v:string  { return new AST.StringNode(v); }
-integerNode = v:integer {
-  if (AST.IntegerNode) {
-    return new AST.IntegerNode(v);
-  } else {
-    return new AST.NumberNode(v);
-  }
-}
+integerNode = v:integer { return new AST.NumberNode(v); }
 booleanNode = v:boolean { return new AST.BooleanNode(v); }
 
 boolean "Boolean" = 'true' / 'false'

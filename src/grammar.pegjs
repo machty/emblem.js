@@ -441,7 +441,7 @@ inMustache
 { 
   if(isPartial) {
     var n = new AST.PartialNameNode(new AST.StringNode(sexpr.id.string));
-    return new AST.PartialNode(n, sexpr.params[0]);
+    return new AST.PartialNode(n, sexpr.params[0], undefined, {});
   }
 
   var mustacheNode = createMustacheNode(sexpr, null, true);

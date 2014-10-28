@@ -297,11 +297,13 @@ blankLine = _ TERM { return []; }
 legacyPartialInvocation
   = '>' _ n:legacyPartialName params:inMustacheParam* _ TERM 
 { 
-  return [new AST.PartialNode(n, params[0])]; 
+  return [new AST.PartialNode(n, params[0], undefined, {})];
 }
 
 legacyPartialName
-  = s:$[a-zA-Z0-9_$-/]+ { return new AST.PartialNameNode(new AST.StringNode(s)); }
+  = s:$[a-zA-Z0-9_$-/]+ {
+    return new AST.PartialNameNode(new AST.StringNode(s));
+  }
 
 // Returns [MustacheNode] or [BlockNode]
 mustache 
@@ -400,7 +402,6 @@ htmlElement = h:inHtmlTag nested:htmlTerminator
 
 mustacheOrBlock = mustacheNode:inMustache _ inlineComment?nestedContentProgramNode:mustacheNestedContent
 { 
-  
   if (!nestedContentProgramNode) {
     return mustacheNode;
   }

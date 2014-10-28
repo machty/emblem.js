@@ -251,11 +251,13 @@ Emblem.Parser = (function() {
         peg$c13 = ">",
         peg$c14 = "\">\"",
         peg$c15 = function(n, params) { 
-          return [new AST.PartialNode(n, params[0])]; 
+          return [new AST.PartialNode(n, params[0], undefined, {})];
         },
         peg$c16 = /^[a-zA-Z0-9_$-\/]/,
         peg$c17 = "[a-zA-Z0-9_$-\\/]",
-        peg$c18 = function(s) { return new AST.PartialNameNode(new AST.StringNode(s)); },
+        peg$c18 = function(s) {
+            return new AST.PartialNameNode(new AST.StringNode(s));
+          },
         peg$c19 = function(m) { 
           return [m]; 
         },
@@ -313,7 +315,6 @@ Emblem.Parser = (function() {
           return ret;
         },
         peg$c34 = function(mustacheNode, nestedContentProgramNode) { 
-          
           if (!nestedContentProgramNode) {
             return mustacheNode;
           }

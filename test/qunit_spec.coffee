@@ -31,7 +31,7 @@ else
 unless CompilerContext?
   # Note that this doesn't have the same context separation as the rspec test.
   # Both should be run for full acceptance of the two libary modes.
-  CompilerContext = 
+  CompilerContext =
     compile: (template, options) ->
       Emblem.compile(Handlebars, template, options)
 
@@ -199,14 +199,14 @@ test "w/ block mustaches", ->
     and {{sally: span Hello}}!
   '''
 
-  shouldCompileTo emblem, 
+  shouldCompileTo emblem,
                   '<p>Hello, <sally class="none">Hello</sally>, and <sally class="none"><span>Hello</span></sally>!</p>'
 
   emblem =
   '''
   p Hello, #{ sally: span: a Hello}!
   '''
-  shouldCompileTo emblem, 
+  shouldCompileTo emblem,
                   '<p>Hello, <sally class="none"><span><a>Hello</a></span></sally>!</p>'
 
 test "with followup", ->
@@ -225,7 +225,7 @@ test 'acts like {{}}', ->
   '''
   span Yo #{foo}, I herd.
   '''
-  shouldCompileTo emblem, 
+  shouldCompileTo emblem,
     { foo: '<span>123</span>' },
     "<span>Yo &lt;span&gt;123&lt;/span&gt;, I herd.</span>"
  

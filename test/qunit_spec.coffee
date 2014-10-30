@@ -871,7 +871,7 @@ Handlebars.registerHelper 'sally', ->
   params = Array::slice.call arguments, 0, -1
   param = params[0] || 'none'
   if options.fn
-    content = options.fn @ 
+    content = options.fn @
     new Handlebars.SafeString """<sally class="#{param}">#{content}</sally>"""
   else
     content = param
@@ -1234,7 +1234,7 @@ test "class bind-attr braced syntax w/ underscores and dashes", ->
   shouldEmberPrecompileToHelper 'p class={f-oo:bar :b_az}'
   shouldEmberPrecompileToHelper 'p class={ f-oo:bar :b_az }'
   shouldEmberPrecompileToHelper 'p class={ f-oo:bar :b_az } Hello'
-  emblem = 
+  emblem =
   """
   .input-prepend class={ filterOn:input-append }
     span.add-on
@@ -1258,7 +1258,7 @@ test "exclamation modifier (ember)", ->
 suite "in-tag explicit mustache"
 
 Handlebars.registerHelper 'inTagHelper', (p) ->
-  return p;
+  return p
 
 test "single", ->
   shouldCompileTo 'p{inTagHelper foo}', {foo: "ALEX"}, '<p ALEX></p>'
@@ -1594,8 +1594,8 @@ test "calling handlebars partial", ->
   > hbPartial
   | Hello #{> hbPartial}
   '''
-  shouldCompileToString emblem, 
-    { id: 666, name: "Death" }, 
+  shouldCompileToString emblem,
+    { id: 666, name: "Death" },
     '<a href="/people/666">Death</a>Hello <a href="/people/666">Death</a>'
 
 Emblem.registerPartial(Handlebars, 'emblemPartial', 'a href="/people/{{id}}" = name')
@@ -1794,21 +1794,21 @@ test "basic", ->
     p = this
     this
   '''
-  shouldCompileTo emblem, 
-    { foo: [ "Alex", "Emily" ] }, 
+  shouldCompileTo emblem,
+    { foo: [ "Alex", "Emily" ] },
     '<p>Alex</p>Alex<p>Emily</p>Emily'
 
 suite "colon separator"
 
 test "basic", ->
   emblem = 'each foo: p Hello, #{this}'
-  shouldCompileTo emblem, 
-    { foo: [ "Alex", "Emily", "Nicole" ] }, 
+  shouldCompileTo emblem,
+    { foo: [ "Alex", "Emily", "Nicole" ] },
     '<p>Hello, Alex</p><p>Hello, Emily</p><p>Hello, Nicole</p>'
 
 test "html stack", ->
   emblem = '.container: .row: .span5: span Hello'
-  shouldCompileToString emblem, 
+  shouldCompileToString emblem,
     '<div class="container"><div class="row"><div class="span5"><span>Hello</span></div></div></div>'
 
 test "epic", ->
@@ -1828,13 +1828,13 @@ test "html stack elements only", ->
 test "mixed separators", ->
   emblem = '.fun = each foo: %nork = this'
   shouldCompileTo emblem,
-    { foo: [ "Alex", "Emily", "Nicole" ] }, 
+    { foo: [ "Alex", "Emily", "Nicole" ] },
     '<div class="fun"><nork>Alex</nork><nork>Emily</nork><nork>Nicole</nork></div>'
 
 test "mixed separators rewritten", ->
   emblem = '.fun: each foo: %nork: this'
   shouldCompileTo emblem,
-    { foo: [ "Alex", "Emily", "Nicole" ] }, 
+    { foo: [ "Alex", "Emily", "Nicole" ] },
     '<div class="fun"><nork>Alex</nork><nork>Emily</nork><nork>Nicole</nork></div>'
 
 test "with text terminator", ->
@@ -1866,7 +1866,7 @@ suite "base indent / predent"
 
 test "predent", ->
   emblem = "        \n"
-  s = 
+  s =
   """
   pre
     ` This

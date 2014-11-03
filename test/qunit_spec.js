@@ -1209,13 +1209,13 @@ test("basic (click) followed by attr", function() {
 test("nested (mouseEnter)", function() {
   var emblem;
   emblem = "a mouseEnter='submitComment target=\"view\"'\n  | Submit Comment";
-  return shouldCompileToString(emblem, '<a action submitComment target=view on=mouseEnter>Submit Comment</a>');
+  return shouldCompileToString(emblem, '<a action submitComment on=mouseEnter target=view>Submit Comment</a>');
 });
 
 test("nested (mouseEnter, doublequoted)", function() {
   var emblem;
   emblem = "a mouseEnter=\"submitComment target='view'\"\n  | Submit Comment";
-  return shouldCompileToString(emblem, '<a action submitComment target=view on=mouseEnter>Submit Comment</a>');
+  return shouldCompileToString(emblem, '<a action submitComment on=mouseEnter target=view>Submit Comment</a>');
 });
 
 test("manual", function() {

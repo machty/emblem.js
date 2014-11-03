@@ -1343,7 +1343,7 @@ test "nested (mouseEnter)", ->
   a mouseEnter='submitComment target="view"'
     | Submit Comment
   """
-  shouldCompileToString emblem, '<a action submitComment target=view on=mouseEnter>Submit Comment</a>'
+  shouldCompileToString emblem, '<a action submitComment on=mouseEnter target=view>Submit Comment</a>'
 
 test "nested (mouseEnter, doublequoted)", ->
   emblem =
@@ -1351,7 +1351,7 @@ test "nested (mouseEnter, doublequoted)", ->
   a mouseEnter="submitComment target='view'"
     | Submit Comment
   """
-  shouldCompileToString emblem, '<a action submitComment target=view on=mouseEnter>Submit Comment</a>'
+  shouldCompileToString emblem, '<a action submitComment on=mouseEnter target=view>Submit Comment</a>'
 
 test "manual", ->
   emblem =

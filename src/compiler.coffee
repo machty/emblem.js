@@ -14,7 +14,7 @@ Emblem.registerPartial = (handlebarsVariant, partialName, text) ->
 
   handlebarsVariant.registerPartial partialName, Emblem.compile handlebarsVariant, text
 
-Emblem.parse = (string) -> 
+Emblem.parse = (string) ->
   # Pre-process, parse
   try
     processed = Emblem.Preprocessor.processSync string

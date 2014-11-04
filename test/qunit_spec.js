@@ -1,6 +1,8 @@
 var CompilerContext, Ember, EmberHandlebars, Emblem, Handlebars, LoadedEmber, bindAttrHelper, compileWithPartials, equal, equals, ok, precompileEmber, runTextLineSuite, shouldCompileTo, shouldCompileToString, shouldCompileToWithPartials, shouldEmberPrecompileToHelper, shouldThrow, supportsEachHelperDataKeywords, supportsSubexpressions, throws, _equal, _ref,
   __hasProp = {}.hasOwnProperty;
 
+LoadedEmber = (typeof window !== "undefined" && window !== null ? window.Ember : void 0) || this.Ember || {};
+
 Ember = (typeof window !== "undefined" && window !== null ? window.Emblem : void 0) || this.Emblem || {};
 
 LoadedEmber = LoadedEmber || {};
@@ -21,6 +23,10 @@ if (typeof Emblem !== "undefined" && Emblem !== null) {
   Emblem = require('../lib/emblem');
   expect = function() {};;
   _ref = require("assert"), equal = _ref.equal, equals = _ref.equals, ok = _ref.ok, throws = _ref.throws;
+}
+
+if (EmberHandlebars == null) {
+  EmberHandlebars = Ember.Handlebars;
 }
 
 if (typeof CompilerContext === "undefined" || CompilerContext === null) {

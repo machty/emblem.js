@@ -1,6 +1,6 @@
 
 # Test Setup: Set up an environment that'll work for both Node and Qunit tests.
-
+LoadedEmber = window?.Ember || @Ember || {}
 Ember = window?.Emblem || @Emblem || {}
 
 # These are needed for the full version ember to load properly
@@ -27,6 +27,10 @@ else
   `expect = function() {};`
 
   {equal, equals, ok, throws} = require("assert")
+
+# Setup Ember handlebars if not loaded with require
+if !EmberHandlebars?
+  EmberHandlebars = Ember.Handlebars
 
 unless CompilerContext?
   # Note that this doesn't have the same context separation as the rspec test.

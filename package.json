@@ -18,28 +18,29 @@
     "node": ">=0.4.7"
   },
   "dependencies": {
-    "handlebars": "~1.3",
-    "optimist": "~0.3",
-    "uglify-js": "~1.2",
-    "StringScanner": "~0.0.3"
+    "StringScanner": "~0.0.3",
+    "handlebars": "^2.0.0",
+    "optimist": "^0.3.7",
+    "uglify-js": "^1.2.6"
   },
   "devDependencies": {
-    "grunt": "~0.4.1",
-    "grunt-contrib-uglify": "~0.2.2",
-    "grunt-contrib-coffee": "~0.7.0",
-    "grunt-peg": "git://github.com/machty/grunt-peg.git#bff7e9145104f9f75117f082f7e43df43c99572a",
-    "grunt-contrib-clean": "~0.5.0",
-    "grunt-contrib-concat": "~0.3.0",
-    "grunt-browserify": "~1.2.3",
-    "grunt-contrib-qunit": "~0.2.2",
-    "grunt-simple-mocha": "~0.4.0",
-    "grunt-saucelabs": "~4.0.2",
-    "matchdep": "~0.1.2",
-    "grunt-cli": "~0.1.6",
-    "grunt-contrib-connect": "~0.1.2",
-    "grunt-contrib-watch": "~0.2.0",
     "connect-redirection": "0.0.1",
-    "grunt-open": "~0.2.2"
+    "ember-template-compiler": "^1.9.0-alpha",
+    "grunt": "^0.4.5",
+    "grunt-browserify": "^3.2.0",
+    "grunt-cli": "^0.1.13",
+    "grunt-contrib-clean": "^0.6.0",
+    "grunt-contrib-coffee": "^0.12.0",
+    "grunt-contrib-concat": "^0.5.0",
+    "grunt-contrib-connect": "^0.8.0",
+    "grunt-contrib-qunit": "^0.5.2",
+    "grunt-contrib-uglify": "^0.6.0",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-open": "^0.2.3",
+    "grunt-peg": "git://github.com/machty/grunt-peg.git#bff7e9145104f9f75117f082f7e43df43c99572a",
+    "grunt-saucelabs": "^8.3.2",
+    "grunt-simple-mocha": "^0.4.0",
+    "matchdep": "^0.3.0"
   },
   "main": "lib/emblem.js",
   "bin": {

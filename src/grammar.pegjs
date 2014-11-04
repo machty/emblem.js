@@ -64,25 +64,13 @@
   var twoBrace = closeBrace + closeBrace;
   var threeBrace = twoBrace + closeBrace;
 
-  var use11AST = handlebarsVariant.VERSION.slice(0, 3) >= 1.1;
-  var useSexprNodes = handlebarsVariant.VERSION.slice(0, 3) >= 1.3;
-
   function createMustacheNode(params, hash, escaped) {
-    if (use11AST) {
-      var open = escaped ? twoBrace : threeBrace;
-      return new AST.MustacheNode(params, hash, open, { left: false, right: false });
-    } else {
-      // old style
-      return new AST.MustacheNode(params, hash, !escaped);
-    }
+    var open = escaped ? twoBrace : threeBrace;
+    return new AST.MustacheNode(params, hash, open, { left: false, right: false });
   }
 
   function createProgramNode(statements, inverse) {
-    if (use11AST) {
-      return new AST.ProgramNode(statements, { left: false, right: false}, inverse, null);
-    } else {
-      return new AST.ProgramNode(statements, inverse);
-    }
+    return new AST.ProgramNode(statements, { left: false, right: false}, inverse, null);
   }
 
   // Returns a new MustacheNode with a new preceding param (id).
@@ -146,17 +134,7 @@
     }
 
     actualParams.unshift(path);
-
-    if (useSexprNodes) {
-      return new AST.SexprNode(actualParams, hash);
-    } else {
-      // Stub a sexpr-like node for backwards compatibility with pre-1.3 AST.
-      return {
-        id: actualParams[0],
-        params: actualParams.slice(1),
-        hash: hash
-      };
-    }
+    return new AST.SexprNode(actualParams, hash);
   }
   function parseInHtml(h, inTagMustaches, fullAttributes) {
   
@@ -216,7 +194,6 @@
           if (fullAttributes[i][2].type == 'mustache') {
             var mustacheNode, classesContent, hash, params;
             // If class was mustache binding, transform attribute into bind-attr MustacheNode
-            // In case of 'div.shorthand class=varBinding' will transform into '<div {{bind-attr class=":shorthand varBinding"}}'
             mustacheNode = fullAttributes[i][2];
             classesContent = ':' + classes.join(' :') + ' ' + mustacheNode.id.original;
             hash = new AST.HashNode([
@@ -255,9 +232,11 @@
 
 start = invertibleContent
 
-invertibleContent = c:content i:( DEDENT else _ TERM indentation c:content {return c;})?
+invertibleContent = c:content i:( DEDENT else _ TERM blankLine* indentation c:content {return c;})?
 { 
-  return createProgramNode(c, i || []);
+  var programNode = createProgramNode(c);
+  if(i) { programNode.inverse = createProgramNode(i); }
+  return programNode;
 }
 
 else
@@ -312,18 +291,19 @@ contentStatement "ContentStatement"
   / htmlElement
   / textLine
   / mustache
-  
 
 blankLine = _ TERM { return []; } 
 
 legacyPartialInvocation
   = '>' _ n:legacyPartialName params:inMustacheParam* _ TERM 
 { 
-  return [new AST.PartialNode(n, params[0])]; 
+  return [new AST.PartialNode(n, params[0], undefined, {})];
 }
 
 legacyPartialName
-  = s:$[a-zA-Z0-9_$-/]+ { return new AST.PartialNameNode(new AST.StringNode(s)); }
+  = s:$[a-zA-Z0-9_$-/]+ {
+    return new AST.PartialNameNode(new AST.StringNode(s));
+  }
 
 // Returns [MustacheNode] or [BlockNode]
 mustache 
@@ -422,28 +402,19 @@ htmlElement = h:inHtmlTag nested:htmlTerminator
 
 mustacheOrBlock = mustacheNode:inMustache _ inlineComment?nestedContentProgramNode:mustacheNestedContent
 { 
-  
   if (!nestedContentProgramNode) {
     return mustacheNode;
   }
 
-  var close = mustacheNode.id;
-  if (use11AST) {
-    close.path = mustacheNode.id;
-    close.strip = {
-      left: false,
-      right: false
-    };
-  }
-  var block = new AST.BlockNode(mustacheNode, nestedContentProgramNode, nestedContentProgramNode.inverse, close);
+  var strip = {
+    left: false,
+    right: false
+  };
+
+  var block = new AST.BlockNode(mustacheNode, nestedContentProgramNode, nestedContentProgramNode.inverse, strip);
 
   block.path = mustacheNode.id;
   return block;
-}
-
-invertibleContent = c:content i:( DEDENT else _ TERM blankLine* indentation c:content {return c;})?
-{ 
-  return createProgramNode(c, i || []);
 }
 
 colonContent = ': ' _ c:contentStatement { return c; }
@@ -470,15 +441,10 @@ inMustache
 { 
   if(isPartial) {
     var n = new AST.PartialNameNode(new AST.StringNode(sexpr.id.string));
-    return new AST.PartialNode(n, sexpr.params[0]);
+    return new AST.PartialNode(n, sexpr.params[0], undefined, {});
   }
 
-  var mustacheNode;
-  if (useSexprNodes) {
-    mustacheNode = createMustacheNode(sexpr, null, true);
-  } else {
-    mustacheNode = createMustacheNode([sexpr.id].concat(sexpr.params), sexpr.hash, true);
-  }
+  var mustacheNode = createMustacheNode(sexpr, null, true);
 
   var tm = sexpr.id._emblemSuffixModifier;
   if(tm === '!') {
@@ -587,7 +553,7 @@ pathIdNode = v:path
 }
 
 stringNode  = v:string  { return new AST.StringNode(v); }
-integerNode = v:integer { return new AST.IntegerNode(v); }
+integerNode = v:integer { return new AST.NumberNode(v); }
 booleanNode = v:boolean { return new AST.BooleanNode(v); }
 
 boolean "Boolean" = 'true' / 'false'

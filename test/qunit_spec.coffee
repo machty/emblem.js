@@ -1,6 +1,6 @@
 
 # Test Setup: Set up an environment that'll work for both Node and Qunit tests.
-
+LoadedEmber = window?.Ember || @Ember || {}
 Ember = window?.Emblem || @Emblem || {}
 
 # These are needed for the full version ember to load properly
@@ -20,7 +20,7 @@ if Emblem?
 else
   # Setup for Node package testing
   Handlebars = require('handlebars')
-  EmberHandlebars = require('./resources/ember-template-compiler.js').EmberHandlebars
+  EmberHandlebars = require('../node_modules/ember-template-compiler/vendor/ember-template-compiler.js').EmberHandlebars
   Emblem = require('../lib/emblem')
 
   # TODO: replace with real expect()
@@ -28,10 +28,14 @@ else
 
   {equal, equals, ok, throws} = require("assert")
 
+# Setup Ember handlebars if not loaded with require
+if !EmberHandlebars?
+  EmberHandlebars = Ember.Handlebars
+
 unless CompilerContext?
   # Note that this doesn't have the same context separation as the rspec test.
   # Both should be run for full acceptance of the two libary modes.
-  CompilerContext = 
+  CompilerContext =
     compile: (template, options) ->
       Emblem.compile(Handlebars, template, options)
 
@@ -199,14 +203,14 @@ test "w/ block mustaches", ->
     and {{sally: span Hello}}!
   '''
 
-  shouldCompileTo emblem, 
+  shouldCompileTo emblem,
                   '<p>Hello, <sally class="none">Hello</sally>, and <sally class="none"><span>Hello</span></sally>!</p>'
 
   emblem =
   '''
   p Hello, #{ sally: span: a Hello}!
   '''
-  shouldCompileTo emblem, 
+  shouldCompileTo emblem,
                   '<p>Hello, <sally class="none"><span><a>Hello</a></span></sally>!</p>'
 
 test "with followup", ->
@@ -225,7 +229,7 @@ test 'acts like {{}}', ->
   '''
   span Yo #{foo}, I herd.
   '''
-  shouldCompileTo emblem, 
+  shouldCompileTo emblem,
     { foo: '<span>123</span>' },
     "<span>Yo &lt;span&gt;123&lt;/span&gt;, I herd.</span>"
  
@@ -871,7 +875,7 @@ Handlebars.registerHelper 'sally', ->
   params = Array::slice.call arguments, 0, -1
   param = params[0] || 'none'
   if options.fn
-    content = options.fn @ 
+    content = options.fn @
     new Handlebars.SafeString """<sally class="#{param}">#{content}</sally>"""
   else
     content = param
@@ -1234,7 +1238,7 @@ test "class bind-attr braced syntax w/ underscores and dashes", ->
   shouldEmberPrecompileToHelper 'p class={f-oo:bar :b_az}'
   shouldEmberPrecompileToHelper 'p class={ f-oo:bar :b_az }'
   shouldEmberPrecompileToHelper 'p class={ f-oo:bar :b_az } Hello'
-  emblem = 
+  emblem =
   """
   .input-prepend class={ filterOn:input-append }
     span.add-on
@@ -1258,7 +1262,7 @@ test "exclamation modifier (ember)", ->
 suite "in-tag explicit mustache"
 
 Handlebars.registerHelper 'inTagHelper', (p) ->
-  return p;
+  return p
 
 test "single", ->
   shouldCompileTo 'p{inTagHelper foo}', {foo: "ALEX"}, '<p ALEX></p>'
@@ -1343,7 +1347,7 @@ test "nested (mouseEnter)", ->
   a mouseEnter='submitComment target="view"'
     | Submit Comment
   """
-  shouldCompileToString emblem, '<a action submitComment target=view on=mouseEnter>Submit Comment</a>'
+  shouldCompileToString emblem, '<a action submitComment on=mouseEnter target=view>Submit Comment</a>'
 
 test "nested (mouseEnter, doublequoted)", ->
   emblem =
@@ -1351,7 +1355,7 @@ test "nested (mouseEnter, doublequoted)", ->
   a mouseEnter="submitComment target='view'"
     | Submit Comment
   """
-  shouldCompileToString emblem, '<a action submitComment target=view on=mouseEnter>Submit Comment</a>'
+  shouldCompileToString emblem, '<a action submitComment on=mouseEnter target=view>Submit Comment</a>'
 
 test "manual", ->
   emblem =
@@ -1594,8 +1598,8 @@ test "calling handlebars partial", ->
   > hbPartial
   | Hello #{> hbPartial}
   '''
-  shouldCompileToString emblem, 
-    { id: 666, name: "Death" }, 
+  shouldCompileToString emblem,
+    { id: 666, name: "Death" },
     '<a href="/people/666">Death</a>Hello <a href="/people/666">Death</a>'
 
 Emblem.registerPartial(Handlebars, 'emblemPartial', 'a href="/people/{{id}}" = name')
@@ -1794,21 +1798,21 @@ test "basic", ->
     p = this
     this
   '''
-  shouldCompileTo emblem, 
-    { foo: [ "Alex", "Emily" ] }, 
+  shouldCompileTo emblem,
+    { foo: [ "Alex", "Emily" ] },
     '<p>Alex</p>Alex<p>Emily</p>Emily'
 
 suite "colon separator"
 
 test "basic", ->
   emblem = 'each foo: p Hello, #{this}'
-  shouldCompileTo emblem, 
-    { foo: [ "Alex", "Emily", "Nicole" ] }, 
+  shouldCompileTo emblem,
+    { foo: [ "Alex", "Emily", "Nicole" ] },
     '<p>Hello, Alex</p><p>Hello, Emily</p><p>Hello, Nicole</p>'
 
 test "html stack", ->
   emblem = '.container: .row: .span5: span Hello'
-  shouldCompileToString emblem, 
+  shouldCompileToString emblem,
     '<div class="container"><div class="row"><div class="span5"><span>Hello</span></div></div></div>'
 
 test "epic", ->
@@ -1828,13 +1832,13 @@ test "html stack elements only", ->
 test "mixed separators", ->
   emblem = '.fun = each foo: %nork = this'
   shouldCompileTo emblem,
-    { foo: [ "Alex", "Emily", "Nicole" ] }, 
+    { foo: [ "Alex", "Emily", "Nicole" ] },
     '<div class="fun"><nork>Alex</nork><nork>Emily</nork><nork>Nicole</nork></div>'
 
 test "mixed separators rewritten", ->
   emblem = '.fun: each foo: %nork: this'
   shouldCompileTo emblem,
-    { foo: [ "Alex", "Emily", "Nicole" ] }, 
+    { foo: [ "Alex", "Emily", "Nicole" ] },
     '<div class="fun"><nork>Alex</nork><nork>Emily</nork><nork>Nicole</nork></div>'
 
 test "with text terminator", ->
@@ -1866,7 +1870,7 @@ suite "base indent / predent"
 
 test "predent", ->
   emblem = "        \n"
-  s = 
+  s =
   """
   pre
     ` This

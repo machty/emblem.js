@@ -8,21 +8,21 @@ module.exports = (grunt) ->
       browserName: "firefox",
       version: "19",
       platform: "XP"
-  , 
+  ,
       browserName: "chrome",
       platform: "XP"
-  , 
+  ,
       browserName: "chrome",
       platform: "linux"
-  , 
+  ,
       browserName: "internet explorer",
       platform: "WIN8",
       version: "10"
-  , 
+  ,
       browserName: "internet explorer",
       platform: "VISTA",
       version: "9"
-  , 
+  ,
       browserName: "opera",
       platform: "Windows 2008",
       version: "12"
@@ -49,10 +49,10 @@ module.exports = (grunt) ->
         bare: true
          
     peg:
-      grammar: 
+      grammar:
         src: "src/grammar.pegjs"
         dest: "tmp/grammar.js"
-        options: 
+        options:
           exportVar: 'Emblem.Parser'
 
     concat:
@@ -63,7 +63,7 @@ module.exports = (grunt) ->
           banner: "var Emblem = require('./emblem');\n\n"
           footer: "\n\nmodule.exports = Emblem.Parser;\n"
 
-    browserify: 
+    browserify:
       dist:
         files:
           'dist/emblem.js': 'lib/emblem.js'
@@ -73,16 +73,16 @@ module.exports = (grunt) ->
         files:
           'dist/emblem.min.js': 'dist/emblem.js'
       options:
-        beautify: 
+        beautify:
           # Special unicode IN/DEDENT tokens get clobbered unless this is set.
           ascii_only : true
 
-    qunit: 
+    qunit:
       all: ['test/**/*.html']
 
 
     simplemocha:
-      all: 
+      all:
         src: ['test/*.js', 'test/resources/*.js']
 
       options:
@@ -97,23 +97,23 @@ module.exports = (grunt) ->
             [
               require('connect-redirection')(),
               ((req, res, next) ->
-                if (req.url == '/') 
-                  res.redirect('/test') 
+                if (req.url == '/')
+                  res.redirect('/test')
                 else
                   next()
               ),
               connect.static(options.base)
             ]
-    watch: {}       
+    watch: {}
 
-    open: 
+    open:
       dev:
         path: 'http://127.0.0.1:9999/',
         app: 'Google Chrome'
 
-    'saucelabs-qunit': 
-      all: 
-        options: 
+    'saucelabs-qunit':
+      all:
+        options:
           urls: ["http://127.0.0.1:9999/test/index.html"]
           tunnelTimeout: 5
           build: process.env.TRAVIS_JOB_ID
@@ -124,7 +124,7 @@ module.exports = (grunt) ->
 
   grunt.registerTask 'dev', ['connect', 'open:dev', 'watch']
 
-  grunt.registerTask 'compileParser', 'Compile PegJS grammar file', 
+  grunt.registerTask 'compileParser', 'Compile PegJS grammar file',
                      ['peg', 'concat:grammar']
 
   grunt.registerTask 'build', ['clean', 'compileParser', 'coffee:lib', 'browserify', 'uglify']

@@ -43,7 +43,7 @@ Emblem.precompile = function(handlebarsVariant, string, options) {
   }
   Emblem.handlebarsVariant = handlebarsVariant;
   ast = Emblem.parse(string);
-  return handlebarsVariant.precompile(ast, options);
+  return handlebarsVariant.precompile(ast, false);
 };
 
 Emblem.compile = function(handlebarsVariant, string, options) {
@@ -97,7 +97,8 @@ if (typeof window !== "undefined" && window !== null) {
 }
 
 },{"./emblem":3}],3:[function(require,module,exports){
-var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};var Emblem;
+(function (global){
+var Emblem;
 
 this.Emblem = {};
 
@@ -121,6 +122,7 @@ require('./preprocessor');
 
 require('./emberties');
 
+}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./compiler":1,"./emberties":2,"./parser":4,"./preprocessor":5}],4:[function(require,module,exports){
 var Emblem = require('./emblem');
 
@@ -198,15 +200,17 @@ Emblem.Parser = (function() {
 
         peg$c0 = null,
         peg$c1 = "",
-        peg$c2 = function(c) {return c;},
-        peg$c3 = function(c, i) { 
-          return createProgramNode(c, i || []);
+        peg$c2 = [],
+        peg$c3 = function(c) {return c;},
+        peg$c4 = function(c, i) { 
+          var programNode = createProgramNode(c);
+          if(i) { programNode.inverse = createProgramNode(i); }
+          return programNode;
         },
-        peg$c4 = "=",
-        peg$c5 = "\"=\"",
-        peg$c6 = "else",
-        peg$c7 = "\"else\"",
-        peg$c8 = [],
+        peg$c5 = "=",
+        peg$c6 = "\"=\"",
+        peg$c7 = "else",
+        peg$c8 = "\"else\"",
         peg$c9 = function(statements) {
           // Coalesce all adjacent ContentNodes into one.
 
@@ -247,11 +251,13 @@ Emblem.Parser = (function() {
         peg$c13 = ">",
         peg$c14 = "\">\"",
         peg$c15 = function(n, params) { 
-          return [new AST.PartialNode(n, params[0])]; 
+          return [new AST.PartialNode(n, params[0], undefined, {})];
         },
         peg$c16 = /^[a-zA-Z0-9_$-\/]/,
         peg$c17 = "[a-zA-Z0-9_$-\\/]",
-        peg$c18 = function(s) { return new AST.PartialNameNode(new AST.StringNode(s)); },
+        peg$c18 = function(s) {
+            return new AST.PartialNameNode(new AST.StringNode(s));
+          },
         peg$c19 = function(m) { 
           return [m]; 
         },
@@ -309,20 +315,16 @@ Emblem.Parser = (function() {
           return ret;
         },
         peg$c34 = function(mustacheNode, nestedContentProgramNode) { 
-          
           if (!nestedContentProgramNode) {
             return mustacheNode;
           }
 
-          var close = mustacheNode.id;
-          if (use11AST) {
-            close.path = mustacheNode.id;
-            close.strip = {
-              left: false,
-              right: false
-            };
-          }
-          var block = new AST.BlockNode(mustacheNode, nestedContentProgramNode, nestedContentProgramNode.inverse, close);
+          var strip = {
+            left: false,
+            right: false
+          };
+
+          var block = new AST.BlockNode(mustacheNode, nestedContentProgramNode, nestedContentProgramNode.inverse, strip);
 
           block.path = mustacheNode.id;
           return block;
@@ -344,15 +346,10 @@ Emblem.Parser = (function() {
         peg$c43 = function(isPartial, sexpr) { 
           if(isPartial) {
             var n = new AST.PartialNameNode(new AST.StringNode(sexpr.id.string));
-            return new AST.PartialNode(n, sexpr.params[0]);
+            return new AST.PartialNode(n, sexpr.params[0], undefined, {});
           }
 
-          var mustacheNode;
-          if (useSexprNodes) {
-            mustacheNode = createMustacheNode(sexpr, null, true);
-          } else {
-            mustacheNode = createMustacheNode([sexpr.id].concat(sexpr.params), sexpr.hash, true);
-          }
+          var mustacheNode = createMustacheNode(sexpr, null, true);
 
           var tm = sexpr.id._emblemSuffixModifier;
           if(tm === '!') {
@@ -431,7 +428,7 @@ Emblem.Parser = (function() {
           return idNode;
         },
         peg$c79 = function(v) { return new AST.StringNode(v); },
-        peg$c80 = function(v) { return new AST.IntegerNode(v); },
+        peg$c80 = function(v) { return new AST.NumberNode(v); },
         peg$c81 = function(v) { return new AST.BooleanNode(v); },
         peg$c82 = "Boolean",
         peg$c83 = "true",
@@ -765,7 +762,7 @@ Emblem.Parser = (function() {
     }
 
     function peg$parseinvertibleContent() {
-      var s0, s1, s2, s3, s4, s5, s6, s7, s8;
+      var s0, s1, s2, s3, s4, s5, s6, s7, s8, s9;
 
       s0 = peg$currPos;
       s1 = peg$parsecontent();
@@ -779,17 +776,28 @@ Emblem.Parser = (function() {
             if (s5 !== null) {
               s6 = peg$parseTERM();
               if (s6 !== null) {
-                s7 = peg$parseindentation();
+                s7 = [];
+                s8 = peg$parseblankLine();
+                while (s8 !== null) {
+                  s7.push(s8);
+                  s8 = peg$parseblankLine();
+                }
                 if (s7 !== null) {
-                  s8 = peg$parsecontent();
+                  s8 = peg$parseindentation();
                   if (s8 !== null) {
-                    peg$reportedPos = s2;
-                    s3 = peg$c2(s8);
-                    if (s3 === null) {
-                      peg$currPos = s2;
-                      s2 = s3;
+                    s9 = peg$parsecontent();
+                    if (s9 !== null) {
+                      peg$reportedPos = s2;
+                      s3 = peg$c3(s9);
+                      if (s3 === null) {
+                        peg$currPos = s2;
+                        s2 = s3;
+                      } else {
+                        s2 = s3;
+                      }
                     } else {
-                      s2 = s3;
+                      peg$currPos = s2;
+                      s2 = peg$c0;
                     }
                   } else {
                     peg$currPos = s2;
@@ -820,7 +828,7 @@ Emblem.Parser = (function() {
         }
         if (s2 !== null) {
           peg$reportedPos = s0;
-          s1 = peg$c3(s1, s2);
+          s1 = peg$c4(s1, s2);
           if (s1 === null) {
             peg$currPos = s0;
             s0 = s1;
@@ -845,11 +853,11 @@ Emblem.Parser = (function() {
       s0 = peg$currPos;
       s1 = peg$currPos;
       if (input.charCodeAt(peg$currPos) === 61) {
-        s2 = peg$c4;
+        s2 = peg$c5;
         peg$currPos++;
       } else {
         s2 = null;
-        if (peg$silentFails === 0) { peg$fail(peg$c5); }
+        if (peg$silentFails === 0) { peg$fail(peg$c6); }
       }
       if (s2 !== null) {
         s3 = peg$parse_();
@@ -868,12 +876,12 @@ Emblem.Parser = (function() {
         s1 = peg$c1;
       }
       if (s1 !== null) {
-        if (input.substr(peg$currPos, 4) === peg$c6) {
-          s2 = peg$c6;
+        if (input.substr(peg$currPos, 4) === peg$c7) {
+          s2 = peg$c7;
           peg$currPos += 4;
         } else {
           s2 = null;
-          if (peg$silentFails === 0) { peg$fail(peg$c7); }
+          if (peg$silentFails === 0) { peg$fail(peg$c8); }
         }
         if (s2 !== null) {
           s1 = [s1, s2];
@@ -1681,92 +1689,6 @@ Emblem.Parser = (function() {
           } else {
             peg$currPos = s0;
             s0 = peg$c0;
-          }
-        } else {
-          peg$currPos = s0;
-          s0 = peg$c0;
-        }
-      } else {
-        peg$currPos = s0;
-        s0 = peg$c0;
-      }
-
-      return s0;
-    }
-
-    function peg$parseinvertibleContent() {
-      var s0, s1, s2, s3, s4, s5, s6, s7, s8, s9;
-
-      s0 = peg$currPos;
-      s1 = peg$parsecontent();
-      if (s1 !== null) {
-        s2 = peg$currPos;
-        s3 = peg$parseDEDENT();
-        if (s3 !== null) {
-          s4 = peg$parseelse();
-          if (s4 !== null) {
-            s5 = peg$parse_();
-            if (s5 !== null) {
-              s6 = peg$parseTERM();
-              if (s6 !== null) {
-                s7 = [];
-                s8 = peg$parseblankLine();
-                while (s8 !== null) {
-                  s7.push(s8);
-                  s8 = peg$parseblankLine();
-                }
-                if (s7 !== null) {
-                  s8 = peg$parseindentation();
-                  if (s8 !== null) {
-                    s9 = peg$parsecontent();
-                    if (s9 !== null) {
-                      peg$reportedPos = s2;
-                      s3 = peg$c2(s9);
-                      if (s3 === null) {
-                        peg$currPos = s2;
-                        s2 = s3;
-                      } else {
-                        s2 = s3;
-                      }
-                    } else {
-                      peg$currPos = s2;
-                      s2 = peg$c0;
-                    }
-                  } else {
-                    peg$currPos = s2;
-                    s2 = peg$c0;
-                  }
-                } else {
-                  peg$currPos = s2;
-                  s2 = peg$c0;
-                }
-              } else {
-                peg$currPos = s2;
-                s2 = peg$c0;
-              }
-            } else {
-              peg$currPos = s2;
-              s2 = peg$c0;
-            }
-          } else {
-            peg$currPos = s2;
-            s2 = peg$c0;
-          }
-        } else {
-          peg$currPos = s2;
-          s2 = peg$c0;
-        }
-        if (s2 === null) {
-          s2 = peg$c1;
-        }
-        if (s2 !== null) {
-          peg$reportedPos = s0;
-          s1 = peg$c3(s1, s2);
-          if (s1 === null) {
-            peg$currPos = s0;
-            s0 = s1;
-          } else {
-            s0 = s1;
           }
         } else {
           peg$currPos = s0;
@@ -2627,11 +2549,11 @@ Emblem.Parser = (function() {
             s2 = peg$currPos;
             peg$silentFails++;
             if (input.charCodeAt(peg$currPos) === 61) {
-              s3 = peg$c4;
+              s3 = peg$c5;
               peg$currPos++;
             } else {
               s3 = null;
-              if (peg$silentFails === 0) { peg$fail(peg$c5); }
+              if (peg$silentFails === 0) { peg$fail(peg$c6); }
             }
             peg$silentFails--;
             if (s3 === null) {
@@ -2783,11 +2705,11 @@ Emblem.Parser = (function() {
         s3 = peg$parsekey();
         if (s3 !== null) {
           if (input.charCodeAt(peg$currPos) === 61) {
-            s4 = peg$c4;
+            s4 = peg$c5;
             peg$currPos++;
           } else {
             s4 = null;
-            if (peg$silentFails === 0) { peg$fail(peg$c5); }
+            if (peg$silentFails === 0) { peg$fail(peg$c6); }
           }
           if (s4 !== null) {
             s5 = peg$parseparam();
@@ -2844,11 +2766,11 @@ Emblem.Parser = (function() {
           s4 = peg$parsekey();
           if (s4 !== null) {
             if (input.charCodeAt(peg$currPos) === 61) {
-              s5 = peg$c4;
+              s5 = peg$c5;
               peg$currPos++;
             } else {
               s5 = null;
-              if (peg$silentFails === 0) { peg$fail(peg$c5); }
+              if (peg$silentFails === 0) { peg$fail(peg$c6); }
             }
             if (s5 !== null) {
               s6 = peg$parseparam();
@@ -4735,11 +4657,11 @@ Emblem.Parser = (function() {
       if (s0 === null) {
         s0 = peg$currPos;
         if (input.charCodeAt(peg$currPos) === 61) {
-          s1 = peg$c4;
+          s1 = peg$c5;
           peg$currPos++;
         } else {
           s1 = null;
-          if (peg$silentFails === 0) { peg$fail(peg$c5); }
+          if (peg$silentFails === 0) { peg$fail(peg$c6); }
         }
         if (s1 !== null) {
           if (input.charCodeAt(peg$currPos) === 32) {
@@ -5289,11 +5211,11 @@ Emblem.Parser = (function() {
       s1 = peg$parseknownEvent();
       if (s1 !== null) {
         if (input.charCodeAt(peg$currPos) === 61) {
-          s2 = peg$c4;
+          s2 = peg$c5;
           peg$currPos++;
         } else {
           s2 = null;
-          if (peg$silentFails === 0) { peg$fail(peg$c5); }
+          if (peg$silentFails === 0) { peg$fail(peg$c6); }
         }
         if (s2 !== null) {
           s3 = peg$parseactionValue();
@@ -5329,11 +5251,11 @@ Emblem.Parser = (function() {
       s1 = peg$parsekey();
       if (s1 !== null) {
         if (input.charCodeAt(peg$currPos) === 61) {
-          s2 = peg$c4;
+          s2 = peg$c5;
           peg$currPos++;
         } else {
           s2 = null;
-          if (peg$silentFails === 0) { peg$fail(peg$c5); }
+          if (peg$silentFails === 0) { peg$fail(peg$c6); }
         }
         if (s2 !== null) {
           if (input.substr(peg$currPos, 4) === peg$c83) {
@@ -5491,11 +5413,11 @@ Emblem.Parser = (function() {
       s1 = peg$parsekey();
       if (s1 !== null) {
         if (input.charCodeAt(peg$currPos) === 61) {
-          s2 = peg$c4;
+          s2 = peg$c5;
           peg$currPos++;
         } else {
           s2 = null;
-          if (peg$silentFails === 0) { peg$fail(peg$c5); }
+          if (peg$silentFails === 0) { peg$fail(peg$c6); }
         }
         if (s2 !== null) {
           s3 = peg$parseboundAttributeValue();
@@ -5564,11 +5486,11 @@ Emblem.Parser = (function() {
       s1 = peg$parsekey();
       if (s1 !== null) {
         if (input.charCodeAt(peg$currPos) === 61) {
-          s2 = peg$c4;
+          s2 = peg$c5;
           peg$currPos++;
         } else {
           s2 = null;
-          if (peg$silentFails === 0) { peg$fail(peg$c5); }
+          if (peg$silentFails === 0) { peg$fail(peg$c6); }
         }
         if (s2 !== null) {
           s3 = peg$parsepathIdNode();
@@ -5604,11 +5526,11 @@ Emblem.Parser = (function() {
       s1 = peg$parsekey();
       if (s1 !== null) {
         if (input.charCodeAt(peg$currPos) === 61) {
-          s2 = peg$c4;
+          s2 = peg$c5;
           peg$currPos++;
         } else {
           s2 = null;
-          if (peg$silentFails === 0) { peg$fail(peg$c5); }
+          if (peg$silentFails === 0) { peg$fail(peg$c6); }
         }
         if (s2 !== null) {
           s3 = peg$parseattributeTextNodes();
@@ -6485,25 +6407,13 @@ Emblem.Parser = (function() {
       var twoBrace = closeBrace + closeBrace;
       var threeBrace = twoBrace + closeBrace;
 
-      var use11AST = handlebarsVariant.VERSION.slice(0, 3) >= 1.1;
-      var useSexprNodes = handlebarsVariant.VERSION.slice(0, 3) >= 1.3;
-
       function createMustacheNode(params, hash, escaped) {
-        if (use11AST) {
-          var open = escaped ? twoBrace : threeBrace;
-          return new AST.MustacheNode(params, hash, open, { left: false, right: false });
-        } else {
-          // old style
-          return new AST.MustacheNode(params, hash, !escaped);
-        }
+        var open = escaped ? twoBrace : threeBrace;
+        return new AST.MustacheNode(params, hash, open, { left: false, right: false });
       }
 
       function createProgramNode(statements, inverse) {
-        if (use11AST) {
-          return new AST.ProgramNode(statements, { left: false, right: false}, inverse, null);
-        } else {
-          return new AST.ProgramNode(statements, inverse);
-        }
+        return new AST.ProgramNode(statements, { left: false, right: false}, inverse, null);
       }
 
       // Returns a new MustacheNode with a new preceding param (id).
@@ -6567,17 +6477,7 @@ Emblem.Parser = (function() {
         }
 
         actualParams.unshift(path);
-
-        if (useSexprNodes) {
-          return new AST.SexprNode(actualParams, hash);
-        } else {
-          // Stub a sexpr-like node for backwards compatibility with pre-1.3 AST.
-          return {
-            id: actualParams[0],
-            params: actualParams.slice(1),
-            hash: hash
-          };
-        }
+        return new AST.SexprNode(actualParams, hash);
       }
       function parseInHtml(h, inTagMustaches, fullAttributes) {
       
@@ -6637,7 +6537,6 @@ Emblem.Parser = (function() {
               if (fullAttributes[i][2].type == 'mustache') {
                 var mustacheNode, classesContent, hash, params;
                 // If class was mustache binding, transform attribute into bind-attr MustacheNode
-                // In case of 'div.shorthand class=varBinding' will transform into '<div {{bind-attr class=":shorthand varBinding"}}'
                 mustacheNode = fullAttributes[i][2];
                 classesContent = ':' + classes.join(' :') + ' ' + mustacheNode.id.original;
                 hash = new AST.HashNode([

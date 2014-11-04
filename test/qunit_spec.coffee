@@ -20,7 +20,7 @@ if Emblem?
 else
   # Setup for Node package testing
   Handlebars = require('handlebars')
-  EmberHandlebars = require('./resources/ember-template-compiler.js').EmberHandlebars
+  EmberHandlebars = require('../node_modules/ember-template-compiler/vendor/ember-template-compiler.js').EmberHandlebars
   Emblem = require('../lib/emblem')
 
   # TODO: replace with real expect()

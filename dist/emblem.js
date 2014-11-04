@@ -43,7 +43,7 @@ Emblem.precompile = function(handlebarsVariant, string, options) {
   }
   Emblem.handlebarsVariant = handlebarsVariant;
   ast = Emblem.parse(string);
-  return handlebarsVariant.precompile(ast, options);
+  return handlebarsVariant.precompile(ast, false);
 };
 
 Emblem.compile = function(handlebarsVariant, string, options) {

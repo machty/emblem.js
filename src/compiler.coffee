@@ -35,7 +35,7 @@ Emblem.parse = (string) ->
 Emblem.precompile = (handlebarsVariant, string, options = {}) ->
   Emblem.handlebarsVariant = handlebarsVariant
   ast = Emblem.parse string
-  handlebarsVariant.precompile ast, options
+  handlebarsVariant.precompile ast, false
 
 Emblem.compile = (handlebarsVariant, string, options = {}) ->
   Emblem.handlebarsVariant = handlebarsVariant

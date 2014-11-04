@@ -17,7 +17,7 @@ if (typeof Emblem !== "undefined" && Emblem !== null) {
   window.suite = module;
 } else {
   Handlebars = require('handlebars');
-  EmberHandlebars = require('./resources/ember-template-compiler.js').EmberHandlebars;
+  EmberHandlebars = require('../node_modules/ember-template-compiler/vendor/ember-template-compiler.js').EmberHandlebars;
   Emblem = require('../lib/emblem');
   expect = function() {};;
   _ref = require("assert"), equal = _ref.equal, equals = _ref.equals, ok = _ref.ok, throws = _ref.throws;

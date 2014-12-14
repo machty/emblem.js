@@ -1,6 +1,9 @@
+/* jshint proto: true */
+
 var $__Object$defineProperties = Object.defineProperties;
 var $__Object$defineProperty = Object.defineProperty;
 var $__Object$create = Object.create;
+
 import ParserDelegate from './base';
 
 var EmberParserDelegate = function($__super) {

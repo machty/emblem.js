@@ -1,43 +1,3 @@
-module('JSHint - .');
-test('bootstrap.js should pass jshint', function() { 
-  ok(true, 'bootstrap.js should pass jshint.'); 
-});
-
-module('JSHint - .');
-test('compiler.js should pass jshint', function() { 
-  ok(true, 'compiler.js should pass jshint.'); 
-});
-
-module('JSHint - .');
-test('emblem.js should pass jshint', function() { 
-  ok(true, 'emblem.js should pass jshint.'); 
-});
-
-module('JSHint - .');
-test('emblem.umd.js should pass jshint', function() { 
-  ok(true, 'emblem.umd.js should pass jshint.'); 
-});
-
-module('JSHint - parser-delegate');
-test('parser-delegate/base.js should pass jshint', function() { 
-  ok(true, 'parser-delegate/base.js should pass jshint.'); 
-});
-
-module('JSHint - parser-delegate');
-test('parser-delegate/ember.js should pass jshint', function() { 
-  ok(true, 'parser-delegate/ember.js should pass jshint.'); 
-});
-
-module('JSHint - .');
-test('parser.js should pass jshint', function() { 
-  ok(true, 'parser.js should pass jshint.'); 
-});
-
-module('JSHint - .');
-test('preprocessor.js should pass jshint', function() { 
-  ok(true, 'preprocessor.js should pass jshint.'); 
-});
-
 (function() {
     "use strict";
     /*jshint newcap: false, laxbreak: true */
@@ -6115,19 +6075,19 @@ test('preprocessor.js should pass jshint', function() {
       try {
         var AST = {};
         var astDelegate = new $$parser$delegate$ember$$default(AST, $$compiler$$parse);
-        var processed = emblem$$default.Preprocessor.processSync(string);
+        var processed = $$emblem$$default.Preprocessor.processSync(string);
         return $$parser$$parse(processed, {
           astDelegate: astDelegate
         });
       } catch (_error) {
         e = _error;
-        if (e instanceof emblem$$default.Parser.SyntaxError) {
+        if (e instanceof $$emblem$$default.Parser.SyntaxError) {
           lines = string.split("\n");
           line = lines[e.line - 1];
           msg = "" + e.message + "\n" + line + "\n";
           msg += new Array(e.column).join("-");
           msg += "^";
-          return emblem$$default.throwCompileError(e.line, msg);
+          return $$emblem$$default.throwCompileError(e.line, msg);
         } else {
           throw e;
         }
@@ -6139,8 +6099,8 @@ test('preprocessor.js should pass jshint', function() {
       if (options == null) {
         options = {};
       }
-      emblem$$default.handlebarsVariant = handlebarsVariant;
-      ast = emblem$$default.parse(string);
+      $$emblem$$default.handlebarsVariant = handlebarsVariant;
+      ast = $$emblem$$default.parse(string);
       return handlebarsVariant.precompile(ast, false);
     }
 
@@ -6149,8 +6109,8 @@ test('preprocessor.js should pass jshint', function() {
       if (options == null) {
         options = {};
       }
-      emblem$$default.handlebarsVariant = handlebarsVariant;
-      ast = emblem$$default.parse(string);
+      $$emblem$$default.handlebarsVariant = handlebarsVariant;
+      ast = $$emblem$$default.parse(string);
       return handlebarsVariant.compile(ast, options);
     }
 
@@ -6192,23 +6152,19 @@ test('preprocessor.js should pass jshint', function() {
       });
     }
 
-    var emblem$$default = {
+    var $$emblem$$default = {
       Parser: $$parser$$default,
       VERSION: "0.4.0"
     };
 
-    module("The match DSL", {
-      setup: function() {
-      }
-    });
-
-    test("wat", function() {
-      ok(false, "wat");
-    });
+    /* global define:true module:true window: true */
+    if (typeof define === 'function' && define['amd']) {
+      define(function() { return $$emblem$$default; });
+    } else if (typeof module !== 'undefined' && module['exports']) {
+      module['exports'] = $$emblem$$default;
+    } else if (typeof this !== 'undefined') {
+      this['Emblem'] = $$emblem$$default;
+    }
 }).call(this);
 
-//# sourceMappingURL=emblem-test-bundle.js.map
-module('JSHint - tests');
-test('tests/emblem-test.js should pass jshint', function() { 
-  ok(true, 'tests/emblem-test.js should pass jshint.'); 
-});
+//# sourceMappingURL=emblem.js.map

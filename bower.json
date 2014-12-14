@@ -1,0 +1,33 @@
+{
+  "name": "emblem",
+  "homepage": "http://www.emblemjs.com/",
+  "authors": [
+    "Alex Matchneer <machty@gmail.com>"
+  ],
+  "description": "Templating language targeting Handlebars with default Ember.js conventions",
+  "main": "dist/emblem.js",
+  "moduleType": [
+    "amd",
+    "globals",
+    "node"
+  ],
+  "keywords": [
+    "ember",
+    "handlebars",
+    "template",
+    "html",
+    "indentation"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "qunit": "~1.14.0",
+    "loader.js": "stefanpenner/loader.js#7f79173fd5c61dc256af9aa01c56d50ebfec10fe"
+  }
+}

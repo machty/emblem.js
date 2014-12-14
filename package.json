@@ -1,7 +1,7 @@
 {
   "name": "emblem",
   "description": "Templating language targeting Handlebars with default Ember.js conventions",
-  "version": "0.3.18",
+  "version": "0.4.0",
   "homepage": "http://www.emblemjs.com/",
   "keywords": [
     "ember",
@@ -19,36 +19,30 @@
   },
   "dependencies": {
     "StringScanner": "~0.0.3",
-    "handlebars": "^2.0.0",
     "optimist": "^0.3.7",
     "uglify-js": "^1.2.6"
   },
   "devDependencies": {
-    "connect-redirection": "0.0.1",
-    "ember-template-compiler": "^1.9.0-alpha",
-    "grunt": "^0.4.5",
-    "grunt-browserify": "^3.2.0",
-    "grunt-cli": "^0.1.13",
-    "grunt-contrib-clean": "^0.6.0",
-    "grunt-contrib-coffee": "^0.12.0",
-    "grunt-contrib-concat": "^0.5.0",
-    "grunt-contrib-connect": "^0.8.0",
-    "grunt-contrib-qunit": "^0.5.2",
-    "grunt-contrib-uglify": "^0.6.0",
-    "grunt-contrib-watch": "^0.6.1",
-    "grunt-open": "^0.2.3",
-    "grunt-peg": "git://github.com/machty/grunt-peg.git#bff7e9145104f9f75117f082f7e43df43c99572a",
-    "grunt-saucelabs": "^8.3.2",
-    "grunt-simple-mocha": "^0.4.0",
-    "matchdep": "^0.3.0"
+    "broccoli-compile-modules": "^1.1.0",
+    "broccoli-concat": "0.0.12",
+    "broccoli-esnext": "^0.5.0",
+    "broccoli-export-tree": "^0.3.2",
+    "broccoli-funnel": "^0.1.6",
+    "broccoli-jshint": "~0.5.1",
+    "broccoli-merge-trees": "^0.2.1",
+    "broccoli-pegjs": "0.0.1",
+    "broccoli-replace": "~0.1.6",
+    "handlebars": "mmun/handlebars.js#new-ast-3238645f",
+    "ember-cli": "0.0.40"
   },
   "main": "lib/emblem.js",
   "bin": {
     "emblem": "bin/emblem"
   },
   "scripts": {
-    "build": "./node_modules/grunt-cli/bin/grunt build",
-    "test": "./node_modules/grunt-cli/bin/grunt test"
+    "test": "ember test",
+    "start": "ember test --server",
+    "build": "ember build"
   },
   "optionalDependencies": {}
 }

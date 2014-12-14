@@ -66,15 +66,6 @@ Follow the pattern in [this JSBin](http://jsbin.com/ulegec/337/edit):
 1. Include Emblem
 1. Include Ember
 
-If you have a recent enough version of Ember, all the Emblem code you
-put into `<script type="text/x-emblem">` tags will get compiled and
-stripped out of the DOM. If you're using an out-of-date Ember, you
-can trigger this to happen manually before app initialization via
-
-```
-Ember.onLoad('application', Emblem.compileScriptTags);
-```
-
 ### Via Rails 3.1+
 
 Add the following to your Gemfile:

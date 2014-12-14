@@ -42,6 +42,51 @@ var _get = function get(object, property, receiver) {
   }
 };
 
+module("JSHint - .");
+test("bootstrap.js should pass jshint", function () {
+  ok(true, "bootstrap.js should pass jshint.");
+});
+
+module("JSHint - .");
+test("compiler.js should pass jshint", function () {
+  ok(true, "compiler.js should pass jshint.");
+});
+
+module("JSHint - .");
+test("emblem.js should pass jshint", function () {
+  ok(true, "emblem.js should pass jshint.");
+});
+
+module("JSHint - .");
+test("emblem.umd.js should pass jshint", function () {
+  ok(true, "emblem.umd.js should pass jshint.");
+});
+
+module("JSHint - parser-delegate");
+test("parser-delegate/base.js should pass jshint", function () {
+  ok(true, "parser-delegate/base.js should pass jshint.");
+});
+
+module("JSHint - parser-delegate");
+test("parser-delegate/ember.js should pass jshint", function () {
+  ok(true, "parser-delegate/ember.js should pass jshint.");
+});
+
+module("JSHint - .");
+test("parser.js should pass jshint", function () {
+  ok(true, "parser.js should pass jshint.");
+});
+
+module("JSHint - .");
+test("preprocessor.js should pass jshint", function () {
+  ok(true, "preprocessor.js should pass jshint.");
+});
+
+module("JSHint - tests");
+test("tests/ast-test.js should pass jshint", function () {
+  ok(false, "tests/ast-test.js should pass jshint.\ntests/ast-test.js: line 11, col 13, 'parse' is not defined.\n\n1 error");
+});
+
 (function () {
   "use strict";
   var $$compiler$$throwCompileError = function (line, msg) {
@@ -63,19 +108,19 @@ var _get = function get(object, property, receiver) {
     try {
       var AST = {};
       var astDelegate = new $$parser$delegate$ember$$default(AST, $$compiler$$parse);
-      var processed = $$emblem$$default.Preprocessor.processSync(string);
+      var processed = emblem$$default.Preprocessor.processSync(string);
       return $$parser$$parse(processed, {
         astDelegate: astDelegate
       });
     } catch (_error) {
       e = _error;
-      if (e instanceof $$emblem$$default.Parser.SyntaxError) {
+      if (e instanceof emblem$$default.Parser.SyntaxError) {
         lines = string.split("\n");
         line = lines[e.line - 1];
         msg = "" + e.message + "\n" + line + "\n";
         msg += new Array(e.column).join("-");
         msg += "^";
-        return $$emblem$$default.throwCompileError(e.line, msg);
+        return emblem$$default.throwCompileError(e.line, msg);
       } else {
         throw e;
       }
@@ -87,8 +132,8 @@ var _get = function get(object, property, receiver) {
     if (options == null) {
       options = {};
     }
-    $$emblem$$default.handlebarsVariant = handlebarsVariant;
-    ast = $$emblem$$default.parse(string);
+    emblem$$default.handlebarsVariant = handlebarsVariant;
+    ast = emblem$$default.parse(string);
     return handlebarsVariant.precompile(ast, false);
   };
 
@@ -97,8 +142,8 @@ var _get = function get(object, property, receiver) {
     if (options == null) {
       options = {};
     }
-    $$emblem$$default.handlebarsVariant = handlebarsVariant;
-    ast = $$emblem$$default.parse(string);
+    emblem$$default.handlebarsVariant = handlebarsVariant;
+    ast = emblem$$default.parse(string);
     return handlebarsVariant.compile(ast, options);
   };
 
@@ -6554,21 +6599,36 @@ var _get = function get(object, property, receiver) {
     });
   }
 
-  var $$emblem$$default = {
+  var emblem$$default = {
     Parser: $$parser$$default,
     VERSION: "0.4.0"
   };
 
-  /* global define:true module:true window: true */
-  if (typeof define === "function" && define.amd) {
-    define(function () {
-      return $$emblem$$default;
+  module("Parsing into AST", {
+    setup: function () {}
+  });
+
+  test("single char", function () {
+    deepEqual(parse("| a"), {
+      type: "program",
+      children: [{
+        type: "text",
+        content: "a"
+      }]
     });
-  } else if (typeof module !== "undefined" && module.exports) {
-    module.exports = $$emblem$$default;
-  } else if (typeof this !== "undefined") {
-    this.Emblem = $$emblem$$default;
-  }
+  });
+
+  module("The match DSL", {
+    setup: function () {}
+  });
+
+  test("wat", function () {
+    ok(emblem$$default, "wat");
+  });
 }).call(this);
 
-//# sourceMappingURL=emblem.js.map
+//# sourceMappingURL=emblem-test-bundle.js.map
+module("JSHint - tests");
+test("tests/emblem-test.js should pass jshint", function () {
+  ok(true, "tests/emblem-test.js should pass jshint.");
+});

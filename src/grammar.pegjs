@@ -64,37 +64,39 @@
   var twoBrace = closeBrace + closeBrace;
   var threeBrace = twoBrace + closeBrace;
 
-  function createMustacheNode(params, hash, escaped) {
-    var open = escaped ? twoBrace : threeBrace;
-    return new AST.MustacheNode(params, hash, open, { left: false, right: false });
+  function createMustacheStatement(params, hash, escaped) {
+    if(params.length){
+      params = new AST.SubExpression(params[0], params.slice(1), hash);
+    }
+    return new AST.MustacheStatement(params, escaped, { open: false, close: false });
   }
 
-  function createProgramNode(statements, inverse) {
-    return new AST.ProgramNode(statements, { left: false, right: false}, inverse, null);
+  function createProgram(statements) {
+    return new AST.Program(statements, null, { open: false, close: false}, null);
   }
 
-  // Returns a new MustacheNode with a new preceding param (id).
+  // Returns a new MustacheStatement with a new preceding param (id).
   function unshiftParam(mustacheNode, helperName, newHashPairs) {
 
-    var hash = mustacheNode.hash;
+    var hash = mustacheNode.sexpr.hash;
 
     // Merge hash.
     if(newHashPairs) {
-      hash = hash || new AST.HashNode([]);
+      hash = hash || new AST.Hash([]);
 
       for(var i = 0; i < newHashPairs.length; ++i) {
         hash.pairs.push(newHashPairs[i]);
       }
     }
 
-    var params = [mustacheNode.id].concat(mustacheNode.params);
-    params.unshift(new AST.IdNode([{ part: helperName}]));
-    return createMustacheNode(params, hash, mustacheNode.escaped);
+    var params = [mustacheNode.sexpr.path].concat(mustacheNode.sexpr.params);
+    params.unshift(new AST.PathExpression(false, 0, [helperName], helperName));
+    return createMustacheStatement(params, hash, mustacheNode.escaped);
   }
 
   function textNodesResult(first, tail) {
     var ret = [];
-    if(first) { ret.push(first); } 
+    if(first) { ret.push(first); }
     for(var i = 0; i < tail.length; ++i) {
       var t = tail[i];
       ret.push(t[0]);
@@ -126,106 +128,105 @@
     }
 
     if(hasAttrs) {
-      hash = hash || new AST.HashNode([]);
+      hash = hash || new AST.Hash([]);
       for(var k in attrs) {
         if(!attrs.hasOwnProperty(k)) continue;
-        hash.pairs.push([k, new AST.StringNode(attrs[k].join(' '))]);
+        hash.pairs.push({key: k, value: new AST.StringLiteral(attrs[k].join(' '))});
       }
     }
 
-    actualParams.unshift(path);
-    return new AST.SexprNode(actualParams, hash);
+    return new AST.SubExpression(path, actualParams, hash);
   }
   function parseInHtml(h, inTagMustaches, fullAttributes) {
-  
+
     var tagName = h[0] || 'div',
         shorthandAttributes = h[1] || [],
         id = shorthandAttributes[0],
         classes = shorthandAttributes[1] || [],
         tagOpenContent = [],
-        updateMustacheNode;
+        updateMustacheStatement;
 
-    updateMustacheNode = function (node) {
+    updateMustacheStatement = function (node) {
       var pairs, pair, stringNode, original;
       if (!classes.length) {
         return;
       }
-      if (!node.id || node.id.string !== 'bind-attr') {
+      if (!node.sexpr.path || node.sexpr.path.original !== 'bind-attr') {
         return;
       }
-      if (node.hash && node.hash.pairs && (pairs = node.hash.pairs)) {
+      if (node.sexpr.hash && node.sexpr.hash.pairs && (pairs = node.sexpr.hash.pairs)) {
         for (var i2 in pairs) {
           if (!pairs.hasOwnProperty(i2)) { continue; }
           pair = pairs[i2];
-          if (pair && pair[0] === 'class' && pair[1] instanceof AST.StringNode) {
-            stringNode = pair[1];
+          if (pair && pair.key === 'class' && pair.value instanceof AST.StringLiteral) {
+            stringNode = pair.value;
             original = stringNode.original;
-            stringNode.original = stringNode.string = stringNode.stringModeValue = ':' + classes.join(' :') + ' ' + original;
+            stringNode.original = stringNode.value = stringNode.stringModeValue = ':' + classes.join(' :') + ' ' + original;
             classes = [];
           }
         }
       }
     };
 
-    tagOpenContent.push(new AST.ContentNode('<' + tagName));
+    tagOpenContent.push(new AST.ContentStatement('<' + tagName));
 
     if(id) {
-      tagOpenContent.push(new AST.ContentNode(' id="' + id + '"'));
+      tagOpenContent.push(new AST.ContentStatement(' id="' + id + '"'));
     }
 
     // Pad in tag mustaches with spaces.
     for(var i = 0; i < inTagMustaches.length; ++i) {
       // Check if given mustache node has class bindings and prepend shorthand classes
-      updateMustacheNode(inTagMustaches[i]);
-      tagOpenContent.push(new AST.ContentNode(' '));
+      updateMustacheStatement(inTagMustaches[i]);
+      tagOpenContent.push(new AST.ContentStatement(' '));
       tagOpenContent.push(inTagMustaches[i]);
     }
     for(var i = 0; i < fullAttributes.length; ++i) {
       for (var i2 in fullAttributes[i]) {
-        if (fullAttributes[i][i2] instanceof AST.MustacheNode) {
-          updateMustacheNode(fullAttributes[i][i2]);
+        if (fullAttributes[i][i2] instanceof AST.MustacheStatement) {
+          updateMustacheStatement(fullAttributes[i][i2]);
         }
       }
       if (classes.length) {
-        var isClassAttr = fullAttributes[i][1] && fullAttributes[i][1].string === 'class="';
-    
+        var isClassAttr = fullAttributes[i][1] && fullAttributes[i][1].value === 'class="';
+
         // Check if attribute is class attribute and has content
         if (isClassAttr && fullAttributes[i].length === 4) {
-          if (fullAttributes[i][2].type == 'mustache') {
+          if (fullAttributes[i][2].type == 'MustacheStatement') {
             var mustacheNode, classesContent, hash, params;
-            // If class was mustache binding, transform attribute into bind-attr MustacheNode
+            // If class was mustache binding, transform attribute into bind-attr MustacheStatement
             mustacheNode = fullAttributes[i][2];
-            classesContent = ':' + classes.join(' :') + ' ' + mustacheNode.id.original;
-            hash = new AST.HashNode([
-                ['class', new AST.StringNode(classesContent)]
+            classesContent = ':' + classes.join(' :') + ' ' + mustacheNode.sexpr.path.original;
+            hash = new AST.Hash([
+                {key: 'class', value: new AST.StringLiteral(classesContent)}
             ]);
-            
-            params = [new AST.IdNode([{ part: 'bind-attr'}])].concat(mustacheNode.params);
-            fullAttributes[i] = [fullAttributes[i][0], createMustacheNode(params, hash, true)];
+
+            params = [new AST.PathExpression(false, 0, ['bind-attr'], 'bind-attr')].concat(mustacheNode.sexpr.params);
+            fullAttributes[i] = [fullAttributes[i][0], createMustacheStatement(params, hash, true)];
           } else {
-            // Else prepend shorthand classes to attribute 
-            classes.push(fullAttributes[i][2].string);
-            fullAttributes[i][2].string = classes.join(' ');
+            // Else prepend shorthand classes to attribute
+            classes.push(fullAttributes[i][2].value);
+            fullAttributes[i][2].value = classes.join(' ');
           }
           classes = [];
         }
       }
-      
+
       tagOpenContent = tagOpenContent.concat(fullAttributes[i]);
     }
 
     if(classes && classes.length) {
-      tagOpenContent.push(new AST.ContentNode(' class="' + classes.join(' ') + '"'));
+      tagOpenContent.push(new AST.ContentStatement(' class="' + classes.join(' ') + '"'));
     }
     var closingTagSlashPresent = !!h[2];
     if(SELF_CLOSING_TAG[tagName] || closingTagSlashPresent) {
-      tagOpenContent.push(new AST.ContentNode(' />'));
+      tagOpenContent.push(new AST.ContentStatement(' />'));
       return [tagOpenContent];
     } else {
-      
-      tagOpenContent.push(new AST.ContentNode('>'));
 
-      return [tagOpenContent, new AST.ContentNode('</' + tagName + '>')];
+      tagOpenContent.push(new AST.ContentStatement('>'));
+
+      return [tagOpenContent, new AST.ContentStatement('</' + tagName + '>')];
     }
   }
 }
@@ -233,9 +234,9 @@
 start = invertibleContent
 
 invertibleContent = c:content i:( DEDENT else _ TERM blankLine* indentation c:content {return c;})?
-{ 
-  var programNode = createProgramNode(c);
-  if(i) { programNode.inverse = createProgramNode(i); }
+{
+  var programNode = createProgram(c);
+  if(i) { programNode.inverse = createProgram(i); }
   return programNode;
 }
 
@@ -244,7 +245,7 @@ else
 
 content = statements:statement*
 {
-  // Coalesce all adjacent ContentNodes into one.
+  // Coalesce all adjacent ContentStatements into one.
 
   var compressedStatements = [];
   var buffer = [];
@@ -255,24 +256,24 @@ content = statements:statement*
     for(var j = 0; j < nodes.length; ++j) {
       var node = nodes[j]
       if(node.type === "content") {
-        if(node.string) {
+        if(node.value) {
           // Ignore empty strings (comments).
-          buffer.push(node.string);
+          buffer.push(node.value);
         }
         continue;
-      } 
+      }
 
       // Flush content if present.
       if(buffer.length) {
-        compressedStatements.push(new AST.ContentNode(buffer.join('')));
+        compressedStatements.push(new AST.ContentStatement(buffer.join('')));
         buffer = [];
       }
       compressedStatements.push(node);
     }
   }
 
-  if(buffer.length) { 
-    compressedStatements.push(new AST.ContentNode(buffer.join(''))); 
+  if(buffer.length) {
+    compressedStatements.push(new AST.ContentStatement(buffer.join('')));
   }
 
   return compressedStatements;
@@ -292,58 +293,59 @@ contentStatement "ContentStatement"
   / textLine
   / mustache
 
-blankLine = _ TERM { return []; } 
+blankLine = _ TERM { return []; }
 
 legacyPartialInvocation
-  = '>' _ n:legacyPartialName params:inMustacheParam* _ TERM 
-{ 
-  return [new AST.PartialNode(n, params[0], undefined, {})];
+  = '>' _ n:legacyPartialName params:inMustacheParam* _ TERM
+{
+  n = new AST.SubExpression(n, params);
+  return [new AST.PartialStatement(n, {open: false, close: false})];
 }
 
 legacyPartialName
   = s:$[a-zA-Z0-9_$-/]+ {
-    return new AST.PartialNameNode(new AST.StringNode(s));
+    return new AST.PathExpression(false, 0, s.split('.'), s);
   }
 
-// Returns [MustacheNode] or [BlockNode]
-mustache 
-  = m:(explicitMustache / lineStartingMustache) 
-{ 
-  return [m]; 
+// Returns [MustacheStatement] or [BlockStatement]
+mustache
+  = m:(explicitMustache / lineStartingMustache)
+{
+  return [m];
 }
 
 
 commentContent
  = lineContent TERM ( indentation (commentContent)+ anyDedent)* { return []; }
 
-comment 
+comment
   = '/' commentContent { return []; }
 
 inlineComment
   = '/' lineContent
 
-lineStartingMustache 
+lineStartingMustache
   = capitalizedLineStarterMustache / mustacheOrBlock
-  
-capitalizedLineStarterMustache 
-  = &[A-Z] ret:mustacheOrBlock 
+
+capitalizedLineStarterMustache
+  = &[A-Z] ret:mustacheOrBlock
 {
   // TODO make this configurable
   var defaultCapitalizedHelper = 'view';
 
-  if(ret.mustache) {
-    // Block. Modify inner MustacheNode and return.
+  if(ret instanceof AST.BlockStatement) {
+    // Block. Modify inner MustacheStatement and return.
 
     // Make sure a suffix modifier hasn't already been applied.
-    var ch = ret.mustache.id.string.charAt(0);
+    var ch = ret.sexpr.path.original.charAt(0);
     if(!IS_EMBER || !ch.match(/[A-Z]/)) return ret;
 
-    ret.mustache = unshiftParam(ret.mustache, defaultCapitalizedHelper);
+    ret.sexpr = unshiftParam(ret, defaultCapitalizedHelper).sexpr;
     return ret;
   } else {
 
     // Make sure a suffix modifier hasn't already been applied.
-    var ch = ret.id.string.charAt(0);
+    var ch = ret.sexpr.path.original.charAt(0);
     if(!IS_EMBER || !ch.match(/[A-Z]/)) return ret;
 
     return unshiftParam(ret, defaultCapitalizedHelper);
@@ -362,7 +364,7 @@ htmlNestedTextNodes
   if(multilineContent) {
     multilineContent = multilineContent[1];
     for(var i = 0, len = multilineContent.length; i < len; ++i) {
-      ret.push(new AST.ContentNode(' '));
+      ret.push(new AST.ContentStatement(' '));
       ret = ret.concat(multilineContent[i]);
     }
   }
@@ -379,8 +381,8 @@ unindentedContent = blankLine* c:content DEDENT { return c; }
 // that get nested within the HTML element, or could just be a line
 // terminator.
 htmlTerminator
-  = colonContent 
-  / _ m:explicitMustache { return [m]; } 
+  = colonContent
+  / _ m:explicitMustache { return [m]; }
   / _ inlineComment? TERM c:indentedContent? { return c; }
   / _ inlineComment? ']' TERM  c:unindentedContent? { return c; } // bracketed
   / h:htmlNestedTextNodes { return h;}
@@ -390,39 +392,32 @@ htmlTerminator
 // and any nested content inside of it.
 htmlElement = h:inHtmlTag nested:htmlTerminator
 {
-  // h is [[open tag content], closing tag ContentNode]
+  // h is [[open tag content], closing tag ContentStatement]
   var ret = h[0];
   if(nested) { ret = ret.concat(nested); }
 
-  // Push the closing tag ContentNode if it exists (self-closing if not)
+  // Push the closing tag ContentStatement if it exists (self-closing if not)
   if(h[1]) { ret.push(h[1]); }
 
   return ret;
 }
 
-mustacheOrBlock = mustacheNode:inMustache _ inlineComment?nestedContentProgramNode:mustacheNestedContent
-{ 
-  if (!nestedContentProgramNode) {
+mustacheOrBlock = mustacheNode:inMustache _ inlineComment?nestedContentProgram:mustacheNestedContent
+{
+  if (!nestedContentProgram) {
     return mustacheNode;
   }
 
-  var strip = {
-    left: false,
-    right: false
-  };
-
-  var block = new AST.BlockNode(mustacheNode, nestedContentProgramNode, nestedContentProgramNode.inverse, strip);
-
-  block.path = mustacheNode.id;
+  var block = new AST.BlockStatement(mustacheNode.sexpr, nestedContentProgram, nestedContentProgram.inverse, false, false, false);
   return block;
 }
 
 colonContent = ': ' _ c:contentStatement { return c; }
 
-// Returns a ProgramNode
+// Returns a Program
 mustacheNestedContent
-  = statements:(colonContent / textLine) { return createProgramNode(statements, []); }
-  / _ ']' TERM statements:(colonContent / textLine) DEDENT { return createProgramNode(statements, []); }
+  = statements:(colonContent / textLine) { return createProgram(statements); }
+  / _ ']' TERM statements:(colonContent / textLine) DEDENT { return createProgram(statements); }
   / TERM block:(blankLine* indentation invertibleContent DEDENT)? {return block && block[2]; }
   / _ ']' TERM block:invertibleContent DEDENT {
     return block;
@@ -431,22 +426,20 @@ mustacheNestedContent
 
 explicitMustache = e:equalSign ret:mustacheOrBlock
 {
-  var mustache = ret.mustache || ret;
-  mustache.escaped = e;
+  ret.escaped = e;
   return ret;
 }
 
 inMustache
   = isPartial:'>'? !('[' TERM) _ sexpr:sexpr
-{ 
+{
   if(isPartial) {
-    var n = new AST.PartialNameNode(new AST.StringNode(sexpr.id.string));
-    return new AST.PartialNode(n, sexpr.params[0], undefined, {});
+    return new AST.PartialStatement(sexpr,  {open: false, close: false});
   }
 
-  var mustacheNode = createMustacheNode(sexpr, null, true);
+  var mustacheNode = createMustacheStatement(sexpr, null, true);
 
-  var tm = sexpr.id._emblemSuffixModifier;
+  var tm = sexpr.path._emblemSuffixModifier;
   if(tm === '!') {
     return unshiftParam(mustacheNode, 'unbound');
   } else if(tm === '?') {
@@ -458,9 +451,9 @@ inMustache
 }
 
 sexpr
-  = path:pathIdNode !' [' params:inMustacheParam* hash:hash?
+  = path:pathPathExpression !' [' params:inMustacheParam* hash:(hash?)
   { return parseSexpr(path, params, hash) }
-  / path:pathIdNode _ '[' _ TERM* INDENT* _ params:inMustacheBracketedParam* hash:bracketedHash?
+  / path:pathPathExpression _ '[' _ TERM* INDENT* _ params:inMustacheBracketedParam* hash:(bracketedHash?)
   { return parseSexpr(path, params, hash) }
 
 // %div converts to tagName="div", .foo.thing converts to class="foo thing", #id converst to id="id"
@@ -472,13 +465,13 @@ htmlMustacheAttribute
   return a;
 }
 
-shorthandAttributes 
+shorthandAttributes
   = attributesAtLeastID / attributesAtLeastClass
 
-attributesAtLeastID 
+attributesAtLeastID
   = id:idShorthand classes:classShorthand* { return [id, classes]; }
 
-attributesAtLeastClass 
+attributesAtLeastClass
   = classes:classShorthand+ { return [null, classes]; }
 
 inMustacheParam
@@ -487,11 +480,11 @@ inMustacheParam
 inMustacheBracketedParam
   = a:(htmlMustacheAttribute / p:param TERM* { return p; } ) { return a; }
 
-hash 
-  = h:hashSegment+ { return new AST.HashNode(h); }
+hash
+  = h:hashSegment+ { return new AST.Hash(h); }
 
 bracketedHash
-  = INDENT* ' '* h:bracketedHashSegment+ { return new AST.HashNode(h); }
+  = INDENT* ' '* h:bracketedHashSegment+ { return new AST.Hash(h); }
 
 pathIdent "PathIdent"
   = '..'
@@ -503,21 +496,21 @@ key "Key"
   = $((nmchar / ':')*)
 
 hashSegment
-  = __ h:(key '=' param) { return [h[0], h[2]]; }
+  = __ h:(key '=' param) { return {key: h[0], value: h[2]}; }
 
 bracketedHashSegment
-  = INDENT* _ h:(key '=' param) TERM* { return [h[0], h[2]];}
+  = INDENT* _ h:(key '=' param) TERM* { return {key: h[0], value: h[2]};}
 
 param
   = booleanNode
   / integerNode
-  / pathIdNode
+  / pathPathExpression
   / stringNode
   / sexprOpen s:sexpr sexprClose { s.isHelper = true; return s; }
 
-path = first:pathIdent tail:(s:seperator p:pathIdent { return { part: p, separator: s }; })* 
+path = first:pathIdent tail:(s:seperator p:pathIdent { return { part: p, separator: s }; })*
 {
-  var ret = [{ part: first }];
+  var ret = [{part: first}];
   for(var i = 0; i < tail.length; ++i) {
     ret.push(tail[i]);
   }
@@ -526,17 +519,43 @@ path = first:pathIdent tail:(s:seperator p:pathIdent { return { part: p, separat
 
 seperator "PathSeparator" = [\/.]
 
-pathIdNode = v:path    
-{ 
+pathPathExpression = v:path
+{
+  //copied from handlebars helpers, hopefully will be exposed later. TODO
+  function preparePath(data, parts, locInfo) {
+      /*jshint -W040 */
+
+      var original = data ? '@' : '',
+          dig = [],
+          depth = 0,
+          depthString = '';
+
+      for(var i=0,l=parts.length; i<l; i++) {
+          var part = parts[i].part;
+          original += (parts[i].separator || '') + part;
+
+          if (part === '..' || part === '.' || part === 'this') {
+              if (dig.length > 0) {
+                  throw new Exception('Invalid path: ' + original, {loc: locInfo});
+              } else if (part === '..') {
+                  depth++;
+                  depthString += '../';
+              }
+          } else {
+              dig.push(part);
+          }
+      }
+
+      return new AST.PathExpression(data, depth, dig, original, locInfo);
+  }
   var last = v[v.length - 1];
+  var data = false;
 
   // Support for data keywords that are prefixed with @ in the each
   // block helper such as @index, @key, @first, @last
   if (last.part.charAt(0) === '@') {
     last.part = last.part.slice(1);
-    var idNode = new AST.IdNode(v);
-    var dataNode = new AST.DataNode(idNode);
-    return dataNode;
+    data = true;
   }
 
   var match;
@@ -546,15 +565,15 @@ pathIdNode = v:path
     last.part = last.part.slice(0, -1);
   }
 
-  var idNode = new AST.IdNode(v); 
+  var idNode = preparePath(data, v);
   idNode._emblemSuffixModifier = suffixModifier;
 
   return idNode;
 }
 
-stringNode  = v:string  { return new AST.StringNode(v); }
-integerNode = v:integer { return new AST.NumberNode(v); }
-booleanNode = v:boolean { return new AST.BooleanNode(v); }
+stringNode  = v:string  { return new AST.StringLiteral(v); }
+integerNode = v:integer { return new AST.NumberLiteral(v); }
+booleanNode = v:boolean { return new AST.BooleanLiteral(v); }
 
 boolean "Boolean" = 'true' / 'false'
 
@@ -570,23 +589,23 @@ alpha = [A-Za-z]
 whitespaceableTextNodes
  = ind:indentation nodes:textNodes w:whitespaceableTextNodes* anyDedent
 {
-  nodes.unshift(new AST.ContentNode(ind));
+  nodes.unshift(new AST.ContentStatement(ind));
 
   for(var i = 0; i < w.length; ++i) {
-    nodes.push(new AST.ContentNode(ind));
+    nodes.push(new AST.ContentStatement(ind));
     nodes = nodes.concat(w[i]);
     nodes.push("\n");
   }
-  return nodes; 
+  return nodes;
 }
  / textNodes
 
-textLineStart 
+textLineStart
  = s:[|`'] ' '?  { return s; }
  / &'<' { return '<'; }
 
 textLine = s:textLineStart nodes:textNodes indentedNodes:(indentation whitespaceableTextNodes* DEDENT)?
-{ 
+{
   if(nodes.length || !indentedNodes) {
     nodes.push("\n");
   }
@@ -594,7 +613,7 @@ textLine = s:textLineStart nodes:textNodes indentedNodes:(indentation whitespace
   if(indentedNodes) {
     indentedNodes = indentedNodes[1];
     for(var i = 0; i < indentedNodes.length; ++i) {
-      /*nodes.push(new AST.ContentNode("#"));*/
+      /*nodes.push(new AST.ContentStatement("#"));*/
       nodes = nodes.concat(indentedNodes[i]);
       nodes.push("\n");
     }
@@ -606,7 +625,7 @@ textLine = s:textLineStart nodes:textNodes indentedNodes:(indentation whitespace
     var node = nodes[i];
     if(node == "\n") {
       if(!strip) {
-        ret.push(new AST.ContentNode("\n"));
+        ret.push(new AST.ContentStatement("\n"));
       }
     } else {
       ret.push(node);
@@ -614,7 +633,7 @@ textLine = s:textLineStart nodes:textNodes indentedNodes:(indentation whitespace
   }
 
   if(s === "'") {
-    ret.push(new AST.ContentNode(" "));
+    ret.push(new AST.ContentStatement(" "));
   }
   return ret;
 }
@@ -639,24 +658,24 @@ recursivelyParsedMustacheContent
   // Force interpretation as mustache.
   // TODO: change to just parse with a specific rule?
   text = "=" + text;
-  return Emblem.parse(text).statements[0];
+  return Emblem.parse(text).body[0];
 }
 
-rawMustacheEscaped   
+rawMustacheEscaped
  = doubleOpen _ m:recursivelyParsedMustacheContent _ doubleClose { m.escaped = true; return m; }
  / hashStacheOpen _ m:recursivelyParsedMustacheContent _ hashStacheClose { m.escaped = true; return m; }
 
-rawMustacheUnescaped 
+rawMustacheUnescaped
  = tripleOpen _ m:recursivelyParsedMustacheContent _ tripleClose { m.escaped = false; return m; }
 
-preAttrMustacheText = a:$preAttrMustacheUnit+ { return new AST.ContentNode(a); }
-preAttrMustacheTextSingle = a:$preAttrMustacheUnitSingle+ { return new AST.ContentNode(a); }
+preAttrMustacheText = a:$preAttrMustacheUnit+ { return new AST.ContentStatement(a); }
+preAttrMustacheTextSingle = a:$preAttrMustacheUnitSingle+ { return new AST.ContentStatement(a); }
 
 preAttrMustacheUnit       = !(nonMustacheUnit / '"') c:. { return c; }
 preAttrMustacheUnitSingle = !(nonMustacheUnit / "'") c:. { return c; }
 
-preMustacheText 
-  = a:$preMustacheUnit+ { return new AST.ContentNode(a); }
+preMustacheText
+  = a:$preMustacheUnit+ { return new AST.ContentStatement(a); }
 preMustacheUnit
   = !nonMustacheUnit c:. { return c; }
 
@@ -666,7 +685,7 @@ nonMustacheUnit
 // Support for div#id.whatever{ bindAttr whatever="asd" }
 rawMustacheSingle
  = singleOpen _ m:recursivelyParsedMustacheContent _ singleClose { m.escaped = true; return m; }
-inTagMustache 
+inTagMustache
   = rawMustacheSingle / rawMustacheUnescaped / rawMustacheEscaped
 
 singleOpen "SingleMustacheOpen" = '{'
@@ -683,10 +702,10 @@ hashStacheOpen  "InterpolationOpen"  = '#{'
 hashStacheClose "InterpolationClose" = '}'
 
 // Returns whether the mustache should be escaped.
-equalSign = "==" ' '? { return false; } / "=" ' '? { return true; } 
+equalSign = "==" ' '? { return false; } / "=" ' '? { return true; }
 
 
-// Start of a chunk of HTML. Must have either tagName or shorthand 
+// Start of a chunk of HTML. Must have either tagName or shorthand
 // class/id attributes or both. Examples:
 // p#some-id
 // #some-id
@@ -694,24 +713,24 @@ equalSign = "==" ' '? { return false; } / "=" ' '? { return true; }
 // span.combo#of.stuff
 // NOTE: this returns a 2 element array of [h,s].
 // The return is used to reject a when both h an s are falsy.
-htmlStart = h:htmlTagName? s:shorthandAttributes? '/'? &{ return h || s; } 
+htmlStart = h:htmlTagName? s:shorthandAttributes? '/'? &{ return h || s; }
 
 // Everything that goes in the angle brackets of an html tag. Examples:
 // p#some-id class="asdasd"
 // #some-id data-foo="sdsdf"
 // p{ action "click" target="view" }
-inHtmlTag 
+inHtmlTag
 = h:htmlStart ' [' TERM* inTagMustaches:inTagMustache* fullAttributes:bracketedAttribute+
-{ 
+{
   return parseInHtml(h, inTagMustaches, fullAttributes)
 }
 / h:htmlStart inTagMustaches:inTagMustache* fullAttributes:fullAttribute*
-{ 
+{
   return parseInHtml(h, inTagMustaches, fullAttributes)
 }
 
 
-shorthandAttributes 
+shorthandAttributes
   = shorthands:(s:idShorthand    { return { shorthand: s, id: true}; } /
                 s:classShorthand { return { shorthand: s }; } )+
 {
@@ -732,7 +751,7 @@ fullAttribute
   = ' '+ a:(actionAttribute / booleanAttribute / boundAttribute / rawMustacheAttribute / normalAttribute)
 {
   if (a.length) {
-    return [new AST.ContentNode(' ')].concat(a); 
+    return [new AST.ContentStatement(' ')].concat(a);
   } else {
     return [];
   }
@@ -742,7 +761,7 @@ bracketedAttribute
 = INDENT* ' '* a:(actionAttribute / booleanAttribute / boundAttribute / rawMustacheAttribute / normalAttribute) TERM*
 {
   if (a.length) {
-    return [new AST.ContentNode(' ')].concat(a); 
+    return [new AST.ContentStatement(' ')].concat(a);
   } else {
     return [];
   }
@@ -753,25 +772,25 @@ boundAttributeValueChar = [A-Za-z\.0-9_\-] / nonSeparatorColon
 // Value of an action can be an unwrapped string, or a single or double quoted string
 actionValue
   = quotedActionValue
-  / id:pathIdNode { return createMustacheNode([id], null, true); }
+  / id:pathPathExpression { return createMustacheStatement([id], null, true); }
 
 quotedActionValue = p:('"' inMustache '"' / "'" inMustache "'") { return p[1]; }
 
 actionAttribute
   = event:knownEvent '=' mustacheNode:actionValue
 {
-  // Replace the IdNode with a StringNode to prevent unquoted action deprecation warnings
-  mustacheNode.id = new AST.StringNode(mustacheNode.id.string);
+  // Replace the PathExpression with a StringLiteral to prevent unquoted action deprecation warnings
+  mustacheNode.sexpr.path = new AST.StringLiteral(mustacheNode.sexpr.path.original);
 
   // Unshift the action helper and augment the hash
-  return [unshiftParam(mustacheNode, 'action', [['on', new AST.StringNode(event)]])];
+  return [unshiftParam(mustacheNode, 'action', [{key: 'on', value: new AST.StringLiteral(event)}])];
 }
 
 booleanAttribute
   = key:key '=' boolValue:('true'/'false')
-{ 
+{
   if (boolValue === 'true') {
-    return [ new AST.ContentNode(key) ];
+    return [ new AST.ContentStatement(key) ];
   } else {
     return [];
   }
@@ -781,41 +800,41 @@ boundAttributeValue
   = '{' _ value:$(boundAttributeValueChar / ' ')+ _ '}' { return value.replace(/ *$/, ''); }
   / $boundAttributeValueChar+
 
-// With Ember-Handlebars variant, 
+// With Ember-Handlebars variant,
 // p class=something -> <p {{bindAttr class="something"}}></p>
 boundAttribute
   = key:key '=' value:boundAttributeValue !'!' &{ return IS_EMBER; }
-{ 
-  var hashNode = new AST.HashNode([[key, new AST.StringNode(value)]]);
-  var params = [new AST.IdNode([{part: 'bind-attr'}])];
-  var mustacheNode = createMustacheNode(params, hashNode);
+{
+  var hashNode = new AST.Hash([{key: key, value: new AST.StringLiteral(value)}]);
+  var params = [new AST.PathExpression(false, 0, ['bind-attr'], 'bind-attr')];
+  var mustacheNode = createMustacheStatement(params, hashNode);
 
   return [mustacheNode];
 }
 
-// With vanilla Handlebars variant, 
+// With vanilla Handlebars variant,
 // p class=something -> <p class="{{something}}"></p>
 rawMustacheAttribute
-  = key:key '=' id:pathIdNode 
-{ 
-  var mustacheNode = createMustacheNode([id], null, true);
+  = key:key '=' id:pathPathExpression
+{
+  var mustacheNode = createMustacheStatement([id], null, true);
 
   if(IS_EMBER && id._emblemSuffixModifier === '!') {
     mustacheNode = unshiftParam(mustacheNode, 'unbound');
   }
 
   return [
-    new AST.ContentNode(key + '=' + '"'),
+    new AST.ContentStatement(key + '=' + '"'),
     mustacheNode,
-    new AST.ContentNode('"'),
+    new AST.ContentStatement('"'),
   ];
 }
 
 normalAttribute
   = key:key '=' nodes:attributeTextNodes
-{ 
-  var result = [ new AST.ContentNode(key + '=' + '"') ].concat(nodes);
-  return result.concat([new AST.ContentNode('"')]);
+{
+  var result = [ new AST.ContentStatement(key + '=' + '"') ].concat(nodes);
+  return result.concat([new AST.ContentStatement('"')]);
 }
 
 attributeName = $attributeChar*

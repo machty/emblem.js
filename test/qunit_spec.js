@@ -245,6 +245,7 @@ test("# can be only thing on line", function() {
   return shouldCompileTo(emblem, "<span>#</span>");
 });
 
+
 /* TODO: this
 test "can be escaped", ->
   emblem =
@@ -252,8 +253,7 @@ test "can be escaped", ->
   span #\\{yes}
   '''
   shouldCompileTo emblem, '<span>#{yes}</span>'
-*/
-
+ */
 
 runTextLineSuite = function(ch) {
   var sct;
@@ -983,37 +983,37 @@ test("when ember expression is used with variable", function() {
 test("when ember expression is used with variable in braces", function() {
   var result;
   result = shouldEmberPrecompileToHelper('p.foo class={ bar }');
-  return ok(-1 !== result.indexOf('\'class\': (":foo bar")'));
+  return ok(-1 !== result.indexOf('"class":":foo bar"'));
 });
 
 test("when ember expression is used with constant in braces", function() {
   var result;
   result = shouldEmberPrecompileToHelper('p.foo class={ :bar }');
-  return ok(-1 !== result.indexOf('\'class\': (":foo :bar")'));
+  return ok(-1 !== result.indexOf('"class":":foo :bar"'));
 });
 
 test("when ember expression is used with constant and variable in braces", function() {
   var result;
   result = shouldEmberPrecompileToHelper('p.foo class={ :bar bar }');
-  return ok(-1 !== result.indexOf('\'class\': (":foo :bar bar")'));
+  return ok(-1 !== result.indexOf('"class":":foo :bar bar"'));
 });
 
 test("when ember expression is used with bind-attr", function() {
   var result;
   result = shouldEmberPrecompileToHelper('p.foo{ bind-attr class="bar" }');
-  return ok(-1 !== result.indexOf('\'class\': (":foo bar")'));
+  return ok(-1 !== result.indexOf('"class":":foo bar"'));
 });
 
 test("when ember expression is used with bind-attr and multiple attrs", function() {
   var result;
   result = shouldEmberPrecompileToHelper('p.foo{ bind-attr something=bind class="bar" }');
-  return ok(-1 !== result.indexOf('\'class\': (":foo bar")'));
+  return ok(-1 !== result.indexOf('"class":":foo bar"'));
 });
 
 test("only with bind-attr helper", function() {
   var result;
   result = shouldEmberPrecompileToHelper('p.foo{ someHelper class="bar" }', 'someHelper');
-  ok(-1 !== result.indexOf('\'class\': ("bar")'));
+  ok(-1 !== result.indexOf('"class":"bar"'));
   return ok(-1 !== result.indexOf('class=\\"foo\\"'));
 });
 
@@ -1430,10 +1430,10 @@ Handlebars.registerPartial('hbPartial', '<a href="/people/{{id}}">{{name}}</a>')
 test("calling handlebars partial", function() {
   var emblem;
   emblem = '> hbPartial\n| Hello #{> hbPartial}';
-  return shouldCompileToString(emblem, {
+  return shouldCompileTo(emblem, {
     id: 666,
     name: "Death"
-  }, '<a href="/people/666">Death</a>Hello <a href="/people/666">Death</a>');
+  }, '<a href="/people/666">Death</a>Hello <a href="/people/666">Death</a>', null);
 });
 
 Emblem.registerPartial(Handlebars, 'emblemPartial', 'a href="/people/{{id}}" = name');
@@ -1443,28 +1443,28 @@ Emblem.registerPartial(Handlebars, 'emblemPartialB', 'p Grr');
 Emblem.registerPartial(Handlebars, 'emblemPartialC', 'p = a');
 
 test("calling emblem partial", function() {
-  return shouldCompileToString('> emblemPartial', {
+  return shouldCompileTo('> emblemPartial', {
     id: 666,
     name: "Death"
-  }, '<a href="/people/666">Death</a>');
+  }, '<a href="/people/666">Death</a>', null);
 });
 
 test("calling emblem partial with context", function() {
-  return shouldCompileToString('> emblemPartialC foo', {
+  return shouldCompileTo('> emblemPartialC foo', {
     foo: {
       a: "YES"
     }
-  }, '<p>YES</p>');
+  }, '<p>YES</p>', null);
 });
 
 test("partials in mustaches", function() {
   var emblem;
   emblem = "| Hello, {{> emblemPartialC foo}}{{>emblemPartialB}}{{>emblemPartialB }}";
-  return shouldCompileToString(emblem, {
+  return shouldCompileTo(emblem, {
     foo: {
       a: "YES"
     }
-  }, 'Hello, <p>YES</p><p>Grr</p><p>Grr</p>');
+  }, 'Hello, <p>YES</p><p>Grr</p><p>Grr</p>', null);
 });
 
 test("handlebars dot-separated paths with segment-literal notation", function() {
@@ -1560,6 +1560,7 @@ if (supportsEachHelperDataKeywords) {
   });
 }
 
+
 /*
 test "partial in block", ->
   emblem =
@@ -1573,8 +1574,7 @@ test "partial in block", ->
       { "name": "Yehuda", "id": 2 }
     ]
   shouldCompileToString emblem, data, '<ul><a href="/people/1">Alan</a><a href="/people/2">Yehuda</a><ul>'
-*/
-
+ */
 
 suite("inline block helper");
 

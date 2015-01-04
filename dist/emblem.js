@@ -1,4 +1,4 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var Emblem;
 
 Emblem = require('./emblem');
@@ -122,7 +122,7 @@ require('./preprocessor');
 
 require('./emberties');
 
-}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./compiler":1,"./emberties":2,"./parser":4,"./preprocessor":5}],4:[function(require,module,exports){
 var Emblem = require('./emblem');
 
@@ -202,9 +202,9 @@ Emblem.Parser = (function() {
         peg$c1 = "",
         peg$c2 = [],
         peg$c3 = function(c) {return c;},
-        peg$c4 = function(c, i) { 
-          var programNode = createProgramNode(c);
-          if(i) { programNode.inverse = createProgramNode(i); }
+        peg$c4 = function(c, i) {
+          var programNode = createProgram(c);
+          if(i) { programNode.inverse = createProgram(i); }
           return programNode;
         },
         peg$c5 = "=",
@@ -212,7 +212,7 @@ Emblem.Parser = (function() {
         peg$c7 = "else",
         peg$c8 = "\"else\"",
         peg$c9 = function(statements) {
-          // Coalesce all adjacent ContentNodes into one.
+          // Coalesce all adjacent ContentStatements into one.
 
           var compressedStatements = [];
           var buffer = [];
@@ -223,24 +223,24 @@ Emblem.Parser = (function() {
             for(var j = 0; j < nodes.length; ++j) {
               var node = nodes[j]
               if(node.type === "content") {
-                if(node.string) {
+                if(node.value) {
                   // Ignore empty strings (comments).
-                  buffer.push(node.string);
+                  buffer.push(node.value);
                 }
                 continue;
-              } 
+              }
 
               // Flush content if present.
               if(buffer.length) {
-                compressedStatements.push(new AST.ContentNode(buffer.join('')));
+                compressedStatements.push(new AST.ContentStatement(buffer.join('')));
                 buffer = [];
               }
               compressedStatements.push(node);
             }
           }
 
-          if(buffer.length) { 
-            compressedStatements.push(new AST.ContentNode(buffer.join(''))); 
+          if(buffer.length) {
+            compressedStatements.push(new AST.ContentStatement(buffer.join('')));
           }
 
           return compressedStatements;
@@ -250,16 +250,17 @@ Emblem.Parser = (function() {
         peg$c12 = function() { return []; },
         peg$c13 = ">",
         peg$c14 = "\">\"",
-        peg$c15 = function(n, params) { 
-          return [new AST.PartialNode(n, params[0], undefined, {})];
+        peg$c15 = function(n, params) {
+          n = new AST.SubExpression(n, params);
+          return [new AST.PartialStatement(n, {open: false, close: false})];
         },
         peg$c16 = /^[a-zA-Z0-9_$-\/]/,
         peg$c17 = "[a-zA-Z0-9_$-\\/]",
         peg$c18 = function(s) {
-            return new AST.PartialNameNode(new AST.StringNode(s));
+            return new AST.PathExpression(false, 0, s.split('.'), s);
           },
-        peg$c19 = function(m) { 
-          return [m]; 
+        peg$c19 = function(m) {
+          return [m];
         },
         peg$c20 = "/",
         peg$c21 = "\"/\"",
@@ -269,19 +270,19 @@ Emblem.Parser = (function() {
           // TODO make this configurable
           var defaultCapitalizedHelper = 'view';
 
-          if(ret.mustache) {
-            // Block. Modify inner MustacheNode and return.
+          if(ret instanceof AST.BlockStatement) {
+            // Block. Modify inner MustacheStatement and return.
 
             // Make sure a suffix modifier hasn't already been applied.
-            var ch = ret.mustache.id.string.charAt(0);
+            var ch = ret.sexpr.path.original.charAt(0);
             if(!IS_EMBER || !ch.match(/[A-Z]/)) return ret;
 
-            ret.mustache = unshiftParam(ret.mustache, defaultCapitalizedHelper);
+            ret.sexpr = unshiftParam(ret, defaultCapitalizedHelper).sexpr;
             return ret;
           } else {
 
             // Make sure a suffix modifier hasn't already been applied.
-            var ch = ret.id.string.charAt(0);
+            var ch = ret.sexpr.path.original.charAt(0);
             if(!IS_EMBER || !ch.match(/[A-Z]/)) return ret;
 
             return unshiftParam(ret, defaultCapitalizedHelper);
@@ -293,7 +294,7 @@ Emblem.Parser = (function() {
           if(multilineContent) {
             multilineContent = multilineContent[1];
             for(var i = 0, len = multilineContent.length; i < len; ++i) {
-              ret.push(new AST.ContentNode(' '));
+              ret.push(new AST.ContentStatement(' '));
               ret = ret.concat(multilineContent[i]);
             }
           }
@@ -305,53 +306,44 @@ Emblem.Parser = (function() {
         peg$c31 = "\"]\"",
         peg$c32 = function(h) { return h;},
         peg$c33 = function(h, nested) {
-          // h is [[open tag content], closing tag ContentNode]
+          // h is [[open tag content], closing tag ContentStatement]
           var ret = h[0];
           if(nested) { ret = ret.concat(nested); }
 
-          // Push the closing tag ContentNode if it exists (self-closing if not)
+          // Push the closing tag ContentStatement if it exists (self-closing if not)
           if(h[1]) { ret.push(h[1]); }
 
           return ret;
         },
-        peg$c34 = function(mustacheNode, nestedContentProgramNode) { 
-          if (!nestedContentProgramNode) {
+        peg$c34 = function(mustacheNode, nestedContentProgram) {
+          if (!nestedContentProgram) {
             return mustacheNode;
           }
 
-          var strip = {
-            left: false,
-            right: false
-          };
-
-          var block = new AST.BlockNode(mustacheNode, nestedContentProgramNode, nestedContentProgramNode.inverse, strip);
-
-          block.path = mustacheNode.id;
+          var block = new AST.BlockStatement(mustacheNode.sexpr, nestedContentProgram, nestedContentProgram.inverse, false, false, false);
           return block;
         },
         peg$c35 = ": ",
         peg$c36 = "\": \"",
-        peg$c37 = function(statements) { return createProgramNode(statements, []); },
+        peg$c37 = function(statements) { return createProgram(statements); },
         peg$c38 = function(block) {return block && block[2]; },
         peg$c39 = function(block) {
             return block;
           },
         peg$c40 = function(e, ret) {
-          var mustache = ret.mustache || ret;
-          mustache.escaped = e;
+          ret.escaped = e;
           return ret;
         },
         peg$c41 = "[",
         peg$c42 = "\"[\"",
-        peg$c43 = function(isPartial, sexpr) { 
+        peg$c43 = function(isPartial, sexpr) {
           if(isPartial) {
-            var n = new AST.PartialNameNode(new AST.StringNode(sexpr.id.string));
-            return new AST.PartialNode(n, sexpr.params[0], undefined, {});
+            return new AST.PartialStatement(sexpr,  {open: false, close: false});
           }
 
-          var mustacheNode = createMustacheNode(sexpr, null, true);
+          var mustacheNode = createMustacheStatement(sexpr, null, true);
 
-          var tm = sexpr.id._emblemSuffixModifier;
+          var tm = sexpr.path._emblemSuffixModifier;
           if(tm === '!') {
             return unshiftParam(mustacheNode, 'unbound');
           } else if(tm === '?') {
@@ -374,7 +366,7 @@ Emblem.Parser = (function() {
         peg$c52 = function(classes) { return [null, classes]; },
         peg$c53 = function(p) { return p; },
         peg$c54 = function(a) { return a; },
-        peg$c55 = function(h) { return new AST.HashNode(h); },
+        peg$c55 = function(h) { return new AST.Hash(h); },
         peg$c56 = "PathIdent",
         peg$c57 = "..",
         peg$c58 = "\"..\"",
@@ -389,12 +381,12 @@ Emblem.Parser = (function() {
         peg$c67 = "Key",
         peg$c68 = ":",
         peg$c69 = "\":\"",
-        peg$c70 = function(h) { return [h[0], h[2]]; },
-        peg$c71 = function(h) { return [h[0], h[2]];},
+        peg$c70 = function(h) { return {key: h[0], value: h[2]}; },
+        peg$c71 = function(h) { return {key: h[0], value: h[2]};},
         peg$c72 = function(s) { s.isHelper = true; return s; },
         peg$c73 = function(s, p) { return { part: p, separator: s }; },
         peg$c74 = function(first, tail) {
-          var ret = [{ part: first }];
+          var ret = [{part: first}];
           for(var i = 0; i < tail.length; ++i) {
             ret.push(tail[i]);
           }
@@ -403,16 +395,42 @@ Emblem.Parser = (function() {
         peg$c75 = "PathSeparator",
         peg$c76 = /^[\/.]/,
         peg$c77 = "[\\/.]",
-        peg$c78 = function(v) { 
+        peg$c78 = function(v) {
+          //copied from handlebars helpers, hopefully will be exposed later. TODO
+          function preparePath(data, parts, locInfo) {
+              /*jshint -W040 */
+
+              var original = data ? '@' : '',
+                  dig = [],
+                  depth = 0,
+                  depthString = '';
+
+              for(var i=0,l=parts.length; i<l; i++) {
+                  var part = parts[i].part;
+                  original += (parts[i].separator || '') + part;
+
+                  if (part === '..' || part === '.' || part === 'this') {
+                      if (dig.length > 0) {
+                          throw new Exception('Invalid path: ' + original, {loc: locInfo});
+                      } else if (part === '..') {
+                          depth++;
+                          depthString += '../';
+                      }
+                  } else {
+                      dig.push(part);
+                  }
+              }
+
+              return new AST.PathExpression(data, depth, dig, original, locInfo);
+          }
           var last = v[v.length - 1];
+          var data = false;
 
           // Support for data keywords that are prefixed with @ in the each
           // block helper such as @index, @key, @first, @last
           if (last.part.charAt(0) === '@') {
             last.part = last.part.slice(1);
-            var idNode = new AST.IdNode(v);
-            var dataNode = new AST.DataNode(idNode);
-            return dataNode;
+            data = true;
           }
 
           var match;
@@ -422,14 +440,14 @@ Emblem.Parser = (function() {
             last.part = last.part.slice(0, -1);
           }
 
-          var idNode = new AST.IdNode(v); 
+          var idNode = preparePath(data, v);
           idNode._emblemSuffixModifier = suffixModifier;
 
           return idNode;
         },
-        peg$c79 = function(v) { return new AST.StringNode(v); },
-        peg$c80 = function(v) { return new AST.NumberNode(v); },
-        peg$c81 = function(v) { return new AST.BooleanNode(v); },
+        peg$c79 = function(v) { return new AST.StringLiteral(v); },
+        peg$c80 = function(v) { return new AST.NumberLiteral(v); },
+        peg$c81 = function(v) { return new AST.BooleanLiteral(v); },
         peg$c82 = "Boolean",
         peg$c83 = "true",
         peg$c84 = "\"true\"",
@@ -453,21 +471,21 @@ Emblem.Parser = (function() {
         peg$c102 = /^[A-Za-z]/,
         peg$c103 = "[A-Za-z]",
         peg$c104 = function(ind, nodes, w) {
-          nodes.unshift(new AST.ContentNode(ind));
+          nodes.unshift(new AST.ContentStatement(ind));
 
           for(var i = 0; i < w.length; ++i) {
-            nodes.push(new AST.ContentNode(ind));
+            nodes.push(new AST.ContentStatement(ind));
             nodes = nodes.concat(w[i]);
             nodes.push("\n");
           }
-          return nodes; 
+          return nodes;
         },
         peg$c105 = /^[|`']/,
         peg$c106 = "[|`']",
         peg$c107 = "<",
         peg$c108 = "\"<\"",
         peg$c109 = function() { return '<'; },
-        peg$c110 = function(s, nodes, indentedNodes) { 
+        peg$c110 = function(s, nodes, indentedNodes) {
           if(nodes.length || !indentedNodes) {
             nodes.push("\n");
           }
@@ -475,7 +493,7 @@ Emblem.Parser = (function() {
           if(indentedNodes) {
             indentedNodes = indentedNodes[1];
             for(var i = 0; i < indentedNodes.length; ++i) {
-              /*nodes.push(new AST.ContentNode("#"));*/
+              /*nodes.push(new AST.ContentStatement("#"));*/
               nodes = nodes.concat(indentedNodes[i]);
               nodes.push("\n");
             }
@@ -487,7 +505,7 @@ Emblem.Parser = (function() {
             var node = nodes[i];
             if(node == "\n") {
               if(!strip) {
-                ret.push(new AST.ContentNode("\n"));
+                ret.push(new AST.ContentStatement("\n"));
               }
             } else {
               ret.push(node);
@@ -495,7 +513,7 @@ Emblem.Parser = (function() {
           }
 
           if(s === "'") {
-            ret.push(new AST.ContentNode(" "));
+            ret.push(new AST.ContentStatement(" "));
           }
           return ret;
         },
@@ -511,11 +529,11 @@ Emblem.Parser = (function() {
           // Force interpretation as mustache.
           // TODO: change to just parse with a specific rule?
           text = "=" + text;
-          return Emblem.parse(text).statements[0];
+          return Emblem.parse(text).body[0];
         },
         peg$c118 = function(m) { m.escaped = true; return m; },
         peg$c119 = function(m) { m.escaped = false; return m; },
-        peg$c120 = function(a) { return new AST.ContentNode(a); },
+        peg$c120 = function(a) { return new AST.ContentStatement(a); },
         peg$c121 = "any character",
         peg$c122 = "SingleMustacheOpen",
         peg$c123 = "DoubleMustacheOpen",
@@ -548,7 +566,7 @@ Emblem.Parser = (function() {
         peg$c150 = function() { return false; },
         peg$c151 = function() { return true; },
         peg$c152 = function(h, s) { return h || s; },
-        peg$c153 = function(h, inTagMustaches, fullAttributes) { 
+        peg$c153 = function(h, inTagMustaches, fullAttributes) {
           return parseInHtml(h, inTagMustaches, fullAttributes)
         },
         peg$c154 = function(s) { return { shorthand: s, id: true}; },
@@ -568,24 +586,24 @@ Emblem.Parser = (function() {
         },
         peg$c157 = function(a) {
           if (a.length) {
-            return [new AST.ContentNode(' ')].concat(a); 
+            return [new AST.ContentStatement(' ')].concat(a);
           } else {
             return [];
           }
         },
         peg$c158 = /^[A-Za-z.0-9_\-]/,
         peg$c159 = "[A-Za-z.0-9_\\-]",
-        peg$c160 = function(id) { return createMustacheNode([id], null, true); },
+        peg$c160 = function(id) { return createMustacheStatement([id], null, true); },
         peg$c161 = function(event, mustacheNode) {
-          // Replace the IdNode with a StringNode to prevent unquoted action deprecation warnings
-          mustacheNode.id = new AST.StringNode(mustacheNode.id.string);
+          // Replace the PathExpression with a StringLiteral to prevent unquoted action deprecation warnings
+          mustacheNode.sexpr.path = new AST.StringLiteral(mustacheNode.sexpr.path.original);
 
           // Unshift the action helper and augment the hash
-          return [unshiftParam(mustacheNode, 'action', [['on', new AST.StringNode(event)]])];
+          return [unshiftParam(mustacheNode, 'action', [{key: 'on', value: new AST.StringLiteral(event)}])];
         },
-        peg$c162 = function(key, boolValue) { 
+        peg$c162 = function(key, boolValue) {
           if (boolValue === 'true') {
-            return [ new AST.ContentNode(key) ];
+            return [ new AST.ContentStatement(key) ];
           } else {
             return [];
           }
@@ -594,29 +612,29 @@ Emblem.Parser = (function() {
         peg$c164 = "!",
         peg$c165 = "\"!\"",
         peg$c166 = function(key, value) { return IS_EMBER; },
-        peg$c167 = function(key, value) { 
-          var hashNode = new AST.HashNode([[key, new AST.StringNode(value)]]);
-          var params = [new AST.IdNode([{part: 'bind-attr'}])];
-          var mustacheNode = createMustacheNode(params, hashNode);
+        peg$c167 = function(key, value) {
+          var hashNode = new AST.Hash([{key: key, value: new AST.StringLiteral(value)}]);
+          var params = [new AST.PathExpression(false, 0, ['bind-attr'], 'bind-attr')];
+          var mustacheNode = createMustacheStatement(params, hashNode);
 
           return [mustacheNode];
         },
-        peg$c168 = function(key, id) { 
-          var mustacheNode = createMustacheNode([id], null, true);
+        peg$c168 = function(key, id) {
+          var mustacheNode = createMustacheStatement([id], null, true);
 
           if(IS_EMBER && id._emblemSuffixModifier === '!') {
             mustacheNode = unshiftParam(mustacheNode, 'unbound');
           }
 
           return [
-            new AST.ContentNode(key + '=' + '"'),
+            new AST.ContentStatement(key + '=' + '"'),
             mustacheNode,
-            new AST.ContentNode('"'),
+            new AST.ContentStatement('"'),
           ];
         },
-        peg$c169 = function(key, nodes) { 
-          var result = [ new AST.ContentNode(key + '=' + '"') ].concat(nodes);
-          return result.concat([new AST.ContentNode('"')]);
+        peg$c169 = function(key, nodes) {
+          var result = [ new AST.ContentStatement(key + '=' + '"') ].concat(nodes);
+          return result.concat([new AST.ContentStatement('"')]);
         },
         peg$c170 = "_",
         peg$c171 = "\"_\"",
@@ -2028,7 +2046,7 @@ Emblem.Parser = (function() {
       var s0, s1, s2, s3, s4, s5, s6, s7, s8, s9;
 
       s0 = peg$currPos;
-      s1 = peg$parsepathIdNode();
+      s1 = peg$parsepathPathExpression();
       if (s1 !== null) {
         s2 = peg$currPos;
         peg$silentFails++;
@@ -2085,7 +2103,7 @@ Emblem.Parser = (function() {
       }
       if (s0 === null) {
         s0 = peg$currPos;
-        s1 = peg$parsepathIdNode();
+        s1 = peg$parsepathPathExpression();
         if (s1 !== null) {
           s2 = peg$parse_();
           if (s2 !== null) {
@@ -2832,7 +2850,7 @@ Emblem.Parser = (function() {
       if (s0 === null) {
         s0 = peg$parseintegerNode();
         if (s0 === null) {
-          s0 = peg$parsepathIdNode();
+          s0 = peg$parsepathPathExpression();
           if (s0 === null) {
             s0 = peg$parsestringNode();
             if (s0 === null) {
@@ -2964,7 +2982,7 @@ Emblem.Parser = (function() {
       return s0;
     }
 
-    function peg$parsepathIdNode() {
+    function peg$parsepathPathExpression() {
       var s0, s1;
 
       s0 = peg$currPos;
@@ -5102,7 +5120,7 @@ Emblem.Parser = (function() {
       s0 = peg$parsequotedActionValue();
       if (s0 === null) {
         s0 = peg$currPos;
-        s1 = peg$parsepathIdNode();
+        s1 = peg$parsepathPathExpression();
         if (s1 !== null) {
           peg$reportedPos = s0;
           s1 = peg$c160(s1);
@@ -5493,7 +5511,7 @@ Emblem.Parser = (function() {
           if (peg$silentFails === 0) { peg$fail(peg$c6); }
         }
         if (s2 !== null) {
-          s3 = peg$parsepathIdNode();
+          s3 = peg$parsepathPathExpression();
           if (s3 !== null) {
             peg$reportedPos = s0;
             s1 = peg$c168(s1, s3);
@@ -6407,37 +6425,39 @@ Emblem.Parser = (function() {
       var twoBrace = closeBrace + closeBrace;
       var threeBrace = twoBrace + closeBrace;
 
-      function createMustacheNode(params, hash, escaped) {
-        var open = escaped ? twoBrace : threeBrace;
-        return new AST.MustacheNode(params, hash, open, { left: false, right: false });
+      function createMustacheStatement(params, hash, escaped) {
+        if(params.length){
+          params = new AST.SubExpression(params[0], params.slice(1), hash);
+        }
+        return new AST.MustacheStatement(params, escaped, { open: false, close: false });
       }
 
-      function createProgramNode(statements, inverse) {
-        return new AST.ProgramNode(statements, { left: false, right: false}, inverse, null);
+      function createProgram(statements) {
+        return new AST.Program(statements, null, { open: false, close: false}, null);
       }
 
-      // Returns a new MustacheNode with a new preceding param (id).
+      // Returns a new MustacheStatement with a new preceding param (id).
       function unshiftParam(mustacheNode, helperName, newHashPairs) {
 
-        var hash = mustacheNode.hash;
+        var hash = mustacheNode.sexpr.hash;
 
         // Merge hash.
         if(newHashPairs) {
-          hash = hash || new AST.HashNode([]);
+          hash = hash || new AST.Hash([]);
 
           for(var i = 0; i < newHashPairs.length; ++i) {
             hash.pairs.push(newHashPairs[i]);
           }
         }
 
-        var params = [mustacheNode.id].concat(mustacheNode.params);
-        params.unshift(new AST.IdNode([{ part: helperName}]));
-        return createMustacheNode(params, hash, mustacheNode.escaped);
+        var params = [mustacheNode.sexpr.path].concat(mustacheNode.sexpr.params);
+        params.unshift(new AST.PathExpression(false, 0, [helperName], helperName));
+        return createMustacheStatement(params, hash, mustacheNode.escaped);
       }
 
       function textNodesResult(first, tail) {
         var ret = [];
-        if(first) { ret.push(first); } 
+        if(first) { ret.push(first); }
         for(var i = 0; i < tail.length; ++i) {
           var t = tail[i];
           ret.push(t[0]);
@@ -6469,106 +6489,105 @@ Emblem.Parser = (function() {
         }
 
         if(hasAttrs) {
-          hash = hash || new AST.HashNode([]);
+          hash = hash || new AST.Hash([]);
           for(var k in attrs) {
             if(!attrs.hasOwnProperty(k)) continue;
-            hash.pairs.push([k, new AST.StringNode(attrs[k].join(' '))]);
+            hash.pairs.push({key: k, value: new AST.StringLiteral(attrs[k].join(' '))});
           }
         }
 
-        actualParams.unshift(path);
-        return new AST.SexprNode(actualParams, hash);
+        return new AST.SubExpression(path, actualParams, hash);
       }
       function parseInHtml(h, inTagMustaches, fullAttributes) {
-      
+
         var tagName = h[0] || 'div',
             shorthandAttributes = h[1] || [],
             id = shorthandAttributes[0],
             classes = shorthandAttributes[1] || [],
             tagOpenContent = [],
-            updateMustacheNode;
+            updateMustacheStatement;
 
-        updateMustacheNode = function (node) {
+        updateMustacheStatement = function (node) {
           var pairs, pair, stringNode, original;
           if (!classes.length) {
             return;
           }
-          if (!node.id || node.id.string !== 'bind-attr') {
+          if (!node.sexpr.path || node.sexpr.path.original !== 'bind-attr') {
             return;
           }
-          if (node.hash && node.hash.pairs && (pairs = node.hash.pairs)) {
+          if (node.sexpr.hash && node.sexpr.hash.pairs && (pairs = node.sexpr.hash.pairs)) {
             for (var i2 in pairs) {
               if (!pairs.hasOwnProperty(i2)) { continue; }
               pair = pairs[i2];
-              if (pair && pair[0] === 'class' && pair[1] instanceof AST.StringNode) {
-                stringNode = pair[1];
+              if (pair && pair.key === 'class' && pair.value instanceof AST.StringLiteral) {
+                stringNode = pair.value;
                 original = stringNode.original;
-                stringNode.original = stringNode.string = stringNode.stringModeValue = ':' + classes.join(' :') + ' ' + original;
+                stringNode.original = stringNode.value = stringNode.stringModeValue = ':' + classes.join(' :') + ' ' + original;
                 classes = [];
               }
             }
           }
         };
 
-        tagOpenContent.push(new AST.ContentNode('<' + tagName));
+        tagOpenContent.push(new AST.ContentStatement('<' + tagName));
 
         if(id) {
-          tagOpenContent.push(new AST.ContentNode(' id="' + id + '"'));
+          tagOpenContent.push(new AST.ContentStatement(' id="' + id + '"'));
         }
 
         // Pad in tag mustaches with spaces.
         for(var i = 0; i < inTagMustaches.length; ++i) {
           // Check if given mustache node has class bindings and prepend shorthand classes
-          updateMustacheNode(inTagMustaches[i]);
-          tagOpenContent.push(new AST.ContentNode(' '));
+          updateMustacheStatement(inTagMustaches[i]);
+          tagOpenContent.push(new AST.ContentStatement(' '));
           tagOpenContent.push(inTagMustaches[i]);
         }
         for(var i = 0; i < fullAttributes.length; ++i) {
           for (var i2 in fullAttributes[i]) {
-            if (fullAttributes[i][i2] instanceof AST.MustacheNode) {
-              updateMustacheNode(fullAttributes[i][i2]);
+            if (fullAttributes[i][i2] instanceof AST.MustacheStatement) {
+              updateMustacheStatement(fullAttributes[i][i2]);
             }
           }
           if (classes.length) {
-            var isClassAttr = fullAttributes[i][1] && fullAttributes[i][1].string === 'class="';
-        
+            var isClassAttr = fullAttributes[i][1] && fullAttributes[i][1].value === 'class="';
+
             // Check if attribute is class attribute and has content
             if (isClassAttr && fullAttributes[i].length === 4) {
-              if (fullAttributes[i][2].type == 'mustache') {
+              if (fullAttributes[i][2].type == 'MustacheStatement') {
                 var mustacheNode, classesContent, hash, params;
-                // If class was mustache binding, transform attribute into bind-attr MustacheNode
+                // If class was mustache binding, transform attribute into bind-attr MustacheStatement
                 mustacheNode = fullAttributes[i][2];
-                classesContent = ':' + classes.join(' :') + ' ' + mustacheNode.id.original;
-                hash = new AST.HashNode([
-                    ['class', new AST.StringNode(classesContent)]
+                classesContent = ':' + classes.join(' :') + ' ' + mustacheNode.sexpr.path.original;
+                hash = new AST.Hash([
+                    {key: 'class', value: new AST.StringLiteral(classesContent)}
                 ]);
-                
-                params = [new AST.IdNode([{ part: 'bind-attr'}])].concat(mustacheNode.params);
-                fullAttributes[i] = [fullAttributes[i][0], createMustacheNode(params, hash, true)];
+
+                params = [new AST.PathExpression(false, 0, ['bind-attr'], 'bind-attr')].concat(mustacheNode.sexpr.params);
+                fullAttributes[i] = [fullAttributes[i][0], createMustacheStatement(params, hash, true)];
               } else {
-                // Else prepend shorthand classes to attribute 
-                classes.push(fullAttributes[i][2].string);
-                fullAttributes[i][2].string = classes.join(' ');
+                // Else prepend shorthand classes to attribute
+                classes.push(fullAttributes[i][2].value);
+                fullAttributes[i][2].value = classes.join(' ');
               }
               classes = [];
             }
           }
-          
+
           tagOpenContent = tagOpenContent.concat(fullAttributes[i]);
         }
 
         if(classes && classes.length) {
-          tagOpenContent.push(new AST.ContentNode(' class="' + classes.join(' ') + '"'));
+          tagOpenContent.push(new AST.ContentStatement(' class="' + classes.join(' ') + '"'));
         }
         var closingTagSlashPresent = !!h[2];
         if(SELF_CLOSING_TAG[tagName] || closingTagSlashPresent) {
-          tagOpenContent.push(new AST.ContentNode(' />'));
+          tagOpenContent.push(new AST.ContentStatement(' />'));
           return [tagOpenContent];
         } else {
-          
-          tagOpenContent.push(new AST.ContentNode('>'));
 
-          return [tagOpenContent, new AST.ContentNode('</' + tagName + '>')];
+          tagOpenContent.push(new AST.ContentStatement('>'));
+
+          return [tagOpenContent, new AST.ContentStatement('</' + tagName + '>')];
         }
       }
 
@@ -6964,4 +6983,4 @@ Emblem.Preprocessor = Preprocessor = (function() {
   module.exports = StringScanner;
 }).call(this);
 
-},{}]},{},[3])
+},{}]},{},[3]);

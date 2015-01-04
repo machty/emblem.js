@@ -1171,27 +1171,27 @@ test "when ember expression is used with variable", ->
 
 test "when ember expression is used with variable in braces", ->
   result = shouldEmberPrecompileToHelper 'p.foo class={ bar }'
-  ok -1  != result.indexOf '\'class\': (":foo bar")'
+  ok -1  != result.indexOf '"class":":foo bar"'
 
 test "when ember expression is used with constant in braces", ->
   result = shouldEmberPrecompileToHelper 'p.foo class={ :bar }'
-  ok -1  != result.indexOf '\'class\': (":foo :bar")'
+  ok -1  != result.indexOf '"class":":foo :bar"'
 
 test "when ember expression is used with constant and variable in braces", ->
   result = shouldEmberPrecompileToHelper 'p.foo class={ :bar bar }'
-  ok -1  != result.indexOf '\'class\': (":foo :bar bar")'
+  ok -1  != result.indexOf '"class":":foo :bar bar"'
 
 test "when ember expression is used with bind-attr", ->
   result = shouldEmberPrecompileToHelper 'p.foo{ bind-attr class="bar" }'
-  ok -1  != result.indexOf '\'class\': (":foo bar")'
+  ok -1  != result.indexOf '"class":":foo bar"'
   
 test "when ember expression is used with bind-attr and multiple attrs", ->
   result = shouldEmberPrecompileToHelper 'p.foo{ bind-attr something=bind class="bar" }'
-  ok -1 != result.indexOf '\'class\': (":foo bar")'
+  ok -1 != result.indexOf '"class":":foo bar"'
 
 test "only with bind-attr helper", ->
   result = shouldEmberPrecompileToHelper 'p.foo{ someHelper class="bar" }', 'someHelper'
-  ok -1 != result.indexOf '\'class\': ("bar")'
+  ok -1 != result.indexOf '"class":"bar"'
   ok -1 != result.indexOf 'class=\\"foo\\"'
 
 bindAttrHelper = ->
@@ -1598,26 +1598,27 @@ test "calling handlebars partial", ->
   > hbPartial
   | Hello #{> hbPartial}
   '''
-  shouldCompileToString emblem,
+  shouldCompileTo emblem,
     { id: 666, name: "Death" },
-    '<a href="/people/666">Death</a>Hello <a href="/people/666">Death</a>'
+    '<a href="/people/666">Death</a>Hello <a href="/people/666">Death</a>',
+    null
 
 Emblem.registerPartial(Handlebars, 'emblemPartial', 'a href="/people/{{id}}" = name')
 Emblem.registerPartial(Handlebars, 'emblemPartialB', 'p Grr')
 Emblem.registerPartial(Handlebars, 'emblemPartialC', 'p = a')
 
 test "calling emblem partial", ->
-  shouldCompileToString '> emblemPartial', { id: 666, name: "Death" }, '<a href="/people/666">Death</a>'
+  shouldCompileTo '> emblemPartial', { id: 666, name: "Death" }, '<a href="/people/666">Death</a>', null
 
 test "calling emblem partial with context", ->
-  shouldCompileToString '> emblemPartialC foo', { foo: { a: "YES" } }, '<p>YES</p>'
+  shouldCompileTo '> emblemPartialC foo', { foo: { a: "YES" } }, '<p>YES</p>', null
 
 test "partials in mustaches", ->
   emblem =
   """
   | Hello, {{> emblemPartialC foo}}{{>emblemPartialB}}{{>emblemPartialB }}
   """
-  shouldCompileToString emblem, { foo: { a: "YES" } }, 'Hello, <p>YES</p><p>Grr</p><p>Grr</p>'
+  shouldCompileTo emblem, { foo: { a: "YES" } }, 'Hello, <p>YES</p><p>Grr</p><p>Grr</p>', null
 
 test "handlebars dot-separated paths with segment-literal notation", ->
   emblem =

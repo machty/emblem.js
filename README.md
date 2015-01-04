@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/machty/emblem.js.png)](https://travis-ci.org/machty/emblem.js)
 
-## Looking for new maintainer of Emblem.js
+## LOOKING FOR NEW MAINTAINER OF EMBLEM.JS
 
 Please see [this issue](https://github.com/machty/emblem.js/issues/189)
 for information.

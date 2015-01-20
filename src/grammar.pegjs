@@ -281,12 +281,12 @@ content = statements:statement*
 // A statement is an array of nodes.
 // Often they're single-element arrays, but for things
 // like text lines, there might be multiple elements.
-statement "BeginStatement"
+statement
   = blankLine
   / comment
   / contentStatement
 
-contentStatement "ContentStatement"
+contentStatement
   = legacyPartialInvocation
   / htmlElement
   / textLine
@@ -306,7 +306,7 @@ legacyPartialName
   }
 
 // Returns [MustacheNode] or [BlockNode]
-mustache 
+mustache
   = m:(explicitMustache / lineStartingMustache) 
 { 
   return [m]; 
@@ -388,7 +388,8 @@ htmlTerminator
 
 // A whole HTML element, including the html tag itself
 // and any nested content inside of it.
-htmlElement = h:inHtmlTag nested:htmlTerminator
+htmlElement
+  = h:inHtmlTag nested:htmlTerminator
 {
   // h is [[open tag content], closing tag ContentNode]
   var ret = h[0];
@@ -400,7 +401,8 @@ htmlElement = h:inHtmlTag nested:htmlTerminator
   return ret;
 }
 
-mustacheOrBlock = mustacheNode:inMustache _ inlineComment?nestedContentProgramNode:mustacheNestedContent
+mustacheOrBlock
+= mustacheNode:inMustache _ inlineComment?nestedContentProgramNode:mustacheNestedContent
 { 
   if (!nestedContentProgramNode) {
     return mustacheNode;
@@ -460,7 +462,7 @@ inMustache
 sexpr
   = path:pathIdNode !' [' params:inMustacheParam* hash:hash?
   { return parseSexpr(path, params, hash) }
-  / path:pathIdNode _ '[' _ TERM* INDENT* _ params:inMustacheBracketedParam* hash:bracketedHash?
+  / path:pathIdNode _ '[' _ TERM* INDENT* _ params:inMustacheBracketedParam* hash:bracketedHash? &(_ ']')
   { return parseSexpr(path, params, hash) }
 
 // %div converts to tagName="div", .foo.thing converts to class="foo thing", #id converst to id="id"
@@ -487,7 +489,7 @@ inMustacheParam
 inMustacheBracketedParam
   = a:(htmlMustacheAttribute / p:param TERM* { return p; } ) { return a; }
 
-hash 
+hash
   = h:hashSegment+ { return new AST.HashNode(h); }
 
 bracketedHash
@@ -585,7 +587,8 @@ textLineStart
  = s:[|`'] ' '?  { return s; }
  / &'<' { return '<'; }
 
-textLine = s:textLineStart nodes:textNodes indentedNodes:(indentation whitespaceableTextNodes* DEDENT)?
+textLine
+  = s:textLineStart nodes:textNodes indentedNodes:(indentation whitespaceableTextNodes* DEDENT)?
 { 
   if(nodes.length || !indentedNodes) {
     nodes.push("\n");
@@ -619,7 +622,8 @@ textLine = s:textLineStart nodes:textNodes indentedNodes:(indentation whitespace
   return ret;
 }
 
-textNodes = first:preMustacheText? tail:(rawMustache preMustacheText?)* TERM
+textNodes
+  = first:preMustacheText? tail:(rawMustache preMustacheText?)* TERM
 {
   return textNodesResult(first, tail);
 }
@@ -666,7 +670,7 @@ nonMustacheUnit
 // Support for div#id.whatever{ bindAttr whatever="asd" }
 rawMustacheSingle
  = singleOpen _ m:recursivelyParsedMustacheContent _ singleClose { m.escaped = true; return m; }
-inTagMustache 
+inTagMustache
   = rawMustacheSingle / rawMustacheUnescaped / rawMustacheEscaped
 
 singleOpen "SingleMustacheOpen" = '{'
@@ -706,7 +710,7 @@ inHtmlTag
   return parseInHtml(h, inTagMustaches, fullAttributes)
 }
 / h:htmlStart inTagMustaches:inTagMustache* fullAttributes:fullAttribute*
-{ 
+{
   return parseInHtml(h, inTagMustaches, fullAttributes)
 }
 
@@ -833,14 +837,15 @@ nmchar = [_a-zA-Z0-9-] / nonascii
 nmstart = [_a-zA-Z] / nonascii
 nonascii = [\x80-\xFF]
 
-tagString 
+tagString "KnownHTMLTagString"
   = c:$tagChar+
 
-htmlTagName "KnownHTMLTagName"
+htmlTagName
   = '%' _ s:tagString { return s; }
   / knownTagName
 
-knownTagName = t:tagString &{ return !!KNOWN_TAGS[t]; }  { return t; }
+knownTagName "KnownHTMLTag"
+  = t:tagString &{ return !!KNOWN_TAGS[t]; }  { return t; }
 
 tagChar = [_a-zA-Z0-9-] / nonSeparatorColon
 
@@ -868,5 +873,6 @@ whitespace "InlineWhitespace"
   = [ \t]
 
 lineChar = !(INDENT / DEDENT / TERM) c:. { return c; }
-lineContent = $lineChar*
+lineContent "lineContent"
+  = $lineChar*
 

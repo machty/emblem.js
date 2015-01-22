@@ -1,4 +1,4 @@
-/* globals Emblem,QUnit */
+/* globals QUnit */
 
 import Emblem from 'emblem';
 
@@ -8,6 +8,6 @@ module("The match DSL", {
 });
 
 test("wat", function() {
-  ok(false, "wat");
+  ok(Emblem, "wat");
 });
 

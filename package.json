@@ -23,6 +23,7 @@
     "uglify-js": "^1.2.6"
   },
   "devDependencies": {
+    "broccoli-6to5-transpiler": "^2.0.4",
     "broccoli-compile-modules": "^1.1.0",
     "broccoli-concat": "0.0.12",
     "broccoli-esnext": "^0.5.0",
@@ -32,8 +33,8 @@
     "broccoli-merge-trees": "^0.2.1",
     "broccoli-pegjs": "0.0.1",
     "broccoli-replace": "~0.1.6",
-    "handlebars": "mmun/handlebars.js#new-ast-3238645f",
-    "ember-cli": "0.0.40"
+    "ember-cli": "^0.1.7",
+    "handlebars": "mmun/handlebars.js#new-ast-3238645f"
   },
   "main": "lib/emblem.js",
   "bin": {

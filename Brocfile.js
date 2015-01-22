@@ -5,7 +5,7 @@ var mergeTrees = require('broccoli-merge-trees');
 var concat = require('broccoli-concat');
 var replace = require('broccoli-replace');
 var peg = require('broccoli-pegjs');
-var esnext = require('broccoli-esnext');
+var esTranspiler = require('broccoli-6to5-transpiler');
 
 /**
  * Builds the consumable lib
@@ -31,7 +31,7 @@ function buildTestSuite (libTree) {
   var jsHintLib = jsHint(libTree);
 
   var testTree = new Funnel( 'tests', {
-    files: ['emblem-test.js'],
+    include: [/.*-test\.js/],
     destDir: destination
   });
 
@@ -69,18 +69,12 @@ var lib = new Funnel( 'lib', {
   destDir: '/'
 });
 
-lib = esnext(lib);
-
 lib = peg(lib, {
   wrapper: function (src, parser) {
     return '/*jshint newcap: false, laxbreak: true */\nvar Parser = ' + parser + ";\nvar parse = Parser.parse, ParserSyntaxError = Parser.SyntaxError;\nexport {ParserSyntaxError, parse};\nexport default parse;";
   }
 });
 
-var exportTree = require('broccoli-export-tree');
-var extree = exportTree(lib, {
-  destDir: 'dist2'
-});
 
 var version = require('./package.json').version;
 
@@ -94,5 +88,14 @@ lib = replace(lib, {
 var testSuite = buildTestSuite(lib);
 var distLibs = buildDistLib(lib);
 
-module.exports = mergeTrees([distLibs, testSuite, extree]);
+var es6ified = esTranspiler(mergeTrees([distLibs, testSuite]));
+
+var exportTree = require('broccoli-export-tree');
+var extree = exportTree(es6ified, {
+  destDir: 'dist2'
+});
+
+
+module.exports = es6ified;
+module.exports = mergeTrees([es6ified, extree]);
 

@@ -245,6 +245,7 @@ test("# can be only thing on line", function() {
   return shouldCompileTo(emblem, "<span>#</span>");
 });
 
+
 /* TODO: this
 test "can be escaped", ->
   emblem =
@@ -252,8 +253,7 @@ test "can be escaped", ->
   span #\\{yes}
   '''
   shouldCompileTo emblem, '<span>#{yes}</span>'
-*/
-
+ */
 
 runTextLineSuite = function(ch) {
   var sct;
@@ -1560,6 +1560,7 @@ if (supportsEachHelperDataKeywords) {
   });
 }
 
+
 /*
 test "partial in block", ->
   emblem =
@@ -1573,8 +1574,7 @@ test "partial in block", ->
       { "name": "Yehuda", "id": 2 }
     ]
   shouldCompileToString emblem, data, '<ul><a href="/people/1">Alan</a><a href="/people/2">Yehuda</a><ul>'
-*/
-
+ */
 
 suite("inline block helper");
 

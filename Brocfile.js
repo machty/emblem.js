@@ -1,101 +1,98 @@
-var compileModules = require('broccoli-compile-modules');
-var jsHint = require('broccoli-jshint');
+var ModuleTranspiler = require('broccoli-es6modules');
 var Funnel = require('broccoli-funnel');
 var mergeTrees = require('broccoli-merge-trees');
 var concat = require('broccoli-concat');
 var replace = require('broccoli-replace');
 var peg = require('broccoli-pegjs');
-var esTranspiler = require('broccoli-6to5-transpiler');
+var es6to5 = require('broccoli-6to5-transpiler');
+var broccoliStew = require('broccoli-stew');
+var broccoliCoffee = require('broccoli-coffee');
 
-/**
- * Builds the consumable lib
- * @param  {Tree} libTree
- * @return {Array}
- */
-function buildDistLib (libTree) {
-  return compileModules( libTree, {
-    inputFiles: ['emblem.umd.js'],
-    output: '/emblem.js'
+var outputDir = '/';
+
+// Turn ES6 to ES5, without module transpilation
+function transpileES6(tree){
+  return es6to5(tree, {
+    blacklist: ['es6.modules', 'useStrict']
   });
 }
 
-/**
- * Builds the test suite including jsHint
- * and Qunit harness.
- * @param  {Tree} libTree
- * @return {Tree}
- */
-function buildTestSuite (libTree) {
-  var destination = '/tests';
-
-  var jsHintLib = jsHint(libTree);
-
-  var testTree = new Funnel( 'tests', {
-    include: [/.*-test\.js/],
-    destDir: destination
+function buildSrcTree(){
+  var lib = new Funnel('lib', {
+    exclude: ['**/*.rb', '**/*.pegjs'],
+    destDir: outputDir + 'emblem'
   });
 
-  var jsHintTests = jsHint(testTree);
+  lib = broccoliStew.mv(lib, 'emblem/main.js', 'emblem.js');
+  lib = broccoliStew.log(lib);
+  lib = transpileES6(lib);
+  return lib;
+}
 
-  var allTestFiles = mergeTrees([libTree, testTree]);
-
-  var testBundle = compileModules(allTestFiles, {
-    inputFiles: ['emblem.js', 'tests/*.js'],
-    formatter: 'bundle',
-    output: '/tests/emblem-test-bundle.js'
+function buildPegTree(){
+  var pegTree = new Funnel('lib', {
+    include: ['*.pegjs']
   });
 
-  var tests = mergeTrees([jsHintLib, jsHintTests, testBundle]);
+  pegTree = peg(pegTree, {
+    wrapper: function (src, parser) {
+      return '/*jshint newcap: false, laxbreak: true */\nvar Parser = ' + parser + ";\nvar parse = Parser.parse, ParserSyntaxError = Parser.SyntaxError;\nexport {ParserSyntaxError, parse};\nexport default parse;";
+    }
+  });
 
-  tests = concat(tests, {
+  return pegTree;
+}
+
+function buildDistTree(srcTree){
+  var amdTree = new ModuleTranspiler(srcTree, {format: 'amd'});
+  var cjsTree = new ModuleTranspiler(srcTree, {format: 'cjs'});
+
+  cjsTree = broccoliStew.mv(cjsTree, outputDir + '/cjs');
+
+  amdTree = concat(amdTree, {
     inputFiles: ['**/*.js'],
-    outputFile: '/tests/emblem-test-bundle.js'
+    outputFile: outputDir + 'emblem.amd.js',
+    wrapInFunction: false
   });
 
-  var testHarness = new Funnel('tests', {
-    files: ['index.html'],
-    destDir: destination
-  });
-
-  var qunit = new Funnel('bower_components/qunit/qunit', {
-    files: ['qunit.js', 'qunit.css'],
-    destDir: destination
-  });
-
-  return mergeTrees([tests, testHarness, qunit]);
+  return mergeTrees([amdTree, cjsTree]);
 }
 
-var lib = new Funnel( 'lib', {
-  destDir: '/'
-});
+function buildTestTree(){
+  // all test code files
+  var testTree = new Funnel('tests', {
+    include: ['**/*.js', '**/*.coffee']
+  });
 
-lib = peg(lib, {
-  wrapper: function (src, parser) {
-    return '/*jshint newcap: false, laxbreak: true */\nvar Parser = ' + parser + ";\nvar parse = Parser.parse, ParserSyntaxError = Parser.SyntaxError;\nexport {ParserSyntaxError, parse};\nexport default parse;";
-  }
-});
+  // all test asset files
+  var testAssetsTree = new Funnel('tests', {
+    exclude: ['**/*.js', '**/*.coffee']
+  });
 
+  // rewrite .coffee files to .js files
+  testTree = broccoliCoffee(testTree, {bare:true});
 
-var version = require('./package.json').version;
+  // turn es6 to es5, without modules
+  testTree = transpileES6(testTree);
 
-lib = replace(lib, {
-  files: [ '**/*.js' ],
-  patterns: [
-    { match: /VERSION_STRING_PLACEHOLDER/g, replacement: version }
-  ]
-});
+  // transpile modules to amd
+  testTree = new ModuleTranspiler(testTree, { format: 'amd' });
 
-var testSuite = buildTestSuite(lib);
-var distLibs = buildDistLib(lib);
+  // combine AMD files
+  testTree = concat(testTree, {
+    inputFiles: ['**/*.js'],
+    outputFile: outputDir + 'emblem-tests.amd.js',
+    wrapInFunction: false
+  });
 
-var es6ified = esTranspiler(mergeTrees([distLibs, testSuite]));
+  testTree = mergeTrees([testTree, testAssetsTree]);
 
-var exportTree = require('broccoli-export-tree');
-var extree = exportTree(es6ified, {
-  destDir: 'dist2'
-});
+  // put tests in 'tests/'
+  return broccoliStew.mv(testTree, outputDir + 'tests');
+}
 
+var srcTree  = mergeTrees( [buildSrcTree(), buildPegTree()] );
+var distTree = buildDistTree(srcTree);
+var testTree = buildTestTree();
 
-module.exports = es6ified;
-module.exports = mergeTrees([es6ified, extree]);
-
+module.exports = mergeTrees( [distTree, testTree] );

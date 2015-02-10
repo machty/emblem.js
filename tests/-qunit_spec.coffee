@@ -1,7 +1,7 @@
 
 # Test Setup: Set up an environment that'll work for both Node and Qunit tests.
-LoadedEmber = window?.Ember || @Ember || {}
-Ember = window?.Emblem || @Emblem || {}
+LoadedEmber = window?.Ember || {}
+`import Ember from 'emblem'`
 
 # These are needed for the full version ember to load properly
 LoadedEmber = LoadedEmber || {}

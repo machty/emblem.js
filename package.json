@@ -18,7 +18,7 @@
     "node": ">=0.4.7"
   },
   "dependencies": {
-    "StringScanner": "~0.0.3",
+    "handlebars": "^2.0.0",
     "optimist": "^0.3.7",
     "uglify-js": "^1.2.6"
   },
@@ -36,7 +36,7 @@
     "broccoli-replace": "~0.1.6",
     "broccoli-stew": "^0.2.0",
     "ember-cli": "0.1.12",
-    "handlebars": "mmun/handlebars.js#new-ast-3238645f"
+    "StringScanner": "~0.0.3"
   },
   "main": "lib/emblem.js",
   "bin": {

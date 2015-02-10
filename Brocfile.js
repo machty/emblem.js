@@ -24,19 +24,23 @@ function buildSrcTree(){
   });
 
   lib = broccoliStew.mv(lib, 'emblem/main.js', 'emblem.js');
-  lib = broccoliStew.log(lib);
   lib = transpileES6(lib);
   return lib;
 }
 
 function buildPegTree(){
   var pegTree = new Funnel('lib', {
-    include: ['*.pegjs']
+    include: ['*.pegjs'],
+    destDir: outputDir + 'emblem'
   });
 
   pegTree = peg(pegTree, {
     wrapper: function (src, parser) {
-      return '/*jshint newcap: false, laxbreak: true */\nvar Parser = ' + parser + ";\nvar parse = Parser.parse, ParserSyntaxError = Parser.SyntaxError;\nexport {ParserSyntaxError, parse};\nexport default parse;";
+      return ['/*jshint newcap: false, laxbreak: true */',
+              'var Parser = ' + parser + ';',
+              'var parse = Parser.parse, ParserSyntaxError = Parser.SyntaxError;',
+              'export {ParserSyntaxError, parse};',
+              'export default parse;'].join('\n');
     }
   });
 
@@ -58,6 +62,23 @@ function buildDistTree(srcTree){
   return mergeTrees([amdTree, cjsTree]);
 }
 
+function buildSrcDepsTree(){
+  var stringScannerTree = new Funnel('node_modules/StringScanner/lib', {
+    include: ['StringScanner.js']
+  });
+
+  var header = 'var module = {};\n';
+  var footer = 'export default module.exports;';
+
+  return concat(stringScannerTree, {
+    inputFiles: ['StringScanner.js'],
+    outputFile: outputDir + 'string-scanner.js',
+    header: header,
+    footer: footer,
+    wrapInFunction: false
+  });
+}
+
 function buildTestTree(){
   // all test code files
   var testTree = new Funnel('tests', {
@@ -69,11 +90,7 @@ function buildTestTree(){
     exclude: ['**/*.js', '**/*.coffee']
   });
 
-  var testSupportTree = new Funnel('bower_components/qunit', {
-    srcDir: 'qunit',
-    destDir: 'qunit'
-  });
-  testAssetsTree = mergeTrees([testAssetsTree, testSupportTree]);
+  testAssetsTree = mergeTrees([testAssetsTree, buildTestSupportTree()]);
 
   // rewrite .coffee files to .js files
   testTree = broccoliCoffee(testTree, {bare:true});
@@ -97,7 +114,40 @@ function buildTestTree(){
   return broccoliStew.mv(testTree, outputDir + 'tests');
 }
 
-var srcTree  = mergeTrees( [buildSrcTree(), buildPegTree()] );
+function buildTestSupportTree(){
+  var qUnitTree = new Funnel('bower_components/qunit', {
+    srcDir: 'qunit',
+    destDir: 'qunit'
+  });
+
+  var loaderTree = new Funnel('bower_components', {
+    srcDir: 'loader.js',
+    destDir: 'loader.js',
+    include: ['loader.js']
+  });
+
+  var handlebarsTree = new Funnel('node_modules/handlebars/dist', {
+    include: ['handlebars.js'],
+    destDir: 'handlebars'
+  });
+
+  var jQueryTree = new Funnel('bower_components/jquery/dist', {
+    include: ['jquery.js'],
+    destDir: 'jquery'
+  });
+
+  var emberTree = new Funnel('bower_components/ember', {
+    include: ['ember.js'],
+    destDir: 'ember'
+  });
+
+  return mergeTrees([
+    qUnitTree, loaderTree, handlebarsTree, jQueryTree, emberTree]);
+}
+
+var srcTree  = mergeTrees(
+  [buildSrcTree(), buildPegTree(), buildSrcDepsTree()]
+);
 var distTree = buildDistTree(srcTree);
 var testTree = buildTestTree();
 

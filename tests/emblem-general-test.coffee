@@ -1,14 +1,15 @@
 
 # Test Setup: Set up an environment that'll work for both Node and Qunit tests.
 LoadedEmber = window?.Ember || {}
-`import Ember from 'emblem'`
+`import Emblem from 'emblem'`
+`import Handlebars from './support/ember-handlebars'`
 
 # These are needed for the full version ember to load properly
 LoadedEmber = LoadedEmber || {}
 Ember.Handlebars = LoadedEmber.Handlebars
 Ember.warn = LoadedEmber.warn
 
-if Emblem?
+if true
   # Qunit testing
   _equal = equal
   equals = equal = (a, b, msg) ->
@@ -19,18 +20,13 @@ if Emblem?
   window.suite = module
 else
   # Setup for Node package testing
-  Handlebars = require('handlebars')
-  EmberHandlebars = require('../node_modules/ember-template-compiler/vendor/ember-template-compiler.js').EmberHandlebars
-  Emblem = require('../lib/emblem')
+  # FIXME not compatible with coffee + es6 imports
+  # Handlebars = require('handlebars')
 
   # TODO: replace with real expect()
   `expect = function() {};`
 
   {equal, equals, ok, throws} = require("assert")
-
-# Setup Ember handlebars if not loaded with require
-if !EmberHandlebars?
-  EmberHandlebars = Ember.Handlebars
 
 unless CompilerContext?
   # Note that this doesn't have the same context separation as the rspec test.
@@ -43,7 +39,7 @@ supportsEachHelperDataKeywords = Handlebars.VERSION.slice(0, 3) >= 1.2
 supportsSubexpressions = Handlebars.VERSION.slice(0, 3) >= 1.3
 
 precompileEmber = (emblem) ->
-  Emblem.precompile(EmberHandlebars, emblem).toString()
+  Emblem.precompile(Handlebars, emblem).toString()
 
 shouldEmberPrecompileToHelper = (emblem, helper = 'bind-attr') ->
   result = precompileEmber emblem
@@ -1206,8 +1202,6 @@ bindAttrHelper = ->
 
 Handlebars.registerHelper 'bind-attr', bindAttrHelper
 
-EmberHandlebars.registerHelper 'bind-attr', bindAttrHelper
-
 suite "bind-attr behavior for unquoted attribute values"
 
 test "basic", ->
@@ -1566,12 +1560,12 @@ test "input", ->
 
 suite "ember."
 
-test "should precompile with EmberHandlebars", ->
+test "should precompile with Handlebars", ->
   emblem =
   """
   input type="text"
   """
-  result = Emblem.precompile(EmberHandlebars, 'p Hello').toString()
+  result = Emblem.precompile(Handlebars, 'p Hello').toString()
   ok result.match '<p>Hello</p>'
 
 suite "old school handlebars"

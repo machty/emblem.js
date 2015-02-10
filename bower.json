@@ -28,6 +28,11 @@
   ],
   "devDependencies": {
     "qunit": "~1.17.1",
-    "loader.js": "stefanpenner/loader.js#7f79173fd5c61dc256af9aa01c56d50ebfec10fe"
+    "loader.js": "ember-cli/loader.js",
+    "ember": "1.9.1",
+    "jquery": "~2.1.3"
+  },
+  "resolutions": {
+    "ember": "1.9.1"
   }
 }

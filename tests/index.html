@@ -3,13 +3,27 @@
 <head>
   <meta charset="utf-8">
   <title>QUnit Example</title>
-  <link rel="stylesheet" href="qunit.css">
+  <link rel="stylesheet" href="qunit/qunit.css">
 </head>
 <body>
   <div id="qunit"></div>
-  <script src="qunit.js"></script>
-  <script src="tests/emblem-tests.amd.js"></script>
-  <script src="/testem.js"></script>
+  <script src="qunit/qunit.js"></script>
+  <script src="jquery/jquery.js"></script>
+  <script src="handlebars/handlebars.js"></script>
+  <script src="ember/ember.js"></script>
+
+  <script src="loader.js/loader.js"></script>
+  <script src="emblem-tests.amd.js"></script>
+  <script src="../emblem.amd.js"></script>
+  <script>
+    // FIXME ember-cli should do this
+    for (moduleName in requirejs.entries) {
+      if (moduleName.match(/[-_]test$/)) {
+        require(moduleName);
+      }
+    }
+  </script>
+  <!-- FIXME bring testem back <script src="/testem.js"></script> -->
 </body>
 </html>
 

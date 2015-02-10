@@ -35,7 +35,7 @@
     "broccoli-pegjs": "0.0.1",
     "broccoli-replace": "~0.1.6",
     "broccoli-stew": "^0.2.0",
-    "ember-cli": "0.1.7",
+    "ember-cli": "0.1.12",
     "handlebars": "mmun/handlebars.js#new-ast-3238645f"
   },
   "main": "lib/emblem.js",

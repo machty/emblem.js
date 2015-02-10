@@ -69,6 +69,12 @@ function buildTestTree(){
     exclude: ['**/*.js', '**/*.coffee']
   });
 
+  var testSupportTree = new Funnel('bower_components/qunit', {
+    srcDir: 'qunit',
+    destDir: 'qunit'
+  });
+  testAssetsTree = mergeTrees([testAssetsTree, testSupportTree]);
+
   // rewrite .coffee files to .js files
   testTree = broccoliCoffee(testTree, {bare:true});
 

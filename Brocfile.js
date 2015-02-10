@@ -99,19 +99,24 @@ function buildTestTree(){
   testTree = transpileES6(testTree);
 
   // transpile modules to amd
-  testTree = new ModuleTranspiler(testTree, { format: 'amd' });
+  var amdTestTree = new ModuleTranspiler(testTree, { format: 'amd' });
 
   // combine AMD files
-  testTree = concat(testTree, {
+  amdTestTree = concat(amdTestTree, {
     inputFiles: ['**/*.js'],
     outputFile: outputDir + 'emblem-tests.amd.js',
     wrapInFunction: false
   });
 
-  testTree = mergeTrees([testTree, testAssetsTree]);
+  var cjsTestTree = new ModuleTranspiler(testTree, { format: 'cjs' });
 
+  cjsTestTree = broccoliStew.mv(cjsTestTree, outputDir + 'cjs/tests');
+
+  testTree = mergeTrees([amdTestTree, testAssetsTree]);
   // put tests in 'tests/'
-  return broccoliStew.mv(testTree, outputDir + 'tests');
+  testTree = broccoliStew.mv(testTree, outputDir + 'tests');
+
+  return mergeTrees([ cjsTestTree, testTree ]);
 }
 
 function buildTestSupportTree(){

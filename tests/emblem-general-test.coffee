@@ -1,32 +1,12 @@
+`import Emblem from '../emblem'`
+`import Handlebars from './support/handlebars'`
 
-# Test Setup: Set up an environment that'll work for both Node and Qunit tests.
-LoadedEmber = window?.Ember || {}
-`import Emblem from 'emblem'`
-`import Handlebars from './support/ember-handlebars'`
-
-# These are needed for the full version ember to load properly
-LoadedEmber = LoadedEmber || {}
-Ember.Handlebars = LoadedEmber.Handlebars
-Ember.warn = LoadedEmber.warn
-
-if true
-  # Qunit testing
-  _equal = equal
-  equals = equal = (a, b, msg) ->
-    # Allow exec with missing message params
-    _equal(a, b, msg || '')
-
-  # In QUnit, we use module() instead of nonexistent suite()
-  window.suite = module
-else
-  # Setup for Node package testing
-  # FIXME not compatible with coffee + es6 imports
-  # Handlebars = require('handlebars')
-
-  # TODO: replace with real expect()
-  `expect = function() {};`
-
-  {equal, equals, ok, throws} = require("assert")
+# TODO: remove this craaaaaaap
+# Qunit testing
+_equal = equal
+equals = equal = (a, b, msg) ->
+  # Allow exec with missing message params
+  _equal(a, b, msg || '')
 
 unless CompilerContext?
   # Note that this doesn't have the same context separation as the rspec test.
@@ -101,7 +81,7 @@ shouldThrow = (fn, exMessage) ->
 Handlebars.registerHelper 'echo', (param) ->
   "ECHO #{param}"
 
-suite "html one-liners"
+QUnit.module "html one-liners"
 
 test "element only", ->
   shouldCompileTo "p", "<p></p>"
@@ -115,7 +95,7 @@ test "with more complex text", ->
 test "with trailing space", ->
   shouldCompileTo "p Hello   ", "<p>Hello   </p>"
 
-suite "html multi-lines"
+QUnit.module "html multi-lines"
 
 test "two lines", ->
   emblem =
@@ -218,7 +198,7 @@ test "with followup", ->
   """
   shouldCompileTo emblem, "<p>This is pretty cool.</p><p>Hello.</p>"
 
-suite '#{} syntax'
+QUnit.module '#{} syntax'
   
 test 'acts like {{}}', ->
   emblem =
@@ -287,7 +267,7 @@ runTextLineSuite = (ch) ->
     shouldCompileTo emblem, obj, expected
 
 
-  suite "text lines starting with '#{ch}'"
+  QUnit.module "text lines starting with '#{ch}'"
 
   test "basic", -> sct "_ What what", "What what\n\t"
   test "with html", -> 
@@ -453,7 +433,7 @@ runTextLineSuite '|'
 runTextLineSuite '`'
 runTextLineSuite "'"
 
-suite "text line starting with angle bracket"
+QUnit.module "text line starting with angle bracket"
 
 test "can start with angle bracket html", ->
   emblem =
@@ -470,7 +450,7 @@ test "can start with angle bracket html and go to multiple lines", ->
   """
   shouldCompileTo emblem, "<span>Hello dude, what's up?</span>"
 
-suite "preprocessor"
+QUnit.module "preprocessor"
 
 test "it strips out preceding whitespace", ->
   emblem =
@@ -492,7 +472,7 @@ test "it handles preceding indentation and newlines pt 2", ->
   emblem = "  \n  p Woot\n  p Ha"
   shouldCompileTo emblem, "<p>Woot</p><p>Ha</p>"
 
-suite "comments"
+QUnit.module "comments"
 
 test "it strips out single line '/' comments", ->
   emblem =
@@ -612,7 +592,7 @@ test "on same line as colon syntax", ->
   """
   shouldCompileTo emblem, '<ul><li><span>Hello</span></li></ul>'
 
-suite "indentation"
+QUnit.module "indentation"
 
 # This test used to make sure the emblem code threw, but now we
 # support multi-line syntax.
@@ -643,7 +623,7 @@ test "new indentation levels don't have to match parents'", ->
   """
   shouldCompileTo emblem, "<p><span><div><span>yes</span></div></span></p>"
 
-suite "whitespace fussiness"
+QUnit.module "whitespace fussiness"
 
 test "spaces after html elements", ->
   shouldCompileTo "p \n  span asd", "<p><span>asd</span></p>"
@@ -652,7 +632,7 @@ test "spaces after html elements", ->
 test "spaces after mustaches", ->
   shouldCompileTo "each foo    \n  p \n  span", { foo: [1,2] }, "<p></p><span></span><p></p><span></span>"
 
-suite "attribute shorthand"
+QUnit.module "attribute shorthand"
 
 test "id shorthand", ->
   shouldCompileTo "#woot", '<div id="woot"></div>'
@@ -669,7 +649,7 @@ test "class can come first", ->
   shouldCompileTo "span.woot.loot#hello", '<span id="hello" class="woot loot"></span>'
   shouldCompileTo "span.woot.loot#hello.boot", '<span id="hello" class="woot loot boot"></span>'
 
-suite "full attributes - tags with content"
+QUnit.module "full attributes - tags with content"
 
 test "class only", ->
   shouldCompileTo 'p class="yes" Blork', '<p class="yes">Blork</p>'
@@ -712,7 +692,7 @@ test "nesting", ->
   """
   shouldCompileTo emblem, '<p class="hello" data-foo="gnarly"><span>Yes</span></p>'
 
-suite "full attributes - mixed quotes"
+QUnit.module "full attributes - mixed quotes"
 
 test "single empty", ->
   shouldCompileTo "p class=''", '<p class=""></p>'
@@ -721,7 +701,7 @@ test "single full", ->
 test "mixed", ->
   shouldCompileTo "p class='woot \"oof\" yeah'", '<p class="woot "oof" yeah"></p>'
 
-suite "full attributes - tags without content"
+QUnit.module "full attributes - tags without content"
 
 test "empty", ->
   shouldCompileTo 'p class=""', '<p class=""></p>'
@@ -732,7 +712,7 @@ test "id only", ->
 test "class and id", ->
   shouldCompileTo 'p id="yes" class="no"', '<p id="yes" class="no"></p>'
 
-suite "full attributes w/ mustaches"
+QUnit.module "full attributes w/ mustaches"
 
 test "with mustache", ->
   shouldCompileTo 'p class="foo {{yes}}"', {yes: "ALEX"}, '<p class="foo ALEX"></p>'
@@ -754,7 +734,7 @@ test "with mustache calling helper", ->
   """
   shouldCompileTo emblem, '<p class="foo ECHO BORF">Hello</p>'
 
-suite "boolean attributes"
+QUnit.module "boolean attributes"
 
 test "static", ->
   shouldCompileTo 'p borf=true',  '<p borf></p>'
@@ -773,7 +753,7 @@ test "static", ->
   #shouldCompileTo 'p borf=foo Naww', { foo: undefined }, '<p>Naww</p>'
   #shouldCompileTo 'p borf=foo Naww', { foo: 0 },     '<p borf="0">Naww</p>'
   
-suite "html nested"
+QUnit.module "html nested"
 
 test "basic", ->
   emblem =
@@ -807,7 +787,7 @@ test "empty nest w/ attribute shorthand", ->
   shouldCompileTo emblem, '<p class="woo"><span id="yes"><strong class="no yes"><i></i></strong></span></p>'
 
 
-suite "simple mustache"
+QUnit.module "simple mustache"
 
 test "various one-liners", ->
   emblem =
@@ -844,7 +824,7 @@ test "nested combo syntax", ->
     { items: [ { foo: "YEAH"}, { foo: "BOI" } ] },
     '<ul><li>YEAH</li><li>BOI</li></ul>'
 
-suite "mustache helpers"
+QUnit.module "mustache helpers"
 
 Handlebars.registerHelper 'booltest', (options) ->
   hash = options.hash
@@ -959,7 +939,7 @@ Handlebars.registerHelper 'view', (param, a, b, c) ->
 
   new Handlebars.SafeString """<#{param}#{hashString}>#{content}</#{param}>"""
 
-suite "capitalized line-starter"
+QUnit.module "capitalized line-starter"
 
 test "should invoke `view` helper by default", ->
   emblem =
@@ -1003,7 +983,7 @@ test "should not kick in explicit {{mustache}}", ->
 # TODO test overriding the default helper name (instead of always "view")
 
 
-suite "bang syntax defaults to `unbound` helper syntax"
+QUnit.module "bang syntax defaults to `unbound` helper syntax"
 
 Handlebars.registerHelper 'unbound', ->
   options = arguments[arguments.length - 1]
@@ -1029,7 +1009,7 @@ test "bang helper works with blocks", ->
   shouldCompileToString emblem, '<unbound class="hey you suck"><unbound class="foo">foo</unbound></unbound>'
 
 
-suite "question mark syntax defaults to `if` helper syntax"
+QUnit.module "question mark syntax defaults to `if` helper syntax"
 
 test "? helper defaults to `if` invocation", ->
   emblem =
@@ -1076,7 +1056,7 @@ test "compound", ->
   """
   shouldCompileTo emblem, { foo: true, bar: "borf", baz: "narsty" }, '<p>borf</p>'
 
-suite "conditionals"
+QUnit.module "conditionals"
 
 test "simple if statement", ->
   emblem =
@@ -1157,7 +1137,7 @@ test "else followed by newline doesn't gobble else content", ->
   """
   shouldCompileTo emblem, {}, '<p>not nothing</p>'
 
-suite "class shorthand and explicit declaration is coalesced"
+QUnit.module "class shorthand and explicit declaration is coalesced"
 
 test "when literal class is used", ->
   shouldCompileTo 'p.foo class="bar"', '<p class="foo bar"></p>'
@@ -1202,7 +1182,7 @@ bindAttrHelper = ->
 
 Handlebars.registerHelper 'bind-attr', bindAttrHelper
 
-suite "bind-attr behavior for unquoted attribute values"
+QUnit.module "bind-attr behavior for unquoted attribute values"
 
 test "basic", ->
   emblem = 'p class=foo'
@@ -1253,7 +1233,7 @@ test "exclamation modifier (ember)", ->
   ok result.match /helpers\.unbound.*foo/
 
 
-suite "in-tag explicit mustache"
+QUnit.module "in-tag explicit mustache"
 
 Handlebars.registerHelper 'inTagHelper', (p) ->
   return p
@@ -1297,7 +1277,7 @@ test "with nesting", ->
   shouldCompileTo emblem, {foo: "yar"}, 
     '<p bind-attr class to foo><span>Hello</span></p>'
 
-suite "actions"
+QUnit.module "actions"
 
 Handlebars.registerHelper 'action', ->
   options = arguments[arguments.length - 1]
@@ -1366,7 +1346,7 @@ test "manual nested", ->
   """
   shouldCompileToString emblem, '<a action submitComment target=view><p>Submit Comment</p></a>'
 
-suite "haml style"
+QUnit.module "haml style"
 
 test "basic", ->
   emblem =
@@ -1403,7 +1383,7 @@ test "funky chars", ->
     { foo: "Alex" }, 
     '<borf:narf></borf:narf><borf:narf>Hello, Alex.</borf:narf><alex>Alex</alex>'
 
-suite "line-based errors"
+QUnit.module "line-based errors"
 
 test "line number is provided for pegjs error", ->
   emblem =
@@ -1444,7 +1424,7 @@ test "no quote test", ->
   """
   shouldCompileToString emblem, '<button action p on=click>Frank</button>'
 
-suite "mustache DOM attribute shorthand"
+QUnit.module "mustache DOM attribute shorthand"
 
 test "tagName w/o space", ->
   emblem =
@@ -1532,7 +1512,7 @@ test "mixture of all`", ->
   ok result.match /funbags/
   ok result.match /yeah/
 
-suite "self-closing html tags"
+QUnit.module "self-closing html tags"
 
 test "br", ->
   emblem =
@@ -1558,7 +1538,7 @@ test "input", ->
   """
   shouldCompileToString emblem, '<input type="text" />'
 
-suite "ember."
+QUnit.module "ember."
 
 test "should precompile with Handlebars", ->
   emblem =
@@ -1568,7 +1548,7 @@ test "should precompile with Handlebars", ->
   result = Emblem.precompile(Handlebars, 'p Hello').toString()
   ok result.match '<p>Hello</p>'
 
-suite "old school handlebars"
+QUnit.module "old school handlebars"
 
 test "array", ->
   emblem =
@@ -1647,7 +1627,7 @@ test "block as #each", ->
 
 if supportsEachHelperDataKeywords
 
-  suite "each block helper keywords prefixed by @"
+  QUnit.module "each block helper keywords prefixed by @"
   
   test "#each with @index", ->
     emblem =
@@ -1700,7 +1680,7 @@ test "partial in block", ->
 ###
 
 
-#suite "helper hash"
+#QUnit.module "helper hash"
 
 #test "quoteless values get treated as bindings", ->
   #emblem =
@@ -1717,7 +1697,7 @@ test "partial in block", ->
   #"""
   #shouldCompileToString emblem, '<SomeView aBinding=b fooBinding=thing.gnar>SomeView</SomeView>'
 
-suite "inline block helper"
+QUnit.module "inline block helper"
 
 test "text only", ->
   emblem =
@@ -1744,7 +1724,7 @@ test "more complicated", ->
   """
   shouldCompileToString emblem, '<SomeView borf=yes>Hello, How are you? Sup?</SomeView>'
 
-suite "copy paste html"
+QUnit.module "copy paste html"
 
 test "indented", ->
   emblem =
@@ -1784,7 +1764,7 @@ test "bigass", ->
   expected = '<div class="content"><p>  We design and develop ambitious web and mobile applications, </p><p>  A more official portfolio page is on its way, but in the meantime, check out</p></div>'
   shouldCompileToString emblem, expected
 
-suite "`this` keyword"
+QUnit.module "`this` keyword"
 
 test "basic", ->
   emblem = '''
@@ -1796,7 +1776,7 @@ test "basic", ->
     { foo: [ "Alex", "Emily" ] },
     '<p>Alex</p>Alex<p>Emily</p>Emily'
 
-suite "colon separator"
+QUnit.module "colon separator"
 
 test "basic", ->
   emblem = 'each foo: p Hello, #{this}'
@@ -1860,7 +1840,7 @@ test "mixture of colon and indentation pt.2", ->
   result = precompileEmber emblem
   ok(!result.match "a quux")
 
-suite "base indent / predent"
+QUnit.module "base indent / predent"
 
 test "predent", ->
   emblem = "        \n"
@@ -1917,7 +1897,7 @@ test "w/ blank whitespaced lines", ->
   emblem += "    | Woot\n"
   shouldCompileToString emblem, '<p>Hello</p><p>Woot</p><span>yes</span><sally class="none">Woot</sally>'
 
-suite "EOL Whitespace"
+QUnit.module "EOL Whitespace"
 
 test "shouldn't be necessary to insert a space", ->
   emblem =
@@ -1929,7 +1909,7 @@ test "shouldn't be necessary to insert a space", ->
   shouldCompileToString emblem, "<p>Hello, How are you?</p><p>I'm fine, thank you.</p>"
 
 
-suite "misc."
+QUnit.module "misc."
 
 test "end with indent", ->
   expect(0)
@@ -2037,7 +2017,7 @@ test "windows newlines", ->
 
 if supportsSubexpressions
 
-  suite "subexpressions"
+  QUnit.module "subexpressions"
 
   Handlebars.registerHelper 'echo', (param) ->
     "ECHO #{param}"

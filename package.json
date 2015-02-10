@@ -23,6 +23,8 @@
     "uglify-js": "^1.2.6"
   },
   "devDependencies": {
+    "StringScanner": "~0.0.3",
+    "broccoli": "^0.13.3",
     "broccoli-6to5-transpiler": "^3.0.0",
     "broccoli-coffee": "^0.4.0",
     "broccoli-concat": "0.0.12",
@@ -35,15 +37,19 @@
     "broccoli-pegjs": "0.0.1",
     "broccoli-replace": "~0.1.6",
     "broccoli-stew": "^0.2.0",
+    "chalk": "^0.5.1",
     "ember-cli": "0.1.12",
-    "StringScanner": "~0.0.3"
+    "qunit": "^0.7.5",
+    "rsvp": "^3.0.16",
+    "testem": "^0.6.39"
   },
   "main": "lib/emblem.js",
   "bin": {
     "emblem": "bin/emblem"
   },
   "scripts": {
-    "test": "ember test",
+    "pretest": "ember build",
+    "test": "bin/run-tests.js",
     "start": "ember test --server",
     "build": "ember build"
   },

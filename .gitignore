@@ -14,4 +14,5 @@ lib/coffee-script/*.tmp
 tmp
 
 sauce_connect.log
+spec/qunit_spec.js
 

@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/machty/emblem.js.png)](https://travis-ci.org/machty/emblem.js)
+[![Build Status](https://travis-ci.org/machty/emblem.js.svg?branch=master)](https://travis-ci.org/machty/emblem.js)
 
 ## LOOKING FOR NEW MAINTAINER OF EMBLEM.JS
 

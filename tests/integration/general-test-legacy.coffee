@@ -67,53 +67,6 @@ Handlebars.registerHelper 'echo', (param) ->
 
 THE FOLLOWING TESTS HAVE NOT BEEN PORTED
 
-QUnit.module '#{} syntax'
-  
-test 'acts like {{}}', ->
-  emblem =
-  '''
-  span Yo #{foo}, I herd.
-  '''
-  shouldCompileTo emblem,
-    { foo: '<span>123</span>' },
-    "<span>Yo &lt;span&gt;123&lt;/span&gt;, I herd.</span>"
- 
-test 'can start inline content', ->
-  emblem =
-  '''
-  span #{foo}, I herd.
-  '''
-  shouldCompileTo emblem, { foo: "dawg" }, "<span>dawg, I herd.</span>"
- 
-test 'can end inline content', ->
-  emblem =
-  '''
-  span I herd #{foo}
-  '''
-  shouldCompileTo emblem, { foo: "dawg" }, "<span>I herd dawg</span>"
-
-test "doesn't screw up parsing when # used in text nodes", ->
-  emblem =
-  '''
-  span OMG #YOLO
-  '''
-  shouldCompileTo emblem, "<span>OMG #YOLO</span>"
-
-test "# can be only thing on line", ->
-  emblem =
-  '''
-  span #
-  '''
-  shouldCompileTo emblem, "<span>#</span>"
-
-// TODO: this
-// test "can be escaped", ->
-//   emblem =
-//   '''
-//   span #\\{yes}
-//   '''
-//   shouldCompileTo emblem, '<span>#{yes}</span>'
-
 runTextLineSuite = (ch) ->
 
   sct = (emblem, obj, expected) ->
@@ -300,23 +253,6 @@ runTextLineSuite = (ch) ->
 runTextLineSuite '|'
 runTextLineSuite '`'
 runTextLineSuite "'"
-
-QUnit.module "text line starting with angle bracket"
-
-test "can start with angle bracket html", ->
-  emblem =
-  """
-  <span>Hello</span>
-  """
-  shouldCompileTo emblem, "<span>Hello</span>"
-
-test "can start with angle bracket html and go to multiple lines", ->
-  emblem =
-  """
-  <span>Hello dude, 
-        what's up?</span>
-  """
-  shouldCompileTo emblem, "<span>Hello dude, what's up?</span>"
 
 QUnit.module "preprocessor"
 

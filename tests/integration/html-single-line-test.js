@@ -18,3 +18,8 @@ QUnit.test("with more complex text", function(assert){
 QUnit.test("with trailing space", function(assert){
   assert.compilesTo("p Hello   ", "<p>Hello   </p>");
 });
+
+QUnit.test("can start with angle bracket html", function(assert){
+  var emblem = "<span>Hello</span>";
+  assert.compilesTo(emblem, "<span>Hello</span>");
+});

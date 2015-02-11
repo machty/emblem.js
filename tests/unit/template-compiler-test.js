@@ -35,3 +35,55 @@ QUnit.test("compiles element node AST", function(assert){
 
   assert.equal(result, '<div class="red"></div>', 'content is output');
 });
+
+QUnit.test("compiles block node AST", function(assert){
+  var ast = {
+    type: 'program',
+    childNodes: [
+      { type: 'block',
+        content: 'each person in people',
+        childNodes: [
+          { type: 'element',
+            tagName: 'div' }
+        ] }
+    ]
+  };
+
+  var result = compile(ast);
+
+  assert.equal(result, '{{#each person in people}}<div></div>{{/each}}', 'content is output');
+});
+
+QUnit.test("compiles mustache node AST", function(assert){
+  var ast = {
+    type: 'program',
+    childNodes: [
+      { type: 'mustache',
+        content: 'name' }
+    ]
+  };
+
+  var result = compile(ast);
+
+  assert.equal(result, '{{name}}', 'content is output');
+});
+
+QUnit.test("compiles mustaches in attr content AST", function(assert){
+  var ast = {
+    type: 'program',
+    childNodes: [
+      { type: 'element',
+        tagName: 'div',
+        attrStaches: [
+          { type: 'mustache',
+            content: 'bind-attr foo=baz' }
+          { type: 'mustache',
+            content: 'action "whammo"' }
+        ] }
+    ]
+  };
+
+  var result = compile(ast);
+
+  assert.equal(result, '<div {{bind-attr foo=baz}} {{action "whammo"}}></div>', 'content is output');
+});

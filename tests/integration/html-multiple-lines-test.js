@@ -73,7 +73,7 @@ QUnit.test("indentation may vary between parent/child, must be consistent within
 
 
 QUnit.test("w/ mustaches", function(assert){
-  var emblem = q(
+  var emblem = w(
     "div",
     "  span Hello,",
     "       {{foo}} are you?",

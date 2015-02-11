@@ -7,6 +7,7 @@ var peg = require('broccoli-pegjs');
 var es6to5 = require('broccoli-6to5-transpiler');
 var broccoliStew = require('broccoli-stew');
 var broccoliCoffee = require('broccoli-coffee');
+var injectLivereload = require('broccoli-inject-livereload');
 
 var outputDir = '/';
 
@@ -155,5 +156,6 @@ var srcTree  = mergeTrees(
 );
 var distTree = buildDistTree(srcTree);
 var testTree = buildTestTree();
+testTree = injectLivereload(testTree);
 
 module.exports = mergeTrees( [distTree, testTree] );

@@ -32,6 +32,7 @@
     "broccoli-esnext": "^0.5.0",
     "broccoli-export-tree": "^0.3.2",
     "broccoli-funnel": "^0.1.6",
+    "broccoli-inject-livereload": "^0.1.1",
     "broccoli-jshint": "~0.5.1",
     "broccoli-merge-trees": "^0.2.1",
     "broccoli-pegjs": "0.0.1",

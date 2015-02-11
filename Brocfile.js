@@ -38,6 +38,7 @@ function buildPegTree(){
   pegTree = peg(pegTree, {
     wrapper: function (src, parser) {
       return ['/*jshint newcap: false, laxbreak: true */',
+              "import { generateBuilder } from './ast-builder';",
               'var Parser = ' + parser + ';',
               'var parse = Parser.parse, ParserSyntaxError = Parser.SyntaxError;',
               'export {ParserSyntaxError, parse};',

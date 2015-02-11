@@ -1,4 +1,5 @@
-import { compile } from '../../emblem/template-compiler'
+/* global QUnit*/
+import { compile } from '../../emblem/template-compiler';
 
 QUnit.module("template compiler");
 
@@ -76,7 +77,7 @@ QUnit.test("compiles mustaches in attr content AST", function(assert){
         tagName: 'div',
         attrStaches: [
           { type: 'mustache',
-            content: 'bind-attr foo=baz' }
+            content: 'bind-attr foo=baz' },
           { type: 'mustache',
             content: 'action "whammo"' }
         ] }
@@ -86,4 +87,31 @@ QUnit.test("compiles mustaches in attr content AST", function(assert){
   var result = compile(ast);
 
   assert.equal(result, '<div {{bind-attr foo=baz}} {{action "whammo"}}></div>', 'content is output');
+});
+
+QUnit.test("compiles block with inverse AST", function(assert){
+  var ast = {
+    type: 'program',
+    childNodes: [
+      { type: 'block',
+        content: 'with foo as bar',
+        childNodes: [
+          {
+            type: 'text',
+            content: 'hello there'
+          }
+        ],
+        inverseChildNodes: [
+          {
+            type: 'text',
+            content: 'not hello there'
+          }
+        ]
+      }
+    ]
+  };
+
+  var result = compile(ast);
+
+  assert.equal(result, '{{#with foo as bar}}hello there{{else}}not hello there{{/with}}');
 });

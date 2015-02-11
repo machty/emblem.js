@@ -1,23 +1,6 @@
 `import Emblem from '../emblem'`
-`import Handlebars from './support/handlebars'`
 
-# TODO: remove this craaaaaaap
-# Qunit testing
-_equal = equal
-equals = equal = (a, b, msg) ->
-  # Allow exec with missing message params
-  _equal(a, b, msg || '')
-
-unless CompilerContext?
-  # Note that this doesn't have the same context separation as the rspec test.
-  # Both should be run for full acceptance of the two libary modes.
-  CompilerContext =
-    compile: (template, options) ->
-      Emblem.compile(Handlebars, template, options)
-
-supportsEachHelperDataKeywords = Handlebars.VERSION.slice(0, 3) >= 1.2
-supportsSubexpressions = Handlebars.VERSION.slice(0, 3) >= 1.3
-
+###
 precompileEmber = (emblem) ->
   Emblem.precompile(Handlebars, emblem).toString()
 
@@ -81,122 +64,8 @@ shouldThrow = (fn, exMessage) ->
 Handlebars.registerHelper 'echo', (param) ->
   "ECHO #{param}"
 
-QUnit.module "html one-liners"
 
-test "element only", ->
-  shouldCompileTo "p", "<p></p>"
-
-test "with text", ->
-  shouldCompileTo "p Hello", "<p>Hello</p>"
-
-test "with more complex text", ->
-  shouldCompileTo "p Hello, how's it going with you today?", "<p>Hello, how's it going with you today?</p>"
-
-test "with trailing space", ->
-  shouldCompileTo "p Hello   ", "<p>Hello   </p>"
-
-QUnit.module "html multi-lines"
-
-test "two lines", ->
-  emblem =
-  """
-  p This is
-    pretty cool.
-  """
-  shouldCompileTo emblem, "<p>This is pretty cool.</p>"
-
-test "three lines", ->
-  emblem =
-  """
-  p This is
-    pretty damn
-    cool.
-  """
-  shouldCompileTo emblem, "<p>This is pretty damn cool.</p>"
-
-test "three lines w/ embedded html", ->
-  emblem =
-  """
-  p This is
-    pretty <span>damn</span>
-    cool.
-  """
-  shouldCompileTo emblem, "<p>This is pretty <span>damn</span> cool.</p>"
-
-test "indentation doesn't need to match starting inline content's", ->
-  emblem =
-  """
-  span Hello,
-    How are you?
-  """
-  shouldCompileTo emblem, "<span>Hello, How are you?</span>"
-
-test "indentation may vary between parent/child, must be consistent within inline-block", ->
-  emblem =
-  """
-  div
-        span Hello,
-             How are you?
-             Excellent.
-        p asd
-  """
-  shouldCompileTo emblem, "<div><span>Hello, How are you? Excellent.</span><p>asd</p></div>"
-
-  emblem =
-  """
-  div
-    span Hello,
-         How are you?
-       Excellent.
-  """
-  shouldThrow -> CompilerContext.compile emblem
-
-test "indentation may vary between parent/child, must be consistent within inline-block pt 2", ->
-  emblem =
-  """
-  div
-    span Hello,
-         How are you?
-         Excellent.
-  """
-  shouldCompileTo emblem, "<div><span>Hello, How are you? Excellent.</span></div>"
-
-
-test "w/ mustaches", ->
-  emblem =
-  """
-  div
-    span Hello,
-         {{foo}} are you?
-         Excellent.
-  """
-  shouldCompileTo emblem, { foo: "YEAH" }, "<div><span>Hello, YEAH are you? Excellent.</span></div>"
-
-test "w/ block mustaches", ->
-  emblem =
-  '''
-  p Hello, #{ sally | Hello},
-    and {{sally: span Hello}}!
-  '''
-
-  shouldCompileTo emblem,
-                  '<p>Hello, <sally class="none">Hello</sally>, and <sally class="none"><span>Hello</span></sally>!</p>'
-
-  emblem =
-  '''
-  p Hello, #{ sally: span: a Hello}!
-  '''
-  shouldCompileTo emblem,
-                  '<p>Hello, <sally class="none"><span><a>Hello</a></span></sally>!</p>'
-
-test "with followup", ->
-  emblem =
-  """
-  p This is
-    pretty cool.
-  p Hello.
-  """
-  shouldCompileTo emblem, "<p>This is pretty cool.</p><p>Hello.</p>"
+THE FOLLOWING TESTS HAVE NOT BEEN PORTED
 
 QUnit.module '#{} syntax'
   
@@ -237,14 +106,13 @@ test "# can be only thing on line", ->
   '''
   shouldCompileTo emblem, "<span>#</span>"
 
-### TODO: this
-test "can be escaped", ->
-  emblem =
-  '''
-  span #\\{yes}
-  '''
-  shouldCompileTo emblem, '<span>#{yes}</span>'
-###
+// TODO: this
+// test "can be escaped", ->
+//   emblem =
+//   '''
+//   span #\\{yes}
+//   '''
+//   shouldCompileTo emblem, '<span>#{yes}</span>'
 
 runTextLineSuite = (ch) ->
 
@@ -1664,20 +1532,18 @@ if supportsEachHelperDataKeywords
     '''
     shouldCompileTo emblem, { thangs: {'@key': 123, 'works!':456} }, '<p>First item</p><p>works!: 456</p>'
 
-###
-test "partial in block", ->
-  emblem =
-  """
-  ul = people
-    > link
-  """
-  data = 
-    people: [
-      { "name": "Alan", "id": 1 }
-      { "name": "Yehuda", "id": 2 }
-    ]
-  shouldCompileToString emblem, data, '<ul><a href="/people/1">Alan</a><a href="/people/2">Yehuda</a><ul>'
-###
+// test "partial in block", ->
+//   emblem =
+//   """
+//   ul = people
+//     > link
+//   """
+//   data = 
+//     people: [
+//       { "name": "Alan", "id": 1 }
+//       { "name": "Yehuda", "id": 2 }
+//     ]
+//   shouldCompileToString emblem, data, '<ul><a href="/people/1">Alan</a><a href="/people/2">Yehuda</a><ul>'
 
 
 #QUnit.module "helper hash"
@@ -2073,3 +1939,4 @@ if supportsSubexpressions
 
     emblem = '= echofun true (hello how="are" you=false) 1 not=true fun=(equal "ECHO hello" (echo (hello))) win="yes"'
     shouldCompileTo emblem, 'FUN = true'
+###

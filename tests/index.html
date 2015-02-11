@@ -18,6 +18,7 @@
   <script src="../emblem.amd.js"></script>
   <script>
     // FIXME ember-cli should do this
+    require('support/integration-assertions');
     for (moduleName in requirejs.entries) {
       if (moduleName.match(/[-_]test$/)) {
         require(moduleName);

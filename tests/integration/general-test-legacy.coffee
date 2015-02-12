@@ -254,46 +254,6 @@ runTextLineSuite '|'
 runTextLineSuite '`'
 runTextLineSuite "'"
 
-QUnit.module "indentation"
-
-# This test used to make sure the emblem code threw, but now we
-# support multi-line syntax.
-test "it doesn't throw when indenting after a line with inline content", ->
-  emblem =
-  """
-  p Hello
-    p invalid
-  """
-  shouldCompileTo emblem, "<p>Hello p invalid</p>"
-
-test "it throws on half dedent", ->
-  emblem =
-  """
-  p
-      span This is ok
-    span This aint
-  """
-  shouldThrow -> CompilerContext.compile emblem
-
-test "new indentation levels don't have to match parents'", ->
-  emblem =
-  """
-  p 
-    span
-       div
-        span yes
-  """
-  shouldCompileTo emblem, "<p><span><div><span>yes</span></div></span></p>"
-
-QUnit.module "whitespace fussiness"
-
-test "spaces after html elements", ->
-  shouldCompileTo "p \n  span asd", "<p><span>asd</span></p>"
-  shouldCompileTo "p \nspan  \n\ndiv\nspan", "<p></p><span></span><div></div><span></span>"
-
-test "spaces after mustaches", ->
-  shouldCompileTo "each foo    \n  p \n  span", { foo: [1,2] }, "<p></p><span></span><p></p><span></span>"
-
 QUnit.module "attribute shorthand"
 
 test "id shorthand", ->

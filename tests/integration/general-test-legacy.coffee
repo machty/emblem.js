@@ -254,66 +254,6 @@ runTextLineSuite '|'
 runTextLineSuite '`'
 runTextLineSuite "'"
 
-QUnit.module "attribute shorthand"
-
-test "id shorthand", ->
-  shouldCompileTo "#woot", '<div id="woot"></div>'
-  shouldCompileTo "span#woot", '<span id="woot"></span>'
-
-test "class shorthand", ->
-  shouldCompileTo ".woot", '<div class="woot"></div>'
-  shouldCompileTo "span.woot", '<span class="woot"></span>'
-  shouldCompileTo "span.woot.loot", '<span class="woot loot"></span>'
-
-test "class can come first", ->
-  shouldCompileTo ".woot#hello", '<div id="hello" class="woot"></div>'
-  shouldCompileTo "span.woot#hello", '<span id="hello" class="woot"></span>'
-  shouldCompileTo "span.woot.loot#hello", '<span id="hello" class="woot loot"></span>'
-  shouldCompileTo "span.woot.loot#hello.boot", '<span id="hello" class="woot loot boot"></span>'
-
-QUnit.module "full attributes - tags with content"
-
-test "class only", ->
-  shouldCompileTo 'p class="yes" Blork', '<p class="yes">Blork</p>'
-test "id only", ->
-  shouldCompileTo 'p id="yes" Hyeah', '<p id="yes">Hyeah</p>'
-test "class and id", ->
-  shouldCompileTo 'p id="yes" class="no" Blork', '<p id="yes" class="no">Blork</p>'
-test "class and id and embedded html one-liner", ->
-  shouldCompileTo 'p id="yes" class="no" One <b>asd</b>!', '<p id="yes" class="no">One <b>asd</b>!</p>'
-
-test "bracketed attributes", ->
-  emblem =
-  """
-  p [
-    id="yes"
-    class="no" ]
-    | Bracketed Attributes FTW!
-  """
-  shouldCompileTo emblem, '<p id="yes" class="no">Bracketed Attributes FTW!</p>'
-test "bracketed text", ->
-  emblem =
-  """
-  p [ Bracketed text is cool ]
-  """
-  shouldCompileTo emblem, '<p>[ Bracketed text is cool ]</p>'
-
-test "bracketed text indented", ->
-  emblem =
-  """
-  p
-    | [ Bracketed text is cool ]
-  """
-  shouldCompileTo emblem, '<p>[ Bracketed text is cool ]</p>'
-
-test "nesting", ->
-  emblem =
-  """
-  p class="hello" data-foo="gnarly"
-    span Yes
-  """
-  shouldCompileTo emblem, '<p class="hello" data-foo="gnarly"><span>Yes</span></p>'
-
 QUnit.module "full attributes - mixed quotes"
 
 test "single empty", ->

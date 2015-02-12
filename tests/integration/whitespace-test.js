@@ -1,3 +1,4 @@
+/*global QUnit*/
 QUnit.module("whitespace fussiness");
 
 test("spaces after html elements", function(assert){

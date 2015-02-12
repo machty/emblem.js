@@ -2,6 +2,7 @@
 import { parse } from '../../emblem/parser';
 import { processSync } from '../../emblem/preprocessor';
 import { generateBuilder } from '../../emblem/ast-builder';
+import { w } from '../support/utils';
 
 QUnit.module("Unit - parse");
 
@@ -62,8 +63,8 @@ astTest('simple text', '| abc def ghi', function(assert, ast){
 });
 
 astTest('multiline text',
-        ['| abc def ghi',
-         '  another line'].join('\n'), function(assert, ast){
+        w('| abc def ghi',
+          '  another line'), function(assert, ast){
   assert.deepEqual(ast, program([text('abc def ghi\nanother line')]));
 });
 
@@ -109,8 +110,8 @@ astTest('special element', '%blink', function(assert, ast){
 });
 
 astTest('simple nested elements',
-        ['ul',
-         '  li'].join('\n'), function(assert, ast){
+        w('ul',
+          '  li'), function(assert, ast){
   assert.deepEqual(
     ast,
     program([ element('ul', [element('li')]) ])
@@ -118,9 +119,9 @@ astTest('simple nested elements',
 });
 
 astTest('simple nested elements with content',
-        ['ul',
-         '  li hello',
-         '  li goodbye'].join('\n'), function(assert, ast){
+        w('ul',
+          '  li hello',
+          '  li goodbye'), function(assert, ast){
   assert.deepEqual(
     ast,
     program([

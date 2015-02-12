@@ -168,6 +168,7 @@ astTest('simple handlebars expression', 'h1 = name', function(assert, ast){
     program([
       element('h1', [{
         type: 'mustache',
+        escaped: true,
         content: 'name'
       }])
     ])

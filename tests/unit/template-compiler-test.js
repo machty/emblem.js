@@ -60,6 +60,7 @@ QUnit.test("compiles mustache node AST", function(assert){
     type: 'program',
     childNodes: [
       { type: 'mustache',
+        escaped: true,
         content: 'name' }
     ]
   };
@@ -67,6 +68,21 @@ QUnit.test("compiles mustache node AST", function(assert){
   var result = compile(ast);
 
   assert.equal(result, '{{name}}', 'content is output');
+});
+
+QUnit.test("compiles unescaped mustache node AST", function(assert){
+  var ast = {
+    type: 'program',
+    childNodes: [
+      { type: 'mustache',
+        escaped: false,
+        content: 'name' }
+    ]
+  };
+
+  var result = compile(ast);
+
+  assert.equal(result, '{{{name}}}', 'content is output');
 });
 
 QUnit.test("compiles mustaches in attr content AST", function(assert){
@@ -77,8 +93,10 @@ QUnit.test("compiles mustaches in attr content AST", function(assert){
         tagName: 'div',
         attrStaches: [
           { type: 'mustache',
+            escaped: true,
             content: 'bind-attr foo=baz' },
           { type: 'mustache',
+            escaped: true,
             content: 'action "whammo"' }
         ] }
     ]

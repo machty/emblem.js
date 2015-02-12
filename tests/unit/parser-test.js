@@ -15,6 +15,7 @@ function truncate(text, len){
 
 function astTest(name, emblem, callback){
   QUnit.test(name + ' "' + truncate(emblem) + '"', function(assert){
+    debugger;
     var builder = generateBuilder();
     parse( processSync(emblem), {builder:builder} );
     var ast = builder.toAST();
@@ -26,7 +27,7 @@ function astTest(name, emblem, callback){
 function program(childNodes){
   return {
     type: 'program',
-    childNodes: childNodes
+    childNodes: childNodes || []
   };
 }
 
@@ -142,6 +143,34 @@ astTest('html attributes', 'button.close data-dismiss="modal" x', function(asser
               [text('x')],
               [attribute('data-dismiss', 'modal'),
                attribute('class', 'close')])
+    ])
+  );
+});
+
+astTest('comments are stripped', '/ Some comment', function(assert, ast){
+  assert.deepEqual(
+    ast,
+    program()
+  );
+});
+
+astTest('multiline comments are stripped',
+        w('/ Some multiline',
+          '  comment'), function(assert, ast){
+  assert.deepEqual(
+    ast,
+    program()
+  );
+});
+
+astTest('simple handlebars expression', 'h1 = name', function(assert, ast){
+  assert.deepEqual(
+    ast,
+    program([
+      element('h1', [{
+        type: 'mustache',
+        content: 'name'
+      }])
     ])
   );
 });

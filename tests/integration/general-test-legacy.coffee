@@ -254,28 +254,6 @@ runTextLineSuite '|'
 runTextLineSuite '`'
 runTextLineSuite "'"
 
-QUnit.module "preprocessor"
-
-test "it strips out preceding whitespace", ->
-  emblem =
-  """
-
-  p Hello
-  """
-  shouldCompileTo emblem, "<p>Hello</p>"
-
-test "it handles preceding indentation", ->
-  emblem = "  p Woot\n  p Ha"
-  shouldCompileTo emblem, "<p>Woot</p><p>Ha</p>"
-
-test "it handles preceding indentation and newlines", ->
-  emblem = "\n  p Woot\n  p Ha"
-  shouldCompileTo emblem, "<p>Woot</p><p>Ha</p>"
-
-test "it handles preceding indentation and newlines pt 2", ->
-  emblem = "  \n  p Woot\n  p Ha"
-  shouldCompileTo emblem, "<p>Woot</p><p>Ha</p>"
-
 QUnit.module "comments"
 
 test "it strips out single line '/' comments", ->

@@ -84,6 +84,7 @@ QUnit.test("w/ mustaches", function(assert){
     "<div><span>Hello, {{foo}} are you? Excellent.</span></div>");
 });
 
+// This test seems to test nonsense syntax
 QUnit.test("w/ block mustaches", function(assert){
   var emblem = w(
     "p Hello, #{ sally | Hello},",
@@ -91,11 +92,11 @@ QUnit.test("w/ block mustaches", function(assert){
   );
 
   assert.compilesTo(emblem,
-    '<p>Hello, <sally class="none">Hello</sally>, and <sally class="none"><span>Hello</span></sally>!</p>');
+    '<p>Hello, {{sally | Hello}}, and {{sally: span Hello}}!</p>');
 
   emblem = "p Hello, #{ sally: span: a Hello}!";
   assert.compilesTo(emblem,
-    '<p>Hello, <sally class="none"><span><a>Hello</a></span></sally>!</p>');
+    '<p>Hello, {{sally: span: a Hello}}!</p>');
 });
 
 QUnit.test("with followup", function(assert){

@@ -15,7 +15,6 @@ function truncate(text, len){
 function astTest(name, emblem, callback){
   QUnit.test(name + ' "' + truncate(emblem) + '"', function(assert){
     var builder = generateBuilder();
-    debugger;
     parse( processSync(emblem), {builder:builder} );
     var ast = builder.toAST();
 

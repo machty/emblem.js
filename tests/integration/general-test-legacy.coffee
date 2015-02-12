@@ -375,39 +375,6 @@ test "static", ->
   #shouldCompileTo 'p borf=foo Naww', { foo: undefined }, '<p>Naww</p>'
   #shouldCompileTo 'p borf=foo Naww', { foo: 0 },     '<p borf="0">Naww</p>'
   
-QUnit.module "html nested"
-
-test "basic", ->
-  emblem =
-  """
-  p
-    span Hello
-    strong Hi
-  div
-    p Hooray
-  """
-  shouldCompileTo emblem, '<p><span>Hello</span><strong>Hi</strong></p><div><p>Hooray</p></div>'
-
-test "empty nest", ->
-  emblem =
-  """
-  p
-    span
-      strong
-        i
-  """
-  shouldCompileTo emblem, '<p><span><strong><i></i></strong></span></p>'
-
-test "empty nest w/ attribute shorthand", ->
-  emblem =
-  """
-  p.woo
-    span#yes
-      strong.no.yes
-        i
-  """
-  shouldCompileTo emblem, '<p class="woo"><span id="yes"><strong class="no yes"><i></i></strong></span></p>'
-
 
 QUnit.module "simple mustache"
 

@@ -133,3 +133,23 @@ QUnit.test("compiles block with inverse AST", function(assert){
 
   assert.equal(result, '{{#with foo as bar}}hello there{{else}}not hello there{{/with}}');
 });
+
+QUnit.test("compiles boolean attribute", function(assert){
+  var ast = {
+    type: 'program',
+    childNodes: [
+      { type: 'element',
+        tagName: 'input',
+        attrStaches: [{
+          type: 'attribute',
+          name: 'disabled'
+          // NO value for content for a true boolean attribute
+        }]
+      }
+    ]
+  };
+
+  var result = compile(ast);
+
+  assert.equal(result, '<input disabled></input>');
+});

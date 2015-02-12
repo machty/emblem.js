@@ -254,68 +254,6 @@ runTextLineSuite '|'
 runTextLineSuite '`'
 runTextLineSuite "'"
 
-QUnit.module "full attributes - mixed quotes"
-
-test "single empty", ->
-  shouldCompileTo "p class=''", '<p class=""></p>'
-test "single full", ->
-  shouldCompileTo "p class='woot yeah'", '<p class="woot yeah"></p>'
-test "mixed", ->
-  shouldCompileTo "p class='woot \"oof\" yeah'", '<p class="woot "oof" yeah"></p>'
-
-QUnit.module "full attributes - tags without content"
-
-test "empty", ->
-  shouldCompileTo 'p class=""', '<p class=""></p>'
-test "class only", ->
-  shouldCompileTo 'p class="yes"', '<p class="yes"></p>'
-test "id only", ->
-  shouldCompileTo 'p id="yes"', '<p id="yes"></p>'
-test "class and id", ->
-  shouldCompileTo 'p id="yes" class="no"', '<p id="yes" class="no"></p>'
-
-QUnit.module "full attributes w/ mustaches"
-
-test "with mustache", ->
-  shouldCompileTo 'p class="foo {{yes}}"', {yes: "ALEX"}, '<p class="foo ALEX"></p>'
-  shouldCompileTo 'p class="foo {{yes}}" Hello', {yes: "ALEX"}, '<p class="foo ALEX">Hello</p>'
-  emblem =
-  """
-  p class="foo {{yes}}"
-    | Hello
-  """
-  shouldCompileTo emblem, {yes: "ALEX"}, '<p class="foo ALEX">Hello</p>'
-
-test "with mustache calling helper", ->
-  shouldCompileTo 'p class="foo {{{echo "YES"}}}"', '<p class="foo ECHO YES"></p>'
-  shouldCompileTo 'p class="foo #{echo "NO"} and {{{echo "YES"}}}" Hello', '<p class="foo ECHO NO and ECHO YES">Hello</p>'
-  emblem =
-  """
-  p class="foo {{echo "BORF"}}"
-    | Hello
-  """
-  shouldCompileTo emblem, '<p class="foo ECHO BORF">Hello</p>'
-
-QUnit.module "boolean attributes"
-
-test "static", ->
-  shouldCompileTo 'p borf=true',  '<p borf></p>'
-  shouldCompileTo 'p borf=true Woot', '<p borf>Woot</p>'
-  shouldCompileTo 'p borf=false', '<p></p>'
-  shouldCompileTo 'p borf=false Nork', '<p>Nork</p>'
-  shouldCompileTo 'option selected=true Thingeroo', '<option selected>Thingeroo</option>'
-
-#test "dynamic", ->
-  ## TODO
-  #shouldCompileTo 'p borf=foo',      { foo: true },  '<p borf></p>'
-  #shouldCompileTo 'p borf=foo',      { foo: false }, '<p></p>'
-  #shouldCompileTo 'p borf=foo Yeah', { foo: true },  '<p borf>Yeah</p>'
-  #shouldCompileTo 'p borf=foo Naww', { foo: false }, '<p>Naww</p>'
-  #shouldCompileTo 'p borf=foo Naww', { foo: null },  '<p>Naww</p>'
-  #shouldCompileTo 'p borf=foo Naww', { foo: undefined }, '<p>Naww</p>'
-  #shouldCompileTo 'p borf=foo Naww', { foo: 0 },     '<p borf="0">Naww</p>'
-  
-
 QUnit.module "capitalized line-starter"
 
 test "should invoke `view` helper by default", ->

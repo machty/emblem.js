@@ -257,53 +257,6 @@ runTextLineSuite "'"
 # TODO test overriding the default helper name (instead of always "view")
 
 
-QUnit.module "question mark syntax defaults to `if` helper syntax"
-
-test "? helper defaults to `if` invocation", ->
-  emblem =
-  """
-  foo?
-    p Yeah
-  """
-  shouldCompileTo emblem, { foo: true }, '<p>Yeah</p>'
-
-
-test "else works", ->
-  emblem =
-  """
-  foo?
-    p Yeah
-  else
-    p No
-  """
-  shouldCompileTo emblem, { foo: false }, '<p>No</p>'
-
-
-test "compound", ->
-  emblem =
-  """
-  p = foo? 
-    | Hooray
-  else
-    | No
-  p = bar? 
-    | Hooray
-  else
-    | No
-  """
-  shouldCompileTo emblem, { foo: true, bar: false }, '<p>Hooray</p><p>No</p>'
-
-
-test "compound", ->
-  emblem =
-  """
-  p = foo? 
-    bar
-  else
-    baz
-  """
-  shouldCompileTo emblem, { foo: true, bar: "borf", baz: "narsty" }, '<p>borf</p>'
-
 QUnit.module "class shorthand and explicit declaration is coalesced"
 
 test "when literal class is used", ->

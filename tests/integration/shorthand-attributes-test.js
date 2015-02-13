@@ -1,7 +1,4 @@
 /*global QUnit*/
-var bindAttrHelper,
-  __hasProp = {}.hasOwnProperty;
-
 QUnit.module("class shorthand and explicit declaration is coalesced");
 
 test("when literal class is used", function(assert) {
@@ -13,41 +10,32 @@ test("when ember expression is used with variable", function(assert) {
                            '<p {{bind-attr class=":foo bar"}}></p>');
 });
 
-/*
 test("when ember expression is used with variable in braces", function(assert) {
-  var result;
-  result = shouldEmberPrecompileToHelper('p.foo class={ bar }');
-  return ok(-1 !== result.indexOf('\'class\': (":foo bar")'));
+  assert.compilesTo('p.foo class={ bar }', '<p {{bind-attr class=":foo bar"}}></p>');
 });
 
 test("when ember expression is used with constant in braces", function(assert) {
-  var result;
-  result = shouldEmberPrecompileToHelper('p.foo class={ :bar }');
-  return ok(-1 !== result.indexOf('\'class\': (":foo :bar")'));
+  assert.compilesTo('p.foo class={ :bar }', '<p {{bind-attr class=":foo :bar"}}></p>');
 });
 
 test("when ember expression is used with constant and variable in braces", function(assert) {
-  var result;
-  result = shouldEmberPrecompileToHelper('p.foo class={ :bar bar }');
-  return ok(-1 !== result.indexOf('\'class\': (":foo :bar bar")'));
+  assert.compilesTo('p.foo class={ :bar bar }', '<p {{bind-attr class=":foo :bar bar"}}></p>');
 });
 
+/*
+ * FIXME using an explicit bind-attr inside isn't yet supported
 test("when ember expression is used with bind-attr", function(assert) {
-  var result;
-  result = shouldEmberPrecompileToHelper('p.foo{ bind-attr class="bar" }');
-  return ok(-1 !== result.indexOf('\'class\': (":foo bar")'));
+  assert.compilesTo('p.foo{ bind-attr class="bar" }', '<p {{bind-attr class=":foo :bar"}}></p>');
 });
+
 
 test("when ember expression is used with bind-attr and multiple attrs", function(assert) {
-  var result;
-  result = shouldEmberPrecompileToHelper('p.foo{ bind-attr something=bind class="bar" }');
-  return ok(-1 !== result.indexOf('\'class\': (":foo bar")'));
+  assert.compilesTo('p.foo{ bind-attr something=bind class="bar" }',
+                    '<p {{bind-attr class=":foo :bar}} {{bind-attr something=bind}}></p>');
 });
 
 test("only with bind-attr helper", function(assert) {
-  var result;
-  result = shouldEmberPrecompileToHelper('p.foo{ someHelper class="bar" }', 'someHelper');
-  ok(-1 !== result.indexOf('\'class\': ("bar")'));
-  return ok(-1 !== result.indexOf('class=\\"foo\\"'));
+  assert.compilesTo('p.foo{ someHelper class="bar" }',
+                    '<p {{bind-attr class=":foo :bar"}} {{someHelper}}></p>');
 });
 */

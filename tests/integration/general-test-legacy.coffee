@@ -596,46 +596,6 @@ if supportsEachHelperDataKeywords
   #"""
   #shouldCompileToString emblem, '<SomeView aBinding=b fooBinding=thing.gnar>SomeView</SomeView>'
 
-QUnit.module "copy paste html"
-
-test "indented", ->
-  emblem =
-  """
-  <p>
-    <span>This be some text</span>
-    <title>Basic HTML Sample Page</title>
-  </p>
-  """
-  shouldCompileToString emblem, '<p><span>This be some text</span><title>Basic HTML Sample Page</title></p>'
-
-test "flatlina", ->
-  emblem =
-  """
-  <p>
-  <span>This be some text</span>
-  <title>Basic HTML Sample Page</title>
-  </p>
-  """
-  shouldCompileToString emblem, '<p><span>This be some text</span><title>Basic HTML Sample Page</title></p>'
-
-test "bigass", ->
-  expect(0)
-  return "PENDING"
-  emblem =
-  """
-  <div class="content">
-    <p>
-      We design and develop ambitious web and mobile applications, 
-    </p>
-    <p>
-      A more official portfolio page is on its way, but in the meantime, 
-      check out
-    </p>
-  </div>
-  """
-  expected = '<div class="content"><p>  We design and develop ambitious web and mobile applications, </p><p>  A more official portfolio page is on its way, but in the meantime, check out</p></div>'
-  shouldCompileToString emblem, expected
-
 QUnit.module "`this` keyword"
 
 test "basic", ->

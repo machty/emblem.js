@@ -72,3 +72,27 @@ QUnit.test("it handles preceding indentation and newlines pt 2", function(assert
   assert.compilesTo(emblem, "<p>Woot</p><p>Ha</p>");
 });
 
+
+QUnit.module("text: copy paste html");
+
+test("indented", function(assert) {
+  var emblem;
+  emblem = "<p>\n  <span>This be some text</span>\n  <title>Basic HTML Sample Page</title>\n</p>";
+  assert.compilesTo(emblem, '<p>\n<span>This be some text</span>\n<title>Basic HTML Sample Page</title></p>');
+});
+
+test("flatlina", function(assert) {
+  var emblem;
+  emblem = "<p>\n<span>This be some text</span>\n<title>Basic HTML Sample Page</title>\n</p>";
+  assert.compilesTo(emblem, '<p><span>This be some text</span><title>Basic HTML Sample Page</title></p>');
+});
+
+// FIXME maybe -- this test was commented out in the original test suite
+/*
+test("bigass", function(assert) {
+  var emblem, expected;
+  emblem = "<div class=\"content\">\n  <p>\n    We design and develop ambitious web and mobile applications, \n  </p>\n  <p>\n    A more official portfolio page is on its way, but in the meantime, \n    check out\n  </p>\n</div>";
+  expected = '<div class="content">\n<p>  We design and develop ambitious web and mobile applications, \n</p>\n<p>  A more official portfolio page is on its way, but in the meantime, check out\n</p></div>';
+  assert.compilesTo(emblem, expected);
+});
+*/

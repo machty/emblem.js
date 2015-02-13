@@ -596,33 +596,6 @@ if supportsEachHelperDataKeywords
   #"""
   #shouldCompileToString emblem, '<SomeView aBinding=b fooBinding=thing.gnar>SomeView</SomeView>'
 
-QUnit.module "inline block helper"
-
-test "text only", ->
-  emblem =
-  """
-  view SomeView | Hello
-  """
-  shouldCompileToString emblem, '<SomeView nohash>Hello</SomeView>'
-
-test "multiline", ->
-  emblem =
-  """
-  view SomeView | Hello, 
-    How are you? 
-    Sup?
-  """
-  shouldCompileToString emblem, '<SomeView nohash>Hello, How are you? Sup?</SomeView>'
-
-test "more complicated", ->
-  emblem =
-  """
-  view SomeView borf="yes" | Hello, 
-    How are you? 
-    Sup?
-  """
-  shouldCompileToString emblem, '<SomeView borf=yes>Hello, How are you? Sup?</SomeView>'
-
 QUnit.module "copy paste html"
 
 test "indented", ->

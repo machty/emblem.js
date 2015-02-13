@@ -1,3 +1,4 @@
+/*global QUnit*/
 QUnit.module("hash brace syntax, #{}");
 
 test('acts like {{}}', function(assert){

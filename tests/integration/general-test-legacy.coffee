@@ -257,32 +257,6 @@ runTextLineSuite "'"
 # TODO test overriding the default helper name (instead of always "view")
 
 
-QUnit.module "bang syntax defaults to `unbound` helper syntax"
-
-Handlebars.registerHelper 'unbound', ->
-  options = arguments[arguments.length - 1]
-  params = Array::slice.call arguments, 0, -1
-  stringedParams = params.join(' ')
-  content = if options.fn then options.fn @ else stringedParams
-  new Handlebars.SafeString """<unbound class="#{stringedParams}">#{content}</unbound>"""
-
-test "bang helper defaults to `unbound` invocation", ->
-  emblem =
-  """
-  foo! Yar
-  = foo!
-  """
-  shouldCompileToString emblem, '<unbound class="foo Yar">foo Yar</unbound><unbound class="foo">foo</unbound>'
-
-test "bang helper works with blocks", ->
-  emblem =
-  """
-  hey! you suck
-    = foo!
-  """
-  shouldCompileToString emblem, '<unbound class="hey you suck"><unbound class="foo">foo</unbound></unbound>'
-
-
 QUnit.module "question mark syntax defaults to `if` helper syntax"
 
 test "? helper defaults to `if` invocation", ->

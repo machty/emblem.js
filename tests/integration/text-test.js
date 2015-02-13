@@ -4,25 +4,23 @@ import { w } from '../support/utils';
 
 QUnit.module("text: inline block helper");
 
-/*
 test("text only", function(assert) {
   var emblem;
   emblem = "view SomeView | Hello";
-  assert.compilesTo(emblem, '<SomeView nohash>Hello</SomeView>');
+  assert.compilesTo(emblem, '{{#view SomeView}}Hello{{/view}}');
 });
 
 test("multiline", function(assert) {
   var emblem;
   emblem = "view SomeView | Hello, \n  How are you? \n  Sup?";
-  assert.compilesTo(emblem, '<SomeView nohash>Hello, How are you? Sup?</SomeView>');
+  assert.compilesTo(emblem, '{{#view SomeView}}Hello, \nHow are you? \nSup?{{/view}}');
 });
 
 test("more complicated", function(assert) {
   var emblem;
   emblem = "view SomeView borf=\"yes\" | Hello, \n  How are you? \n  Sup?";
-  assert.compilesTo(emblem, '<SomeView borf=yes>Hello, How are you? Sup?</SomeView>');
+  assert.compilesTo(emblem, '{{#view SomeView borf="yes"}}Hello, \nHow are you? \nSup?{{/view}}');
 });
-*/
 
 QUnit.module("text: whitespace fussiness");
 

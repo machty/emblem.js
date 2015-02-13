@@ -1,6 +1,15 @@
-import Emblem from '../emblem'
+/*global QUnit*/
+import Emblem from '../emblem';
 
 QUnit.assert.compilesTo = function( emblem, handlebars, message ) {
   var output = Emblem.compile(emblem);
-  QUnit.push(output == handlebars, output, handlebars, message);
+  if (!message) {
+    var maxLenth = 40;
+    var messageEmblem = emblem.replace(/\n/g, "\\n");
+    if (messageEmblem.length > maxLenth) {
+      messageEmblem = messageEmblem.slice(0,maxLenth) + '...';
+    }
+    message = 'Expected "' + messageEmblem + '" to compile to "' + handlebars + '"';
+  }
+  QUnit.push(output === handlebars, output, handlebars, message);
 };

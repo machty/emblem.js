@@ -149,3 +149,45 @@ test("when ember expression is used with constant in braces", function(assert) {
 test("when ember expression is used with constant and variable in braces", function(assert) {
   assert.compilesTo('p.foo class={ :bar bar }', '<p {{bind-attr class=":foo :bar bar"}}></p>');
 });
+
+QUnit.module("attributes: shorthand: mustache DOM attribute shorthand");
+
+test("tagName w/o space", function(assert) {
+  var emblem = "App.FunView%span";
+  assert.compilesTo(emblem, '{{view App.FunView tagName="span"}}');
+});
+
+test("tagName w/ space", function(assert) {
+  var emblem = "App.FunView %span";
+  assert.compilesTo(emblem, '{{view App.FunView tagName="span"}}');
+});
+
+test("tagName block", function(assert) {
+  var emblem = "view App.FunView%span\n  p Hello";
+  assert.compilesTo(emblem, '{{#view App.FunView tagName="span"}}<p>Hello</p>{{/view}}');
+});
+
+test("class w/ space (needs space)", function(assert) {
+  var emblem = "App.FunView .bork";
+  assert.compilesTo(emblem, '{{view App.FunView class="bork"}}');
+});
+
+test("multiple classes", function(assert) {
+  var emblem = "App.FunView .bork.snork";
+  assert.compilesTo(emblem, '{{view App.FunView class="bork snork"}}');
+});
+
+test("elementId", function(assert) {
+  var emblem = "App.FunView#ohno";
+  assert.compilesTo(emblem, '{{view App.FunView elementId="ohno"}}');
+});
+
+test("mixed w/ hash`", function(assert) {
+  var emblem = "App.FunView .bork.snork funbags=\"yeah\"";
+  assert.compilesTo(emblem, '{{view App.FunView funbags="yeah" class="bork snork"}}');
+});
+
+test("mixture of all`", function(assert) {
+  var emblem = "App.FunView%alex#hell.bork.snork funbags=\"yeah\"";
+  assert.compilesTo(emblem, '{{view App.FunView tagName="alex" elementId="hell" class="bork snork" funbags="yeah"}}');
+});

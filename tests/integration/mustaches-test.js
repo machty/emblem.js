@@ -1,6 +1,7 @@
+/*global QUnit*/
 import { w } from '../support/utils';
 
-QUnit.module("simple mustache");
+QUnit.module("mustache: simple");
 
 test("various one-liners", function(assert){
   var emblem = w(
@@ -33,6 +34,55 @@ test("nested combo syntax", function(assert){
   assert.compilesTo(emblem,
     '<ul>{{#each items}}<li>{{foo}}</li>{{/each}}</ul>');
 });
+
+QUnit.module("mustache: capitalized line-starter");
+
+test("should invoke `view` helper by default", function(assert){
+  var emblem = w(
+    "SomeView"
+  );
+  assert.compilesTo(emblem, '{{view SomeView}}');
+});
+
+test("should support block mode", function(assert){
+  var emblem = w(
+    "SomeView",
+    "  p View content"
+  );
+  assert.compilesTo(emblem, '{{#view SomeView}}<p>View content</p>{{/view}}');
+});
+
+test("should not kick in if preceded by equal sign", function(assert){
+  var emblem = w(
+    "= SomeView"
+  );
+  assert.compilesTo(emblem, '{{SomeView}}');
+});
+
+test("should not kick in explicit {{mustache}}", function(assert){
+  var emblem = w(
+    "p Yeah {{SomeView}}"
+  );
+  assert.compilesTo(emblem, '<p>Yeah {{SomeView}}</p>');
+});
+
+QUnit.module('mustache: lower-case starting string');
+
+test("recognizes double-quoted attrs", function(assert) {
+  var emblem = 'frank text="yes"';
+  assert.compilesTo(emblem, '{{frank text="yes"}}');
+});
+
+test("recognizes single-quoted attrs", function(assert) {
+  var emblem = "frank text='yes'";
+  assert.compilesTo(emblem, "{{frank text='yes'}}");
+});
+
+test("recognizes unquoted attrs", function(assert) {
+  var emblem = "frank foo=bar";
+  assert.compilesTo(emblem, "{{frank foo=bar}}");
+});
+
 
 /*
 QUnit.module("mustache helpers");

@@ -1,5 +1,5 @@
 /*global QUnit*/
-QUnit.module("attribute shorthand");
+QUnit.module("attributes: shorthand");
 
 test("id shorthand", function(assert) {
   assert.compilesTo("#woot", '<div id="woot"></div>');
@@ -19,7 +19,7 @@ test("class can come first", function(assert) {
   return assert.compilesTo("span.woot.loot#hello.boot", '<span id="hello" class="woot loot boot"></span>');
 });
 
-QUnit.module("full attributes - tags with content");
+QUnit.module("attributes: full attributes - tags with content");
 
 test("class only", function(assert) {
   return assert.compilesTo('p class="yes" Blork', '<p class="yes">Blork</p>');
@@ -62,7 +62,7 @@ test("nesting", function(assert) {
 });
 
 
-QUnit.module("full attributes - mixed quotes");
+QUnit.module("attributes: full attributes - mixed quotes");
 
 test("single empty", function(assert) {
   return assert.compilesTo("p class=''", '<p class=""></p>');
@@ -76,7 +76,7 @@ test("mixed", function(assert) {
   return assert.compilesTo("p class='woot \"oof\" yeah'", '<p class="woot \\"oof\\" yeah"></p>');
 });
 
-QUnit.module("full attributes - tags without content");
+QUnit.module("attributes: full attributes - tags without content");
 
 test("empty", function(assert) {
   return assert.compilesTo('p class=""', '<p class=""></p>');
@@ -96,7 +96,7 @@ test("class and id", function(assert) {
 
 // FIXME
 /*
-QUnit.module("full attributes w/ mustaches");
+QUnit.module("attributes: full attributes w/ mustaches");
 
 test("with mustache", function(assert) {
   var emblem;
@@ -117,7 +117,7 @@ test("with mustache calling helper", function(assert) {
 });
 */
 
-QUnit.module("boolean attributes");
+QUnit.module("attributes: boolean");
 
 test("static", function(assert) {
   assert.compilesTo('p borf=true', '<p borf></p>');
@@ -125,4 +125,27 @@ test("static", function(assert) {
   assert.compilesTo('p borf=false', '<p></p>');
   assert.compilesTo('p borf=false Nork', '<p>Nork</p>');
   assert.compilesTo('option selected=true Thingeroo', '<option selected>Thingeroo</option>');
+});
+
+QUnit.module("attributes: class name coalescing");
+
+test("when literal class is used", function(assert) {
+  return assert.compilesTo('p.foo class="bar"', '<p class="foo bar"></p>');
+});
+
+test("when ember expression is used with variable", function(assert) {
+  return assert.compilesTo('p.foo class=bar',
+                           '<p {{bind-attr class=":foo bar"}}></p>');
+});
+
+test("when ember expression is used with variable in braces", function(assert) {
+  assert.compilesTo('p.foo class={ bar }', '<p {{bind-attr class=":foo bar"}}></p>');
+});
+
+test("when ember expression is used with constant in braces", function(assert) {
+  assert.compilesTo('p.foo class={ :bar }', '<p {{bind-attr class=":foo :bar"}}></p>');
+});
+
+test("when ember expression is used with constant and variable in braces", function(assert) {
+  assert.compilesTo('p.foo class={ :bar bar }', '<p {{bind-attr class=":foo :bar bar"}}></p>');
 });

@@ -194,7 +194,7 @@ test("mixture of all`", function(assert) {
   assert.compilesTo(emblem, '{{view App.FunView tagName="alex" elementId="hell" class="bork snork" funbags="yeah"}}');
 });
 
-QUnit.module("attributes: bound");
+QUnit.module("attributes: bound and unbound");
 
 test("path with dot", function(assert){
   var emblem = 'iframe src=post.pdfAttachment';
@@ -204,3 +204,14 @@ test("path with dot", function(assert){
   assert.compilesTo(emblem,
                     '<iframe {{bind-attr src=post.pdfAttachmentUrl}} width="96%" height="400" view="FitV" frameborder="0" style="z-index: 0 !important;"></iframe>');
 });
+
+test('unbound attribute', function(assert){
+  var emblem = 'img src="{{unbound post.showLogoUrl}}" onerror="this.src=\'{{unbound orgSettings.onErrorBlankLogoImage}}\'"';
+  assert.compilesTo(emblem, '<img src="{{unbound post.showLogoUrl}}" onerror="this.src=\'{{unbound orgSettings.onErrorBlankLogoImage}}\'"></img>');
+});
+
+// Other example tests to look at
+//var emblem = '.discover-module-body style="background:url(\'{{unbound post.imageUrl}}\');background-size:100% 100%!important"';
+//assert.compilesTo(emblem,
+//                  '<div class="discover-module-body" style="background:url("{{unbound post.imageUrl}}");background-size: 100% 100%!important"></div>');
+//var emblem = 'div class={:discover-module-share showingShareOverlay:active }';

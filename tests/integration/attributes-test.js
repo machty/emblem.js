@@ -205,9 +205,19 @@ test("path with dot", function(assert){
                     '<iframe {{bind-attr src=post.pdfAttachmentUrl}} width="96%" height="400" view="FitV" frameborder="0" style="z-index: 0 !important;"></iframe>');
 });
 
-test('unbound attribute', function(assert){
+test('mustache in attribute', function(assert){
   var emblem = 'img src="{{unbound post.showLogoUrl}}" onerror="this.src=\'{{unbound orgSettings.onErrorBlankLogoImage}}\'"';
   assert.compilesTo(emblem, '<img src="{{unbound post.showLogoUrl}}" onerror="this.src=\'{{unbound orgSettings.onErrorBlankLogoImage}}\'"></img>');
+});
+
+test('mustache in attribute with exclamation point', function(assert){
+  var emblem = "a href=postLink! target='_blank'";
+  assert.compilesTo(emblem, '<a href="{{unbound postLink}}" target="_blank"></a>');
+});
+
+test('mustache attribute value has comma', function(assert){
+  var emblem = "a name='my, cool, name'";
+  assert.compilesTo(emblem, '<a name="my, cool, name"></a>');
 });
 
 // Other example tests to look at

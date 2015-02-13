@@ -371,42 +371,6 @@ test "with nesting", ->
   shouldCompileTo emblem, {foo: "yar"}, 
     '<p bind-attr class to foo><span>Hello</span></p>'
 
-QUnit.module "haml style"
-
-test "basic", ->
-  emblem =
-  """
-  %borf
-  """
-  shouldCompileToString emblem, '<borf></borf>'
-
-test "nested", ->
-  emblem =
-  """
-  %borf
-      %sporf Hello
-  """
-  shouldCompileToString emblem, '<borf><sporf>Hello</sporf></borf>'
-
-test "capitalized", ->
-  emblem =
-  """
-  %Alex alex
-  %Alex
-    %Woot
-  """
-  shouldCompileToString emblem, '<Alex>alex</Alex><Alex><Woot></Woot></Alex>'
-
-test "funky chars", ->
-  emblem =
-  """
-  %borf:narf
-  %borf:narf Hello, {{foo}}.
-  %alex = foo
-  """
-  shouldCompileToString emblem, 
-    { foo: "Alex" }, 
-    '<borf:narf></borf:narf><borf:narf>Hello, Alex.</borf:narf><alex>Alex</alex>'
 
 QUnit.module "line-based errors"
 

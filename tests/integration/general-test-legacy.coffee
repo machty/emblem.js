@@ -256,51 +256,25 @@ runTextLineSuite "'"
 
 # TODO test overriding the default helper name (instead of always "view")
 
+bindAttrHelper = function(assert) {
+  var bindingString, k, options, param, params, v, _ref;
+  options = arguments[arguments.length - 1];
+  params = Array.prototype.slice.call(arguments, 0, -1);
+  bindingString = "";
+  _ref = options.hash;
+  for (k in _ref) {
+    if (!__hasProp.call(_ref, k)) continue;
+    v = _ref[k];
+    bindingString += " " + k + " to " + v;
+  }
+  if (!bindingString) {
+    bindingString = " narf";
+  }
+  param = params[0] || 'none';
+  return "bind-attr" + bindingString;
+};
 
-QUnit.module "class shorthand and explicit declaration is coalesced"
-
-test "when literal class is used", ->
-  shouldCompileTo 'p.foo class="bar"', '<p class="foo bar"></p>'
-
-test "when ember expression is used with variable", ->
-  shouldCompileTo 'p.foo class=bar', {bar: 'baz'}, '<p bind-attr class to :foo bar></p>'
-
-test "when ember expression is used with variable in braces", ->
-  result = shouldEmberPrecompileToHelper 'p.foo class={ bar }'
-  ok -1  != result.indexOf '\'class\': (":foo bar")'
-
-test "when ember expression is used with constant in braces", ->
-  result = shouldEmberPrecompileToHelper 'p.foo class={ :bar }'
-  ok -1  != result.indexOf '\'class\': (":foo :bar")'
-
-test "when ember expression is used with constant and variable in braces", ->
-  result = shouldEmberPrecompileToHelper 'p.foo class={ :bar bar }'
-  ok -1  != result.indexOf '\'class\': (":foo :bar bar")'
-
-test "when ember expression is used with bind-attr", ->
-  result = shouldEmberPrecompileToHelper 'p.foo{ bind-attr class="bar" }'
-  ok -1  != result.indexOf '\'class\': (":foo bar")'
-  
-test "when ember expression is used with bind-attr and multiple attrs", ->
-  result = shouldEmberPrecompileToHelper 'p.foo{ bind-attr something=bind class="bar" }'
-  ok -1 != result.indexOf '\'class\': (":foo bar")'
-
-test "only with bind-attr helper", ->
-  result = shouldEmberPrecompileToHelper 'p.foo{ someHelper class="bar" }', 'someHelper'
-  ok -1 != result.indexOf '\'class\': ("bar")'
-  ok -1 != result.indexOf 'class=\\"foo\\"'
-
-bindAttrHelper = ->
-  options = arguments[arguments.length - 1]
-  params = Array::slice.call arguments, 0, -1
-  bindingString = ""
-  for own k,v of options.hash
-    bindingString += " #{k} to #{v}"
-  bindingString = " narf" unless bindingString
-  param = params[0] || 'none'
-  "bind-attr#{bindingString}"
-
-Handlebars.registerHelper 'bind-attr', bindAttrHelper
+Handlebars.registerHelper('bind-attr', bindAttrHelper);
 
 QUnit.module "bind-attr behavior for unquoted attribute values"
 

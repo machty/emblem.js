@@ -58,7 +58,7 @@ test("bracketed text indented", function(assert) {
 test("nesting", function(assert) {
   var emblem;
   emblem = "p class=\"hello\" data-foo=\"gnarly\"\n  span Yes";
-  return assert.compilesTo(emblem, '<p class="hello" data-foo="gnarly"><span>Yes</span></p>');
+  return assert.compilesTo(emblem, '<p data-foo="gnarly" class="hello"><span>Yes</span></p>');
 });
 
 

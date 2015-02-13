@@ -83,7 +83,6 @@ test("recognizes unquoted attrs", function(assert) {
   assert.compilesTo(emblem, "{{frank foo=bar}}");
 });
 
-
 /*
 QUnit.module("mustache helpers");
 

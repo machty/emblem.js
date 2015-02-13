@@ -193,3 +193,14 @@ test("mixture of all`", function(assert) {
   var emblem = "App.FunView%alex#hell.bork.snork funbags=\"yeah\"";
   assert.compilesTo(emblem, '{{view App.FunView tagName="alex" elementId="hell" class="bork snork" funbags="yeah"}}');
 });
+
+QUnit.module("attributes: bound");
+
+test("path with dot", function(assert){
+  var emblem = 'iframe src=post.pdfAttachment';
+  assert.compilesTo(emblem, '<iframe {{bind-attr src=post.pdfAttachment}}></iframe>');
+
+  emblem = 'iframe src=post.pdfAttachmentUrl width="96%" height="400" view="FitV" frameborder="0" style="z-index: 0 !important;"';
+  assert.compilesTo(emblem,
+                    '<iframe {{bind-attr src=post.pdfAttachmentUrl}} width="96%" height="400" view="FitV" frameborder="0" style="z-index: 0 !important;"></iframe>');
+});

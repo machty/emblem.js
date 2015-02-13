@@ -254,47 +254,6 @@ runTextLineSuite '|'
 runTextLineSuite '`'
 runTextLineSuite "'"
 
-QUnit.module "capitalized line-starter"
-
-test "should invoke `view` helper by default", ->
-  emblem =
-  """
-  SomeView
-  """
-  shouldEmberPrecompileToHelper emblem, 'view'
-  #shouldCompileToString emblem, '<SomeView nohash>SomeView</SomeView>'
-
-test "should not invoke `view` helper for vanilla HB", ->
-  emblem =
-  """
-  SomeView
-  """
-  shouldCompileToString emblem, {SomeView: "ALEX"}, 'ALEX'
-
-test "should support block mode", ->
-  emblem =
-  """
-  SomeView
-    p View content
-  """
-  #shouldCompileToString emblem, '<SomeView nohash><p>View content</p></SomeView>'
-  shouldEmberPrecompileToHelper emblem, 'view'
-
-test "should not kick in if preceded by equal sign", ->
-  emblem =
-  """
-  = SomeView
-  """
-  shouldCompileTo emblem, { SomeView: 'erp' }, 'erp'
-
-test "should not kick in explicit {{mustache}}", ->
-  emblem =
-  """
-  p Yeah {{SomeView}}
-  """
-  shouldCompileTo emblem, { SomeView: 'erp' }, '<p>Yeah erp</p>'
-
-
 # TODO test overriding the default helper name (instead of always "view")
 
 

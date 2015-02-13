@@ -44,7 +44,7 @@
     "rsvp": "^3.0.16",
     "testem": "^0.6.39"
   },
-  "main": "lib/emblem.js",
+  "main": "dist/cjs/emblem.js",
   "bin": {
     "emblem": "bin/emblem"
   },

@@ -28,7 +28,7 @@ test("basic (click) followed by attr", function(assert){
   var emblem = 'button click="submitComment" class="foo" Submit Comment';
   assert.compilesTo(emblem, '<button {{action "submitComment" on="click"}} class="foo">Submit Comment</button>');
 
-  var emblem = 'button click="submitComment \'omg\'" class="foo" Submit Comment';
+  emblem = 'button click="submitComment \'omg\'" class="foo" Submit Comment';
   assert.compilesTo(emblem, '<button {{action "submitComment" \'omg\' on="click"}} class="foo">Submit Comment</button>');
 });
 
@@ -68,4 +68,3 @@ test("manual nested", function(assert){
   );
   assert.compilesTo(emblem, '<a {{action \'submitComment\' target=view}}><p>Submit Comment</p></a>');
 });
-

@@ -165,7 +165,7 @@ test("tagName w/ space", function(assert) {
 });
 
 test("tagName block", function(assert) {
-  var emblem = "view App.FunView%span\n  p Hello";
+  var emblem = "App.FunView%span\n  p Hello";
   assert.compilesTo(emblem, '{{#view App.FunView tagName="span"}}<p>Hello</p>{{/view}}');
 });
 
@@ -190,8 +190,8 @@ test("mixed w/ hash`", function(assert) {
 });
 
 test("mixture of all`", function(assert) {
-  var emblem = "App.FunView%alex#hell.bork.snork funbags=\"yeah\"";
-  assert.compilesTo(emblem, '{{view App.FunView tagName="alex" elementId="hell" class="bork snork" funbags="yeah"}}');
+  var emblem = 'App.FunView%alex#hell.bork.snork funbags="yeah"';
+  assert.compilesTo(emblem, '{{view App.FunView funbags="yeah" tagName="alex" elementId="hell" class="bork snork"}}');
 });
 
 QUnit.module("attributes: bound and unbound");

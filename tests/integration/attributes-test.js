@@ -219,9 +219,3 @@ test('mustache attribute value has comma', function(assert){
   var emblem = "a name='my, cool, name'";
   assert.compilesTo(emblem, '<a name="my, cool, name"></a>');
 });
-
-// Other example tests to look at
-//var emblem = '.discover-module-body style="background:url(\'{{unbound post.imageUrl}}\');background-size:100% 100%!important"';
-//assert.compilesTo(emblem,
-//                  '<div class="discover-module-body" style="background:url("{{unbound post.imageUrl}}");background-size: 100% 100%!important"></div>');
-//var emblem = 'div class={:discover-module-share showingShareOverlay:active }';

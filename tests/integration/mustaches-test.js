@@ -83,6 +83,29 @@ test("recognizes unquoted attrs", function(assert) {
   assert.compilesTo(emblem, "{{frank foo=bar}}");
 });
 
+test("sub-expressions are ok", function(assert) {
+  var emblem = `
+    = link-to 'content-manage.social' (query-params groupId=defaultGroup.id) tagName="li"
+  `;
+  assert.compilesTo(emblem,
+                    '{{link-to \'content-manage.social\' (query-params groupId=defaultGroup.id) tagName="li"}}');
+});
+
+test('percent sign in quoted attr value', function(assert){
+  var emblem = `
+      = input placeholder="100%"
+  `;
+  assert.compilesTo(emblem, '{{input placeholder="100%"}}');
+});
+
+test('colon and semicolon in quoted attr value', function(assert){
+  var emblem = `
+      = input style="outline:blue; color:red"
+  `;
+  assert.compilesTo(emblem, '{{input style="outline:blue; color:red"}}');
+});
+
+
 /*
 QUnit.module("mustache helpers");
 

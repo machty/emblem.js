@@ -108,9 +108,33 @@ test('colon and semicolon in quoted attr value', function(assert){
 QUnit.module('mustache: raw mustache unescaped');
     // _ Bork {{foo}} {{{bar}}}!
 
-test('triple mustache in line', function(assert){
-  var emblem = `| bork {{foo}} {{{bar}}}!`;
-  assert.compilesTo(emblem, 'Bork {{foo}} {{{bar}}}!');
+test('triple mustache in text line', function(assert){
+  var emblem = `| bork {{{bar}}}`;
+  assert.compilesTo(emblem, 'bork {{{bar}}}');
+});
+
+test('double mustache in text line', function(assert){
+  var emblem = `| bork {{bar}}`;
+  assert.compilesTo(emblem, 'bork {{bar}}');
+});
+
+test('hash stache in text line', function(assert){
+  var emblem = `| bork #{bar}`;
+  assert.compilesTo(emblem, 'bork {{bar}}');
+});
+
+test('multiple text lines', function(assert){
+  var emblem = `
+     span Your name is name
+       and my name is name
+  `;
+  assert.compilesTo(emblem, '<span>Your name is name and my name is name</span>');
+});
+
+test('use an "\'" to add a space', function(assert){
+  var emblem = `span
+                 ' trailing space`;
+  assert.compilesTo(emblem, '<span>trailing space </span>');
 });
 
 /*

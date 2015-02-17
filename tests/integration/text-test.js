@@ -72,6 +72,22 @@ QUnit.test("it handles preceding indentation and newlines pt 2", function(assert
   assert.compilesTo(emblem, "<p>Woot</p><p>Ha</p>");
 });
 
+// FIXME this is the way it should work -- newlines
+// in the emblem should not be turned into newines in the
+// output by default.
+test('multiple text lines', function(assert){
+  var emblem = `
+     span Your name is name
+       and my name is name
+  `;
+  assert.compilesTo(emblem, '<span>Your name is name and my name is name</span>');
+});
+
+test('use an "\'" to add a space', function(assert){
+  var emblem = `span
+                 ' trailing space`;
+  assert.compilesTo(emblem, '<span>trailing space </span>');
+});
 
 QUnit.module("text: copy paste html");
 

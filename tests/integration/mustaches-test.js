@@ -123,20 +123,6 @@ test('hash stache in text line', function(assert){
   assert.compilesTo(emblem, 'bork {{bar}}');
 });
 
-test('multiple text lines', function(assert){
-  var emblem = `
-     span Your name is name
-       and my name is name
-  `;
-  assert.compilesTo(emblem, '<span>Your name is name and my name is name</span>');
-});
-
-test('use an "\'" to add a space', function(assert){
-  var emblem = `span
-                 ' trailing space`;
-  assert.compilesTo(emblem, '<span>trailing space </span>');
-});
-
 /*
 QUnit.module("mustache helpers");
 

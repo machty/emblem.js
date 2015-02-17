@@ -105,6 +105,13 @@ test('colon and semicolon in quoted attr value', function(assert){
   assert.compilesTo(emblem, '{{input style="outline:blue; color:red"}}');
 });
 
+QUnit.module('mustache: raw mustache unescaped');
+    // _ Bork {{foo}} {{{bar}}}!
+
+test('triple mustache in line', function(assert){
+  var emblem = `| bork {{foo}} {{{bar}}}!`;
+  assert.compilesTo(emblem, 'Bork {{foo}} {{{bar}}}!');
+});
 
 /*
 QUnit.module("mustache helpers");

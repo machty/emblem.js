@@ -1,6 +1,7 @@
 /*global QUnit*/
 
 import { w } from '../support/utils';
+import Emblem from '../emblem';
 
 QUnit.module("text: inline block helper");
 
@@ -18,8 +19,8 @@ test("multiline", function(assert) {
 
 test("more complicated", function(assert) {
   var emblem;
-  emblem = "view SomeView borf=\"yes\" | Hello, \n  How are you? \n  Sup?";
-  assert.compilesTo(emblem, '{{#view SomeView borf="yes"}}Hello, \nHow are you? \nSup?{{/view}}');
+  emblem = "view SomeView borf=\"yes\" | Hello, How are you? Sup?";
+  assert.compilesTo(emblem, '{{#view SomeView borf="yes"}}Hello, How are you? Sup?{{/view}}');
 });
 
 QUnit.module("text: whitespace fussiness");
@@ -34,7 +35,6 @@ test("spaces after mustaches", function(assert){
   assert.compilesTo("each foo    \n  p \n  span",
     "{{#each foo}}<p></p><span></span>{{/each}}");
 });
-
 
 QUnit.module("text: preprocessor");
 
@@ -102,6 +102,38 @@ test("flatlina", function(assert) {
   emblem = "<p>\n<span>This be some text</span>\n<title>Basic HTML Sample Page</title>\n</p>";
   assert.compilesTo(emblem, '<p><span>This be some text</span><title>Basic HTML Sample Page</title></p>');
 });
+
+QUnit.module("text: indentation");
+
+test("it doesn't throw when indenting after a line with inline content", function(assert){
+  var emblem = w(
+    "p Hello",
+    "  p invalid"
+  );
+  assert.compilesTo(emblem, "<p>Hello p invalid</p>");
+});
+
+test("it throws on half dedent", function(assert){
+  var emblem = w(
+    "p",
+    "    span This is ok",
+    "  span This aint"
+  );
+  assert.throws(function(){
+    Emblem.compile(emblem);
+  });
+});
+
+test("new indentation levels don't have to match parents'", function(assert){
+  var emblem = w(
+    "p ",
+    "  span",
+    "     div",
+    "      span yes"
+  );
+  assert.compilesTo(emblem, "<p><span><div><span>yes</span></div></span></p>");
+});
+
 
 // FIXME maybe -- this test was commented out in the original test suite
 /*

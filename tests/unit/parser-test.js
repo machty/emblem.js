@@ -62,6 +62,7 @@ astTest('simple text', '| abc def ghi', function(assert, ast){
   assert.deepEqual(ast, program([ text('abc def ghi') ]) );
 });
 
+// FIXME should this actually preserve the newline?
 astTest('multiline text',
         w('| abc def ghi',
           '  another line'), function(assert, ast){

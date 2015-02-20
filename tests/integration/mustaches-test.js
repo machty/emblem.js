@@ -155,6 +155,28 @@ test("# can be only thing on line", function(assert){
     "<span>#</span>");
 });
 
+QUnit.module("mustache: inline block helper");
+
+test("text only", function(assert) {
+  var emblem;
+  emblem = "view SomeView | Hello";
+  assert.compilesTo(emblem, '{{#view SomeView}}Hello{{/view}}');
+});
+
+test("multiline", function(assert) {
+  var emblem;
+  emblem = w("view SomeView | Hello,",
+             "  How are you?",
+             "  Sup?");
+  assert.compilesTo(emblem, '{{#view SomeView}}Hello, How are you? Sup?{{/view}}');
+});
+
+test("more complicated", function(assert) {
+  var emblem;
+  emblem = "view SomeView borf=\"yes\" | Hello, How are you? Sup?";
+  assert.compilesTo(emblem, '{{#view SomeView borf="yes"}}Hello, How are you? Sup?{{/view}}');
+});
+
 /*
 QUnit.module("mustache helpers");
 

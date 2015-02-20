@@ -3,25 +3,37 @@
 import { w } from '../support/utils';
 import Emblem from '../emblem';
 
-QUnit.module("text: inline block helper");
+QUnit.module("text: pipe character");
 
-test("text only", function(assert) {
-  var emblem;
-  emblem = "view SomeView | Hello";
-  assert.compilesTo(emblem, '{{#view SomeView}}Hello{{/view}}');
+test('pipe (|) creates text', function(assert){
+  assert.compilesTo('| hello there', 'hello there');
 });
 
-test("multiline", function(assert) {
-  var emblem;
-  emblem = "view SomeView | Hello, \n  How are you? \n  Sup?";
-  assert.compilesTo(emblem, '{{#view SomeView}}Hello, \nHow are you? \nSup?{{/view}}');
+test('pipe (|) multiline creates text', function(assert){
+  assert.compilesTo(w(
+    '| hello there',
+    '   and more'
+  ), 'hello there and more');
 });
 
-test("more complicated", function(assert) {
-  var emblem;
-  emblem = "view SomeView borf=\"yes\" | Hello, How are you? Sup?";
-  assert.compilesTo(emblem, '{{#view SomeView borf="yes"}}Hello, How are you? Sup?{{/view}}');
+test('pipe lines preserves leading spaces', function(assert){
+  let fourSpaces = '    ';
+  let threeSpaces = '   ';
+  assert.compilesTo(
+    '|' + fourSpaces + 'hello there',
+    threeSpaces + 'hello there');
 });
+
+// FIXME is this correct behavior?
+test('multiple pipe lines are concatenated', function(assert){
+  assert.compilesTo(w(
+    '| hi there',
+    '| and more'
+  ), 'hi thereand more');
+});
+
+// FIXME there is a "strip" modifier ("`") that the parser
+// looks for but is not in the Emblem documentation
 
 QUnit.module("text: whitespace fussiness");
 
@@ -78,8 +90,7 @@ QUnit.test("it handles preceding indentation and newlines pt 2", function(assert
 test('multiple text lines', function(assert){
   var emblem = `
      span Your name is name
-       and my name is name
-  `;
+       and my name is name`;
   assert.compilesTo(emblem, '<span>Your name is name and my name is name</span>');
 });
 
@@ -93,8 +104,11 @@ QUnit.module("text: copy paste html");
 
 test("indented", function(assert) {
   var emblem;
-  emblem = "<p>\n  <span>This be some text</span>\n  <title>Basic HTML Sample Page</title>\n</p>";
-  assert.compilesTo(emblem, '<p>\n<span>This be some text</span>\n<title>Basic HTML Sample Page</title></p>');
+  emblem = w("<p>",
+             "  <span>This be some text</span>",
+             "  <title>Basic HTML Sample Page</title>",
+             "</p>");
+  assert.compilesTo(emblem, '<p> <span>This be some text</span> <title>Basic HTML Sample Page</title></p>');
 });
 
 test("flatlina", function(assert) {

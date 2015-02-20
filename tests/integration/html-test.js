@@ -140,7 +140,7 @@ QUnit.test("can start with angle bracket html and go to multiple lines", functio
     "<span>Hello dude,",
     "      what's up?</span>"
   );
-  assert.compilesTo(emblem, "<span>Hello dude,\nwhat's up?</span>");
+  assert.compilesTo(emblem, "<span>Hello dude, what's up?</span>");
 });
 
 QUnit.module("html: nested");

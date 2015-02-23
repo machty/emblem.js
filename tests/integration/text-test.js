@@ -196,6 +196,71 @@ test("shouldn't be necessary to insert a space", function(assert) {
   assert.compilesTo(emblem, "<p>Hello, How are you?</p><p>I'm fine, thank you.</p>");
 });
 
+QUnit.module('text: indent/predent');
+
+// FIXME
+/*
+test("predent", function(assert) {
+  var emblem;
+  emblem = w("        ",
+             "pre",
+             "  ` This",
+             "  `   should",
+             "  `  hopefully",
+             "  `    work, and work well.");
+  return assert.compilesTo(emblem, '<pre>This\n  should\n hopefully\n   work, and work well.\n</pre>');
+});
+*/
+
+test("mixture", function(assert) {
+  var emblem;
+  emblem = "        \n";
+  emblem += "  p Hello\n";
+  emblem += "  p\n";
+  emblem += "    | Woot\n";
+  emblem += "  span yes\n";
+  return assert.compilesTo(emblem, '<p>Hello</p><p>Woot</p><span>yes</span>');
+});
+
+test("mixture w/o opening blank", function(assert) {
+  var emblem;
+  emblem = "  p Hello\n";
+  emblem += "  p\n";
+  emblem += "    | Woot\n";
+  emblem += "  span yes\n";
+  return assert.compilesTo(emblem, '<p>Hello</p><p>Woot</p><span>yes</span>');
+});
+
+test("w/ blank lines", function(assert) {
+  var emblem;
+  emblem = "  p Hello\n";
+  emblem += "  p\n";
+  emblem += "\n";
+  emblem += "    | Woot\n";
+  emblem += "\n";
+  emblem += "  span yes\n";
+  return assert.compilesTo(emblem, '<p>Hello</p><p>Woot</p><span>yes</span>');
+});
+
+test("w/ blank whitespaced lines", function(assert) {
+  var emblem;
+  emblem = "  p Hello\n";
+  emblem += "  p\n";
+  emblem += "\n";
+  emblem += "    | Woot\n";
+  emblem += "        \n";
+  emblem += "       \n";
+  emblem += "         \n";
+  emblem += "\n";
+  emblem += "  span yes\n";
+  emblem += "\n";
+  emblem += "  sally\n";
+  emblem += "\n";
+  emblem += "         \n";
+  emblem += "    | Woot\n";
+  return assert.compilesTo(emblem, '<p>Hello</p><p>Woot</p><span>yes</span>{{#sally}}Woot{{/sally}}');
+});
+
 
 // FIXME maybe -- this test was commented out in the original test suite
 /*

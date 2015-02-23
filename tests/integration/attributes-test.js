@@ -219,3 +219,23 @@ test('mustache attribute value has comma', function(assert){
   var emblem = "a name='my, cool, name'";
   assert.compilesTo(emblem, '<a name="my, cool, name"></a>');
 });
+
+test("numbers in shorthand", function(assert) {
+  assert.compilesTo('#4a', '<div id="4a"></div>');
+  assert.compilesTo('.4a', '<div class="4a"></div>');
+  assert.compilesTo('.4', '<div class="4"></div>');
+  assert.compilesTo('#4', '<div id="4"></div>');
+  assert.compilesTo('%4', '<4></4>');
+  assert.compilesTo('%4 ermagerd', '<4>ermagerd</4>');
+  assert.compilesTo('%4#4.4 ermagerd', '<4 id="4" class="4">ermagerd</4>');
+});
+
+test("negative numbers should work", function(assert){
+  assert.compilesTo("foo positive=100 negative=-100", '{{foo positive=100 negative=-100}}');
+});
+
+test("booleans with and without quoting", function(assert){
+  assert.compilesTo('foo what=false', '{{foo what=false}}');
+  assert.compilesTo('foo what="false"', '{{foo what="false"}}');
+  assert.compilesTo("foo what='false'", '{{foo what=\'false\'}}');
+});

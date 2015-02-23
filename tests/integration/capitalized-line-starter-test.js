@@ -1,3 +1,4 @@
+/*global QUnit*/
 import { w } from '../support/utils';
 
 QUnit.module("capitalized line-starter");
@@ -22,6 +23,13 @@ test("should not kick in if preceded by equal sign", function(assert){
     "= SomeView"
   );
   assert.compilesTo(emblem, '{{SomeView}}');
+});
+
+test("should not kick in if preceded by equal sign (example with partial)", function(assert){
+  var emblem = w(
+    '= partial "cats"'
+  );
+  assert.compilesTo(emblem, '{{partial "cats"}}');
 });
 
 test("should not kick in explicit {{mustache}}", function(assert){

@@ -62,11 +62,10 @@ astTest('simple text', '| abc def ghi', function(assert, ast){
   assert.deepEqual(ast, program([ text('abc def ghi') ]) );
 });
 
-// FIXME should this actually preserve the newline?
-astTest('multiline text',
+astTest('multiline text puts spaces where newlines are',
         w('| abc def ghi',
           '  another line'), function(assert, ast){
-  assert.deepEqual(ast, program([text('abc def ghi\nanother line')]));
+  assert.deepEqual(ast, program([text('abc def ghi another line')]));
 });
 
 astTest('simple element', 'h1 my great element', function(assert, ast){

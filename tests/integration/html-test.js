@@ -177,3 +177,26 @@ test("empty nest w/ attribute shorthand", function(assert){
   assert.compilesTo(emblem,
     '<p class="woo"><span id="yes"><strong class="no yes"><i></i></strong></span></p>');
 });
+
+// FIXME
+/*
+QUnit.module("html: self-closing html tags");
+
+test("br", function(assert) {
+  var emblem;
+  emblem = "br";
+  assert.compilesTo(emblem, '<br />');
+});
+
+test("br paragraph example", function(assert) {
+  var emblem;
+  emblem = "p\n  | LOL!\n  br\n  | BORF!";
+  assert.compilesTo(emblem, '<p>LOL!<br />BORF!</p>');
+});
+
+test("input", function(assert) {
+  var emblem;
+  emblem = "input type=\"text\"";
+  assert.compilesTo(emblem, '<input type="text" />');
+});
+*/

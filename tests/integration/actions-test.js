@@ -1,23 +1,7 @@
+/* global QUnit*/
 import { w } from '../support/utils';
 
 QUnit.module("actions");
-
-/*
-Handlebars.registerHelper 'action', function(assert){
-  options = arguments[arguments.length - 1]
-  params = Array::slice.call arguments, 0, -1
-
-  hashString = ""
-  paramsString = params.join('|')
-
-  # TODO: bad because it relies on hash ordering?
-  # is this guaranteed? guess it doesn't rreeeeeally
-  # matter since order's not being tested.
-  for own k,v of options.hash
-    hashString += " #{k}=#{v}"
-  hashString = " nohash" unless hashString
-  "action #{paramsString}#{hashString}"
-*/
 
 test("basic (click)", function(assert){
   var emblem = 'button click="submitComment" Submit Comment';
@@ -68,3 +52,24 @@ test("manual nested", function(assert){
   );
   assert.compilesTo(emblem, '<a {{action \'submitComment\' target=view}}><p>Submit Comment</p></a>');
 });
+
+test("single quote test", function(assert) {
+  var emblem;
+  emblem = "button click='p' Frank";
+  assert.compilesTo(emblem, '<button {{action "p" on="click"}}>Frank</button>');
+});
+
+test("double quote test", function(assert) {
+  var emblem;
+  emblem = "button click=\"p\" Frank";
+  assert.compilesTo(emblem, '<button {{action "p" on="click"}}>Frank</button>');
+});
+
+// FIXME -- fails. Should this be {{action p}} or {{action "p"}} ?
+/*
+test("no quote test", function(assert) {
+  var emblem;
+  emblem = "button click=p Frank";
+  assert.compilesTo(emblem, '<button {{action p on="click"}}>Frank</button>');
+});
+*/

@@ -177,6 +177,60 @@ test("more complicated", function(assert) {
   assert.compilesTo(emblem, '{{#view SomeView borf="yes"}}Hello, How are you? Sup?{{/view}}');
 });
 
+test("GH-26: no need for space before equal sign", function(assert) {
+  var emblem;
+  emblem = "span= foo";
+  assert.compilesTo(emblem, '<span>{{foo}}</span>');
+  emblem = "span.foo= foo";
+  assert.compilesTo(emblem, '<span class="foo">{{foo}}</span>');
+  emblem = "span#hooray.foo= foo";
+  assert.compilesTo(emblem, '<span id="hooray" class="foo">{{foo}}</span>');
+  emblem = "#hooray= foo";
+  assert.compilesTo(emblem, '<div id="hooray">{{foo}}</div>');
+  emblem = ".hooray= foo";
+  return assert.compilesTo(emblem, '<div class="hooray">{{foo}}</div>');
+});
+
+QUnit.module('mustache: in-tag explicit mustache');
+
+test("single", function(assert) {
+  return assert.compilesTo('p{inTagHelper foo}', '<p {{inTagHelper foo}}></p>');
+});
+
+test("double", function(assert) {
+  return assert.compilesTo('p{{inTagHelper foo}}', '<p {{inTagHelper foo}}></p>');
+});
+
+test("triple", function(assert) {
+  return assert.compilesTo('p{{{inTagHelper foo}}}', '<p {{{inTagHelper foo}}}></p>');
+});
+
+test("with singlestache", function(assert) {
+  return assert.compilesTo('p{insertClass foo} Hello', '<p {{insertClass foo}}>Hello</p>');
+});
+
+test("singlestache can be used in text nodes", function(assert) {
+  return assert.compilesTo('p Hello {dork}', '<p>Hello {dork}</p>');
+});
+
+test("with doublestache", function(assert) {
+  return assert.compilesTo('p{{insertClass foo}} Hello', '<p {{insertClass foo}}>Hello</p>');
+});
+
+test("with triplestache", function(assert) {
+  return assert.compilesTo('p{{{insertClass foo}}} Hello', '<p {{{insertClass foo}}}>Hello</p>');
+});
+
+test("multiple", function(assert) {
+  return assert.compilesTo('p{{{insertClass foo}}}{{{insertClass boo}}} Hello', '<p {{{insertClass foo}}} {{{insertClass boo}}}>Hello</p>');
+});
+
+test("with nesting", function(assert) {
+  var emblem;
+  emblem = "p{{bind-attr class=\"foo\"}}\n  span Hello";
+  return assert.compilesTo(emblem, '<p {{bind-attr class="foo"}}><span>Hello</span></p>');
+});
+
 /*
 QUnit.module("mustache helpers");
 

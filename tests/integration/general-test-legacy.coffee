@@ -327,51 +327,6 @@ test "exclamation modifier (ember)", ->
   ok result.match /helpers\.unbound.*foo/
 
 
-QUnit.module "in-tag explicit mustache"
-
-Handlebars.registerHelper 'inTagHelper', (p) ->
-  return p
-
-test "single", ->
-  shouldCompileTo 'p{inTagHelper foo}', {foo: "ALEX"}, '<p ALEX></p>'
-
-test "double", ->
-  shouldCompileTo 'p{inTagHelper foo}', {foo: "ALEX"}, '<p ALEX></p>'
-
-test "triple", ->
-  shouldCompileTo 'p{inTagHelper foo}', {foo: "ALEX"}, '<p ALEX></p>'
-
-Handlebars.registerHelper 'insertClass', (p) ->
-  return 'class="' + p + '"'
-
-test "with singlestache", ->
-  shouldCompileTo 'p{insertClass foo} Hello', {foo: "yar"}, '<p class=&quot;yar&quot;>Hello</p>'
-
-test "singlestache can be used in text nodes", ->
-  shouldCompileTo 'p Hello {dork}', '<p>Hello {dork}</p>'
-
-test "with doublestache", ->
-  shouldCompileTo 'p{{insertClass foo}} Hello', {foo: "yar"}, '<p class=&quot;yar&quot;>Hello</p>'
-
-test "with triplestache", ->
-  shouldCompileTo 'p{{{insertClass foo}}} Hello', {foo: "yar"}, '<p class="yar">Hello</p>'
-
-test "multiple", ->
-  shouldCompileTo 'p{{{insertClass foo}}}{{{insertClass boo}}} Hello', 
-                  {foo: "yar", boo: "nar"}, 
-                  '<p class="yar" class="nar">Hello</p>'
-
-
-test "with nesting", ->
-  emblem =
-  """
-  p{{bind-attr class="foo"}}
-    span Hello
-  """
-  shouldCompileTo emblem, {foo: "yar"}, 
-    '<p bind-attr class to foo><span>Hello</span></p>'
-
-
 QUnit.module "line-based errors"
 
 test "line number is provided for pegjs error", ->
@@ -382,80 +337,13 @@ test "line number is provided for pegjs error", ->
   """
   shouldThrow (-> CompilerContext.compile emblem), "line 2"
 
-# https://github.com/machty/emblem.js/issues/6
-test "single quote test", ->
-  emblem =
-  """
-  button click='p' Frank
-        
-  / form s='d target="App"'
-    label I'm a label!
-  """
-  shouldCompileToString emblem, '<button action p on=click>Frank</button>'
-
-test "double quote test", ->
-  emblem =
-  """
-  button click="p" Frank
-        
-  / form s='d target="App"'
-    label I'm a label!
-  """
-  shouldCompileToString emblem, '<button action p on=click>Frank</button>'
-
-test "no quote test", ->
-  emblem =
-  """
-  button click=p Frank
-        
-  / form s='d target="App"'
-    label I'm a label!
-  """
-  shouldCompileToString emblem, '<button action p on=click>Frank</button>'
-
-QUnit.module "self-closing html tags"
-
-test "br", ->
-  emblem =
-  """
-  br
-  """
-  shouldCompileToString emblem, '<br />'
-
-test "br paragraph example", ->
-  emblem =
-  """
-  p
-    | LOL!
-    br
-    | BORF!
-  """
-  shouldCompileToString emblem, '<p>LOL!<br />BORF!</p>'
-
-test "input", ->
-  emblem =
-  """
-  input type="text"
-  """
-  shouldCompileToString emblem, '<input type="text" />'
-
-QUnit.module "ember."
-
-test "should precompile with Handlebars", ->
-  emblem =
-  """
-  input type="text"
-  """
-  result = Emblem.precompile(Handlebars, 'p Hello').toString()
-  ok result.match '<p>Hello</p>'
-
 QUnit.module "old school handlebars"
 
 test "array", ->
   emblem =
   '''
   goodbyes
-    | #{text}! 
+    | #{text}!
   | cruel #{world}!
   '''
   hash = {goodbyes: [{text: "goodbye"}, {text: "Goodbye"}, {text: "GOODBYE"}], world: "world"}
@@ -529,7 +417,7 @@ test "block as #each", ->
 if supportsEachHelperDataKeywords
 
   QUnit.module "each block helper keywords prefixed by @"
-  
+
   test "#each with @index", ->
     emblem =
     '''
@@ -564,37 +452,6 @@ if supportsEachHelperDataKeywords
         p #{@key}: #{this}
     '''
     shouldCompileTo emblem, { thangs: {'@key': 123, 'works!':456} }, '<p>First item</p><p>works!: 456</p>'
-
-// test "partial in block", ->
-//   emblem =
-//   """
-//   ul = people
-//     > link
-//   """
-//   data = 
-//     people: [
-//       { "name": "Alan", "id": 1 }
-//       { "name": "Yehuda", "id": 2 }
-//     ]
-//   shouldCompileToString emblem, data, '<ul><a href="/people/1">Alan</a><a href="/people/2">Yehuda</a><ul>'
-
-
-#QUnit.module "helper hash"
-
-#test "quoteless values get treated as bindings", ->
-  #emblem =
-  #"""
-  #view SomeView a=b
-    #| Yes
-  #"""
-  #shouldCompileToString emblem, '<SomeView aBinding=b>Yes</SomeView>'
-
-#test "more complex", ->
-  #emblem =
-  #"""
-  #view SomeView a=b foo=thing.gnar
-  #"""
-  #shouldCompileToString emblem, '<SomeView aBinding=b fooBinding=thing.gnar>SomeView</SomeView>'
 
 QUnit.module "`this` keyword"
 
@@ -665,18 +522,6 @@ test "w/ blank whitespaced lines", ->
   emblem += "    | Woot\n"
   shouldCompileToString emblem, '<p>Hello</p><p>Woot</p><span>yes</span><sally class="none">Woot</sally>'
 
-QUnit.module "EOL Whitespace"
-
-test "shouldn't be necessary to insert a space", ->
-  emblem =
-  """
-  p Hello,
-    How are you?
-  p I'm fine, thank you.
-  """
-  shouldCompileToString emblem, "<p>Hello, How are you?</p><p>I'm fine, thank you.</p>"
-
-
 QUnit.module "misc."
 
 test "end with indent", ->
@@ -700,87 +545,7 @@ test "capitalized view helper should not kick in if suffix modifiers present", -
   """
   shouldCompileToString emblem, '<unbound class="Foo">Foo</unbound>'
 
-test "GH-26: no need for space before equal sign", ->
-  emblem =
-  """
-  span= foo
-  """
-  shouldCompileToString emblem, {foo: "YEAH"}, '<span>YEAH</span>'
-
-  emblem =
-  """
-  span.foo= foo
-  """
-  shouldCompileToString emblem, {foo: "YEAH"}, '<span class="foo">YEAH</span>'
-
-  emblem =
-  """
-  span#hooray.foo= foo
-  """
-  shouldCompileToString emblem, {foo: "YEAH"}, '<span id="hooray" class="foo">YEAH</span>'
-
-  emblem =
-  """
-  #hooray= foo
-  """
-  shouldCompileToString emblem, {foo: "YEAH"}, '<div id="hooray">YEAH</div>'
-
-  emblem =
-  """
-  .hooray= foo
-  """
-  shouldCompileToString emblem, {foo: "YEAH"}, '<div class="hooray">YEAH</div>'
-
-test "numbers in shorthand", ->
-  shouldCompileToString '#4a', '<div id="4a"></div>'
-  shouldCompileToString '.4a', '<div class="4a"></div>'
-  shouldCompileToString '.4', '<div class="4"></div>'
-  shouldCompileToString '#4', '<div id="4"></div>'
-  shouldCompileToString '%4', '<4></4>'
-  shouldCompileToString '%4 ermagerd', '<4>ermagerd</4>'
-  shouldCompileToString '%4#4.4 ermagerd', '<4 id="4" class="4">ermagerd</4>'
-
 test "Emblem has a VERSION defined", ->
   ok(Emblem.VERSION, "Emblem.VERSION should be defined")
-
-test "Windows line endings", ->
-  emblem = ".navigation\r\n  p Hello\r\n#main\r\n  | hi"
-  shouldCompileToString emblem, '<div class="navigation"><p>Hello</p></div><div id="main">hi</div>'
-
-test "backslash doesn't cause infinite loop", ->
-  emblem =
-  '''
-  | \\
-  '''
-  shouldCompileTo emblem, "\\"
-
-test "backslash doesn't cause infinite loop with letter", ->
-  emblem =
-  '''
-  | \\a
-  '''
-  shouldCompileTo emblem, "\\a"
-
-test "self closing tag with forward slash", ->
-  emblem =
-  '''
-  p/
-  %bork/
-  .omg/
-  #hello.boo/
-  p/ class="asdasd"
-  '''
-  shouldCompileTo emblem, '<p /><bork /><div class="omg" /><div id="hello" class="boo" /><p class="asdasd" />'
-
-test "tagnames and attributes with colons", ->
-  emblem =
-  '''
-  %al:ex match:neer="snork" Hello!
-  '''
-  shouldCompileTo emblem, '<al:ex match:neer="snork">Hello!</al:ex>'
-
-test "windows newlines", ->
-  emblem = "\r\n  \r\n  p Hello\r\n\r\n"
-  shouldCompileTo emblem, '<p>Hello</p>'
 
 ###

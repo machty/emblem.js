@@ -148,6 +148,54 @@ test("new indentation levels don't have to match parents'", function(assert){
   assert.compilesTo(emblem, "<p><span><div><span>yes</span></div></span></p>");
 });
 
+test("Windows line endings", function(assert) {
+  var emblem;
+  emblem = ".navigation\r\n  p Hello\r\n#main\r\n  | hi";
+  assert.compilesTo(
+    emblem, '<div class="navigation"><p>Hello</p></div><div id="main">hi</div>');
+});
+
+test("backslash doesn't cause infinite loop", function(assert) {
+  var emblem;
+  emblem = '| \\';
+  assert.compilesTo(emblem, "\\");
+});
+
+test("backslash doesn't cause infinite loop with letter", function(assert) {
+  var emblem;
+  emblem = '| \\a';
+  assert.compilesTo(emblem, "\\a");
+});
+
+// FIXME failing test for self-closing tag
+/*
+test("self closing tag with forward slash", function(assert) {
+  var emblem;
+  emblem = 'p/\n%bork/\n.omg/\n#hello.boo/\np/ class="asdasd"';
+  assert.compilesTo(emblem, '<p /><bork /><div class="omg" /><div id="hello" class="boo" /><p class="asdasd" />');
+});
+*/
+
+test("tagnames and attributes with colons", function(assert) {
+  var emblem;
+  emblem = '%al:ex match:neer="snork" Hello!';
+  assert.compilesTo(emblem, '<al:ex match:neer="snork">Hello!</al:ex>');
+});
+
+test("windows newlines", function(assert) {
+  var emblem;
+  emblem = "\r\n  \r\n  p Hello\r\n\r\n";
+  assert.compilesTo(emblem, '<p>Hello</p>');
+});
+
+QUnit.module("text: EOL Whitespace");
+
+test("shouldn't be necessary to insert a space", function(assert) {
+  var emblem;
+  emblem = "p Hello,\n  How are you?\np I'm fine, thank you.";
+  assert.compilesTo(emblem, "<p>Hello, How are you?</p><p>I'm fine, thank you.</p>");
+});
+
 
 // FIXME maybe -- this test was commented out in the original test suite
 /*

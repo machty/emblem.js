@@ -219,3 +219,13 @@ test('mustache attribute value has comma', function(assert){
   var emblem = "a name='my, cool, name'";
   assert.compilesTo(emblem, '<a name="my, cool, name"></a>');
 });
+
+test("numbers in shorthand", function(assert) {
+  assert.compilesTo('#4a', '<div id="4a"></div>');
+  assert.compilesTo('.4a', '<div class="4a"></div>');
+  assert.compilesTo('.4', '<div class="4"></div>');
+  assert.compilesTo('#4', '<div id="4"></div>');
+  assert.compilesTo('%4', '<4></4>');
+  assert.compilesTo('%4 ermagerd', '<4>ermagerd</4>');
+  assert.compilesTo('%4#4.4 ermagerd', '<4 id="4" class="4">ermagerd</4>');
+});

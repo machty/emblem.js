@@ -180,25 +180,35 @@ test("empty nest w/ attribute shorthand", function(){
     '<p class="woo"><span id="yes"><strong class="no yes"><i></i></strong></span></p>');
 });
 
-// FIXME
-/*
 QUnit.module("html: self-closing html tags");
 
 test("br", function() {
   var emblem;
   emblem = "br";
-  compilesTo(emblem, '<br />');
+  compilesTo(emblem, '<br>');
+});
+
+test("hr", function(assert) {
+  var emblem;
+  emblem = "hr";
+  compilesTo(emblem, '<hr>');
 });
 
 test("br paragraph example", function() {
   var emblem;
   emblem = "p\n  | LOL!\n  br\n  | BORF!";
-  compilesTo(emblem, '<p>LOL!<br />BORF!</p>');
+  compilesTo(emblem, '<p>LOL!<br>BORF!</p>');
 });
 
 test("input", function() {
   var emblem;
   emblem = "input type=\"text\"";
-  compilesTo(emblem, '<input type="text" />');
+  compilesTo(emblem, '<input type="text">');
 });
-*/
+
+test("nested content under self-closing tag should fail", function() {
+  var emblem = "hr\n | here is text";
+  QUnit.throws( function(){
+    Emblem.compile(emblem);
+  }, /cannot nest/i);
+});

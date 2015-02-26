@@ -266,7 +266,7 @@ test('use of "this"', function(){
 
 test('mustache attr with underscore', function(){
   var emblem = 'input placeholder=cat_name';
-  compilesTo(emblem,'<input {{bind-attr placeholder=cat_name}}></input>');
+  compilesTo(emblem,'<input {{bind-attr placeholder=cat_name}}>');
 });
 
 // FIXME this sees a comment instead

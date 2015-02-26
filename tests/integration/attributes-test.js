@@ -224,8 +224,8 @@ test('mustache attribute value has comma', function(){
 });
 
 test("mustache class binding", function(){
-  var emblem = 'iframe class=dog';
-  compilesTo(emblem, '<iframe {{bind-attr class=dog}}></iframe>');
+  var emblem = 'iframe.foo class=dog';
+  compilesTo(emblem, '<iframe {{bind-attr class=":foo dog"}}></iframe>');
 });
 
 test("numbers in shorthand", function() {

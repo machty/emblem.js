@@ -59,11 +59,8 @@ test("as hashes", function() {
   var emblem  = 'p {{echofun fun=(equal 1 1)}}';
   compilesTo(emblem, '<p>{{echofun fun=(equal 1 1)}}</p>');
 
-  // FIXME failing test:
-  /*
   emblem = '= echofun fun=(equal 1 1)';
   compilesTo(emblem, '{{echofun fun=(equal 1 1)}}');
-  */
 });
 
 test("complex expression", function() {

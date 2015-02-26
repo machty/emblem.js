@@ -269,14 +269,6 @@ test('mustache attr with underscore', function(){
   compilesTo(emblem,'<input {{bind-attr placeholder=cat_name}}>');
 });
 
-// FIXME this sees a comment instead
-/*
-test("../path as inMustacheParam recognized correctly as pathIdNode instead of classShorthand", function() {
-  var emblem = w('each children',
-             '  jumpToParent ../parentLink');
-  compilesTo(emblem, '{{#each children}}{{jumpToParent ../parentLink}}{{/each}}');
-});
-*/
 
 // FIXME
 /*

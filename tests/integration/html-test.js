@@ -113,21 +113,6 @@ QUnit.test("w/ mustaches", function(){
     "<div><span>Hello, {{foo}} are you? Excellent.</span></div>");
 });
 
-// FIXME: This test seems to test nonsense syntax ?
-QUnit.test("w/ block mustaches", function(){
-  var emblem = w(
-    "p Hello, #{ sally | Hello},",
-    "  and {{sally: span Hello}}!"
-  );
-
-  compilesTo(emblem,
-    '<p>Hello, {{sally | Hello}}, and {{sally: span Hello}}!</p>');
-
-  emblem = "p Hello, #{ sally: span: a Hello}!";
-  compilesTo(emblem,
-    '<p>Hello, {{sally: span: a Hello}}!</p>');
-});
-
 QUnit.test("with followup", function(){
   var emblem = w(
     "p This is",

@@ -74,6 +74,14 @@ test('attr value with underscore', function(assert){
   });
 });
 
+test('attr value is subexpression', function(assert){
+  var text = 'echofun fun=(equal 1 1)';
+  assert.deepEqual( parse(text), {
+    name: 'echofun',
+    attrs: ["fun=(equal 1 1)"]
+  });
+});
+
 test('query-params', function(assert){
   var text = 'frank (query-params groupId=defaultGroup.id)';
 

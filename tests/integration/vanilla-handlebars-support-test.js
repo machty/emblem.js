@@ -87,3 +87,13 @@ if supportsEachHelperDataKeywords
     shouldCompileTo emblem, { thangs: {'@key': 123, 'works!':456} }, '<p>First item</p><p>works!: 456</p>'
 
 */
+
+// this sees a comment instead of a "../path"
+// This sort of path is not valid in ember but allowed by vanilla handlebars
+/*
+test("../path as inMustacheParam recognized correctly as pathIdNode instead of classShorthand", function() {
+  var emblem = w('each children',
+             '  jumpToParent ../parentLink');
+  compilesTo(emblem, '{{#each children}}{{jumpToParent ../parentLink}}{{/each}}');
+});
+*/

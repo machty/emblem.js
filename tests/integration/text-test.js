@@ -25,16 +25,12 @@ test('pipe lines preserves leading spaces', function(){
     threeSpaces + 'hello there');
 });
 
-// FIXME is this correct behavior?
 test('multiple pipe lines are concatenated', function(){
   compilesTo(w(
     '| hi there',
     '| and more'
   ), 'hi thereand more');
 });
-
-// FIXME there is a "strip" modifier ("`") that the parser
-// looks for but is not in the Emblem documentation
 
 QUnit.module("text: whitespace fussiness");
 
@@ -85,9 +81,6 @@ QUnit.test("it handles preceding indentation and newlines pt 2", function(){
   compilesTo(emblem, "<p>Woot</p><p>Ha</p>");
 });
 
-// FIXME this is the way it should work -- newlines
-// in the emblem should not be turned into newines in the
-// output by default.
 test('multiple text lines', function(){
   var emblem = `
      span Your name is name
@@ -168,14 +161,14 @@ test("backslash doesn't cause infinite loop with letter", function() {
   compilesTo(emblem, "\\a");
 });
 
-// FIXME failing test for self-closing tag
-/*
 test("self closing tag with forward slash", function() {
-  var emblem;
-  emblem = 'p/\n%bork/\n.omg/\n#hello.boo/\np/ class="asdasd"';
-  compilesTo(emblem, '<p /><bork /><div class="omg" /><div id="hello" class="boo" /><p class="asdasd" />');
+  var emblem = 'hr/';
+  compilesTo(emblem, '<hr>');
+
+  // non-void elements are still closed correctly
+  emblem = 'p/';
+  compilesTo(emblem, '<p></p>');
 });
-*/
 
 test("tagnames and attributes with colons", function() {
   var emblem;
@@ -198,20 +191,6 @@ test("shouldn't be necessary to insert a space", function() {
 });
 
 QUnit.module('text: indent/predent');
-
-// FIXME
-/*
-test("predent", function() {
-  var emblem;
-  emblem = w("        ",
-             "pre",
-             "  ` This",
-             "  `   should",
-             "  `  hopefully",
-             "  `    work, and work well.");
-  return compilesTo(emblem, '<pre>This\n  should\n hopefully\n   work, and work well.\n</pre>');
-});
-*/
 
 test("mixture", function() {
   var emblem;
@@ -261,14 +240,3 @@ test("w/ blank whitespaced lines", function() {
   emblem += "    | Woot\n";
   return compilesTo(emblem, '<p>Hello</p><p>Woot</p><span>yes</span>{{#sally}}Woot{{/sally}}');
 });
-
-
-// FIXME maybe -- this test was commented out in the original test suite
-/*
-test("bigass", function() {
-  var emblem, expected;
-  emblem = "<div class=\"content\">\n  <p>\n    We design and develop ambitious web and mobile applications, \n  </p>\n  <p>\n    A more official portfolio page is on its way, but in the meantime, \n    check out\n  </p>\n</div>";
-  expected = '<div class="content">\n<p>  We design and develop ambitious web and mobile applications, \n</p>\n<p>  A more official portfolio page is on its way, but in the meantime, check out\n</p></div>';
-  compilesTo(emblem, expected);
-});
-*/

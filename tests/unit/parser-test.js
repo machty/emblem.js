@@ -181,10 +181,9 @@ astTest('simple handlebars expression', 'h1 = name', function(assert, ast){
   );
 });
 
-/* FIXME --this is most likely valid emblem and this test should work
 astTest('nested elements interspersed with content',
         ['p',
-         '  blah blah',
+         '  | blah blah',
          '  b bold text'].join('\n'), function(assert, ast){
   assert.deepEqual(
     ast,
@@ -197,4 +196,3 @@ astTest('nested elements interspersed with content',
     ])
   );
 });
-*/

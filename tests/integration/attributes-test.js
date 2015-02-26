@@ -97,8 +97,6 @@ test("class and id", function() {
   return compilesTo('p id="yes" class="no"', '<p id="yes" class="no"></p>');
 });
 
-// FIXME
-/*
 QUnit.module("attributes: full attributes w/ mustaches");
 
 test("with mustache", function() {
@@ -111,14 +109,16 @@ test("with mustache", function() {
 
 test("with mustache calling helper", function() {
   var emblem;
+
   compilesTo('p class="foo {{{echo "YES"}}}"',
-                    '<p class="foo {{{echo "YES"}}}"></p>');
+             '<p class="foo {{{echo \\"YES\\"}}}"></p>');
+
   compilesTo('p class="foo #{echo "NO"} and {{{echo "YES"}}}" Hello',
-                    '<p class="foo ECHO NO and ECHO YES">Hello</p>');
+             '<p class="foo {{echo \\"NO\\"}} and {{{echo \\"YES\\"}}}">Hello</p>');
+
   emblem = "p class=\"foo {{echo \"BORF\"}}\"\n  | Hello";
-  return compilesTo(emblem, '<p class="foo ECHO BORF">Hello</p>');
+  compilesTo(emblem, '<p class="foo {{echo \\"BORF\\"}}">Hello</p>');
 });
-*/
 
 QUnit.module("attributes: boolean");
 

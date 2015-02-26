@@ -223,6 +223,11 @@ test('mustache attribute value has comma', function(){
   compilesTo(emblem, '<a name="my, cool, name"></a>');
 });
 
+test("mustache class binding", function(){
+  var emblem = 'iframe class=dog';
+  compilesTo(emblem, '<iframe {{bind-attr class=dog}}></iframe>');
+});
+
 test("numbers in shorthand", function() {
   compilesTo('#4a', '<div id="4a"></div>');
   compilesTo('.4a', '<div class="4a"></div>');

@@ -66,6 +66,14 @@ test('lowercase single-quoted attr value', function(assert){
   });
 });
 
+test('attr value with underscore', function(assert){
+  var text = 'input placeholder=cat_name';
+  assert.deepEqual( parse(text), {
+    name: 'input',
+    attrs: ["placeholder=cat_name"]
+  });
+});
+
 test('query-params', function(assert){
   var text = 'frank (query-params groupId=defaultGroup.id)';
 

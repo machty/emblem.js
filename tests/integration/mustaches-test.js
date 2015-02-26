@@ -262,6 +262,10 @@ test('use of "this"', function(assert){
   assert.compilesTo(emblem,'{{#each foo}}<p>{{this}}</p>{{this}}{{/each}}');
 });
 
+test('mustache attr with underscore', function(assert){
+  var emblem = 'input placeholder=cat_name';
+  assert.compilesTo(emblem,'<input {{bind-attr placeholder=cat_name}}></input>');
+});
 
 // FIXME this sees a comment instead
 /*

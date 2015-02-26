@@ -262,6 +262,16 @@ test('use of "this"', function(assert){
   assert.compilesTo(emblem,'{{#each foo}}<p>{{this}}</p>{{this}}{{/each}}');
 });
 
+
+// FIXME this sees a comment instead
+/*
+test("../path as inMustacheParam recognized correctly as pathIdNode instead of classShorthand", function(assert) {
+  var emblem = w('each children',
+             '  jumpToParent ../parentLink');
+  assert.compilesTo(emblem, '{{#each children}}{{jumpToParent ../parentLink}}{{/each}}');
+});
+*/
+
 // FIXME
 /*
 test('bracketed nested statement', function(assert){

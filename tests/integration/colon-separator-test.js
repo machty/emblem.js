@@ -71,3 +71,16 @@ test("mixture of colon and indentation pt.2", function(assert) {
   assert.compilesTo(emblem,
     '<ul><li {{bind-attr data-foo=bar}}><a>quux</a></li><li data-foo="bar"><a>quux</a></li><li {{bind-attr data-foo=bar}} href="#"><a>quux</a></li></ul>');
 });
+
+// FIXME
+/*
+test("condensend nesting", function(assert){
+  var emblem = `
+    #content-frame: .container: .row:
+      .span4: render "sidebar"
+      .span8: render "main"
+  `;
+  assert.compilesTo(
+    emblem, '<div id="content-frame"><div class="container"><div class="row"><div class="span4">{{render "sidebar"}}</div><div class="span8">{{render "main"}}</div></div></div>');
+});
+*/

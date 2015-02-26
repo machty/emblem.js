@@ -269,6 +269,16 @@ test('mustache attr with underscore', function(){
   compilesTo(emblem,'<input {{bind-attr placeholder=cat_name}}>');
 });
 
+test('mustache with empty attr value (single-quoted string)', function(){
+  var emblem = "= input placeholder=''";
+  compilesTo(emblem, "{{input placeholder=''}}");
+});
+
+test('mustache with empty attr value (double-quoted string)', function(){
+  var emblem = '= input placeholder=""';
+  compilesTo(emblem, '{{input placeholder=""}}');
+});
+
 
 // FIXME
 /*

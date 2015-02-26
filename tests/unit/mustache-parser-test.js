@@ -91,6 +91,14 @@ test('attr value is complex subexpression', function(assert){
   });
 });
 
+test('attr value is empty string', function(assert){
+  var text = 'input placeholder=""';
+  assert.deepEqual( parse(text), {
+    name: 'input',
+    attrs: ['placeholder=""']
+  });
+});
+
 test('query-params', function(assert){
   var text = 'frank (query-params groupId=defaultGroup.id)';
 

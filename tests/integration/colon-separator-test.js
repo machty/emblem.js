@@ -75,15 +75,12 @@ test("mixture of colon and indentation pt.2", function() {
     '<ul><li {{bind-attr data-foo=bar}}><a>quux</a></li><li data-foo="bar"><a>quux</a></li><li {{bind-attr data-foo=bar}} href="#"><a>quux</a></li></ul>');
 });
 
-// FIXME
-/*
-test("condensend nesting", function(){
+test("condensed nesting", function(){
   var emblem = `
-    #content-frame: .container: .row:
+    #content-frame: .container: .row
       .span4: render "sidebar"
       .span8: render "main"
   `;
   compilesTo(
-    emblem, '<div id="content-frame"><div class="container"><div class="row"><div class="span4">{{render "sidebar"}}</div><div class="span8">{{render "main"}}</div></div></div>');
+    emblem, '<div id="content-frame"><div class="container"><div class="row"><div class="span4">{{render "sidebar"}}</div><div class="span8">{{render "main"}}</div></div></div></div>');
 });
-*/

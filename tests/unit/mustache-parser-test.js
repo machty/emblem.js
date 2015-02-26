@@ -82,6 +82,15 @@ test('attr value is subexpression', function(assert){
   });
 });
 
+test('attr value is complex subexpression', function(assert){
+  var text = 'echofun true (hello how="are" you=false) 1 not=true fun=(equal "ECHO hello" (echo (hello))) win="yes"';
+  assert.deepEqual( parse(text), {
+    name: 'echofun',
+    attrs: ["true", '(hello how="are" you=false)', '1', 'not=true',
+            'fun=(equal "ECHO hello" (echo (hello)))', 'win="yes"']
+  });
+});
+
 test('query-params', function(assert){
   var text = 'frank (query-params groupId=defaultGroup.id)';
 

@@ -38,6 +38,24 @@ QUnit.test('element node', function(assert){
     childNodes: [{
       type: 'element',
       tagName: 'h1',
+      isVoid: false,
+      attrStaches: [],
+      childNodes: []
+    }]
+  });
+});
+
+QUnit.test('void element node', function(assert){
+  var builder = generateBuilder();
+  builder.element('hr');
+  var ast = builder.toAST();
+
+  assert.deepEqual(ast, {
+    type: 'program',
+    childNodes: [{
+      type: 'element',
+      tagName: 'hr',
+      isVoid: true,
       attrStaches: [],
       childNodes: []
     }]
@@ -59,6 +77,7 @@ QUnit.test('attribute node', function(assert){
     childNodes: [{
       type: 'element',
       tagName: 'h1',
+      isVoid: false,
       attrStaches: [{
         type: 'attribute',
         name: attrName,
@@ -83,6 +102,7 @@ QUnit.test('nested element nodes', function(assert){
     childNodes: [{
       type: 'element',
       tagName: 'h1',
+      isVoid: false,
       attrStaches: [],
       childNodes: [{
         type: 'text',
@@ -108,6 +128,7 @@ QUnit.test('nested element nodes enter and exit', function(assert){
     childNodes: [{
       type: 'element',
       tagName: 'h1',
+      isVoid: false,
       attrStaches: [],
       childNodes: [{
         type: 'text',

@@ -3,6 +3,7 @@ import { parse } from '../../emblem/parser';
 import { processSync } from '../../emblem/preprocessor';
 import { generateBuilder } from '../../emblem/ast-builder';
 import { w } from '../support/utils';
+import isVoidElement from '../../emblem/utils/void-elements';
 
 QUnit.module("Unit - parse");
 
@@ -34,6 +35,7 @@ function element(tagName, childNodes, attrStaches){
   return {
     type: 'element',
     tagName: tagName,
+    isVoid: isVoidElement(tagName),
     attrStaches: attrStaches || [],
     childNodes: childNodes || []
   };
@@ -56,6 +58,10 @@ function attribute(attrName, attrContent){
 
 astTest('simple element', 'h1 hello', function(assert, ast){
   assert.deepEqual(ast, program([ element('h1', [ text('hello') ] ) ]) );
+});
+
+astTest('simple void element', 'hr', function(assert, ast){
+  assert.deepEqual(ast, program([ element('hr') ]));
 });
 
 astTest('simple text', '| abc def ghi', function(assert, ast){

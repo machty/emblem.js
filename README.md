@@ -16,26 +16,26 @@ runtime. It is therefore:
 1. Fully compatible with Ember.js's auto-updating templates (with
    Ember-targeting/friendly syntax)
 
-Emblem's syntax most closely resembles that of the 
-[Slim templating language](http://slim-lang.com/). Please see the 
-[Emblem docs site](http://www.emblemjs.com) for a full explanation 
+Emblem's syntax most closely resembles that of the
+[Slim templating language](http://slim-lang.com/). Please see the
+[Emblem docs site](http://www.emblemjs.com) for a full explanation
 of the syntax.
 
-Also check out the 
+Also check out the
 [Embercast on Emblem.js](http://www.embercasts.com/episodes/2)
 
-## Handlebars Version Dependencies 
+## Handlebars Version Dependencies
 
 _Updated: July 2013_
 
-In the push to Handlebars 1.0.0, some changes were made to the Handlebars 
+In the push to Handlebars 1.0.0, some changes were made to the Handlebars
 internals that broke Emblem, but Emblem's been fixed as of July 1, 2013.
 Here are the versions you should be using:
 
 - Handlebars 1.0.0: Use Emblem >= 0.3.0
 - Handlebars <= 1.0.0.rc4: Use Emblem <= 0.2.9
 
-## Query params 
+## Query params
 
 _Updated: March 2014_
 
@@ -51,7 +51,7 @@ Emblem uses the following syntax:
 - [Read the syntax documentation](http://www.emblemjs.com/syntax).
 - [Watch the Embercast](http://www.embercasts.com/episodes/2)
 - [Check out this JSBin.](http://jsbin.com/ulegec/337/edit)
-- Check out this [demo](http://emblem-test.herokuapp.com/) of 
+- Check out this [demo](http://emblem-test.herokuapp.com/) of
   an [ember-rails](https://github.com/machty/ember-rails) site
   with Emblem enabled.
 
@@ -63,7 +63,7 @@ You can use Emblem to compile either to vanilla Handlebars or Emberized
 Handlebars. Let's assume you're compiling to Emberized Handlebars
 for use with an Ember app.
 
-### Compiling in the Browser 
+### Compiling in the Browser
 
 Follow the pattern in [this JSBin](http://jsbin.com/ulegec/337/edit):
 
@@ -79,8 +79,8 @@ Add the following to your Gemfile:
 gem 'emblem-rails'
 ```
 
-`emblem-rails` presently depends on `ember-rails`. With these 
-two gems, any templates ending in `.emblem` will be (pre)compiled 
+`emblem-rails` presently depends on `ember-rails`. With these
+two gems, any templates ending in `.emblem` will be (pre)compiled
 with Emblem.js.
 
 Also, check out the [demo app](https://github.com/machty/emblem-rails-demo)
@@ -88,10 +88,10 @@ which uses the above configuration.
 
 Updates to Emblem syntax do not require an update to `emblem-rails`. To
 update to the latest Emblem, you can run:
-    
+
     bundle update emblem-source
 
-### All Emblem Plugins
+### Emblem Plugins
 
 1. [emblem-rails](https://github.com/alexspeller/emblem-rails)
 1. [barber-emblem](https://github.com/machty/barber-emblem), a
@@ -108,10 +108,23 @@ Clone the repo, then run:
 
 ```
 npm install
-grunt
+bower install
+ember build -e production
 ```
 
-This will also automatically run the test suite. 
+To run tests in the browser, run:
+
+```
+broccoli serve
+```
+
+The tests will be available at http://localhost:4200/tests/.
+
+To run tests in Phantom and Node (which is how CI runs), use:
+
+```
+npm test
+```
 
 ## Syntax Highlighting
 
@@ -127,7 +140,7 @@ and send in a PR).
 ## Reporting Bugs
 
 If you find a bug in Emblem syntax, please try to reproduce it in
-its simplest form with 
+its simplest form with
 [this JSBin](http://jsbin.com/ucanam/4144/edit) before reporting an
 issue, which will help me nail down the source of the issue.
 

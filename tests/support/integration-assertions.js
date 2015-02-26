@@ -1,7 +1,7 @@
 /*global QUnit*/
-import Emblem from '../emblem';
+import Emblem from '../../emblem';
 
-QUnit.assert.compilesTo = function( emblem, handlebars, message ) {
+export function compilesTo( emblem, handlebars, message ) {
   var output = Emblem.compile(emblem);
   if (!message) {
     var maxLenth = 40;

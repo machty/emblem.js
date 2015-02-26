@@ -1,18 +1,21 @@
+/*global QUnit*/
+
 import { w } from '../support/utils';
+import { compilesTo } from '../support/integration-assertions';
 
 QUnit.module("conditionals");
 
-test("simple if statement", function(assert){
+test("simple if statement", function(){
   var emblem = w(
     "if foo",
     "  | Foo",
     "if bar",
     "  | Bar"
   );
-  assert.compilesTo(emblem, "{{#if foo}}Foo{{/if}}{{#if bar}}Bar{{/if}}");
+  compilesTo(emblem, "{{#if foo}}Foo{{/if}}{{#if bar}}Bar{{/if}}");
 });
 
-test("if else ", function(assert){
+test("if else ", function(){
   var emblem = w(
     "if foo",
     "  | Foo",
@@ -27,10 +30,10 @@ test("if else ", function(assert){
     "else",
     "  | Hooray"
   );
-  assert.compilesTo(emblem, "{{#if foo}}Foo{{#if bar}}Bar{{else}}Woot{{/if}}{{else}}WRONG{{/if}}{{#if bar}}WRONG{{else}}Hooray{{/if}}");
+  compilesTo(emblem, "{{#if foo}}Foo{{#if bar}}Bar{{else}}Woot{{/if}}{{else}}WRONG{{/if}}{{#if bar}}WRONG{{else}}Hooray{{/if}}");
 });
 
-test("else with preceding `=`", function(assert){
+test("else with preceding `=`", function(){
   var emblem = w(
   "= if foo",
   "  p Yeah",
@@ -45,11 +48,11 @@ test("else with preceding `=`", function(assert){
   "=else",
   "  p No!"
   );
-  assert.compilesTo(emblem, "{{#if foo}}<p>Yeah</p>{{else}}<p>No</p>{{/if}}{{#if bar}}<p>Yeah!</p>{{else}}<p>No!</p>{{/if}}{{#if bar}}<p>Yeah!</p>{{else}}<p>No!</p>{{/if}}");
+  compilesTo(emblem, "{{#if foo}}<p>Yeah</p>{{else}}<p>No</p>{{/if}}{{#if bar}}<p>Yeah!</p>{{else}}<p>No!</p>{{/if}}{{#if bar}}<p>Yeah!</p>{{else}}<p>No!</p>{{/if}}");
 });
 
 
-test("unless", function(assert){
+test("unless", function(){
   var emblem = w(
   "unless bar",
   "  | Foo",
@@ -64,10 +67,10 @@ test("unless", function(assert){
   "else",
   "  | Hooray"
   );
-  assert.compilesTo(emblem, "{{#unless bar}}Foo{{#unless foo}}Bar{{else}}Woot{{/unless}}{{else}}WRONG{{/unless}}{{#unless foo}}WRONG{{else}}Hooray{{/unless}}");
+  compilesTo(emblem, "{{#unless bar}}Foo{{#unless foo}}Bar{{else}}Woot{{/unless}}{{else}}WRONG{{/unless}}{{#unless foo}}WRONG{{else}}Hooray{{/unless}}");
 });
 
-test("else followed by newline doesn't gobble else content", function(assert){
+test("else followed by newline doesn't gobble else content", function(){
   var emblem = w(
   "if something",
   "  p something",
@@ -78,6 +81,6 @@ test("else followed by newline doesn't gobble else content", function(assert){
   "  else",
   "    p not nothing"
   );
-  assert.compilesTo(emblem, "{{#if something}}<p>something</p>{{else}}{{#if nothing}}<p>nothing</p>{{else}}<p>not nothing</p>{{/if}}{{/if}}");
+  compilesTo(emblem, "{{#if something}}<p>something</p>{{else}}{{#if nothing}}<p>nothing</p>{{else}}<p>not nothing</p>{{/if}}{{/if}}");
 });
 

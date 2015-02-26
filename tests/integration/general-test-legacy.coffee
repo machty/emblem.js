@@ -1,4 +1,4 @@
-`import Emblem from '../emblem'`
+`import Emblem from '../../emblem'`
 
 ###
 QUnit.module "bind-attr behavior for unquoted attribute values"

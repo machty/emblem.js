@@ -1,70 +1,72 @@
 /*global QUnit*/
+
 import Emblem from '../../emblem';
 import { w } from '../support/utils';
+import { compilesTo } from '../support/integration-assertions';
 
 QUnit.module("html: single line");
 
-QUnit.test("element only", function(assert){
-  assert.compilesTo("p", "<p></p>");
+QUnit.test("element only", function(){
+  compilesTo("p", "<p></p>");
 });
 
-QUnit.test("with text", function(assert){
-  assert.compilesTo("p Hello", "<p>Hello</p>");
+QUnit.test("with text", function(){
+  compilesTo("p Hello", "<p>Hello</p>");
 });
 
-QUnit.test("with more complex text", function(assert){
-  assert.compilesTo(
+QUnit.test("with more complex text", function(){
+  compilesTo(
     "p Hello, how's it going with you today?",
     "<p>Hello, how's it going with you today?</p>"
   );
 });
 
-QUnit.test("with trailing space", function(assert){
-  assert.compilesTo("p Hello   ", "<p>Hello   </p>");
+QUnit.test("with trailing space", function(){
+  compilesTo("p Hello   ", "<p>Hello   </p>");
 });
 
-QUnit.test("can start with angle bracket html", function(assert){
+QUnit.test("can start with angle bracket html", function(){
   var emblem = "<span>Hello</span>";
-  assert.compilesTo(emblem, "<span>Hello</span>");
+  compilesTo(emblem, "<span>Hello</span>");
 });
 
 QUnit.module("html: multiple lines");
 
-QUnit.test("two lines", function(assert){
+QUnit.test("two lines", function(){
   var emblem = w(
     "p This is",
     "  pretty cool."
   );
-  assert.compilesTo(emblem, "<p>This is pretty cool.</p>");
+  compilesTo(emblem, "<p>This is pretty cool.</p>");
 });
 
-QUnit.test("three lines", function(assert){
+QUnit.test("three lines", function(){
   var emblem = w(
     "p This is",
     "  pretty damn",
     "  cool."
   );
-  assert.compilesTo(emblem, "<p>This is pretty damn cool.</p>");
+  compilesTo(emblem, "<p>This is pretty damn cool.</p>");
 });
 
-QUnit.test("three lines w/ embedded html", function(assert){
+QUnit.test("three lines w/ embedded html", function(){
   var emblem = w(
     "p This is",
     "  pretty <span>damn</span>",
     "  cool."
   );
-  assert.compilesTo(emblem, "<p>This is pretty <span>damn</span> cool.</p>");
+  compilesTo(emblem, "<p>This is pretty <span>damn</span> cool.</p>");
 });
 
-QUnit.test("indentation doesn't need to match starting inline content's", function(assert){
+QUnit.test("indentation doesn't need to match starting inline content's", function(){
   var emblem = w(
     "  span Hello,",
     "    How are you?"
   );
-  assert.compilesTo(emblem, "<span>Hello, How are you?</span>");
+  compilesTo(emblem, "<span>Hello, How are you?</span>");
 });
 
-QUnit.test("indentation may vary between parent/child, must be consistent within inline-block", function(assert){
+QUnit.test("indentation may vary between parent/child, must be consistent within inline-block", function(){
   var emblem = w(
     "div",
     "      span Hello,",
@@ -72,7 +74,7 @@ QUnit.test("indentation may vary between parent/child, must be consistent within
     "           Excellent.",
     "      p asd"
   );
-  assert.compilesTo(emblem,
+  compilesTo(emblem,
     "<div><span>Hello, How are you? Excellent.</span><p>asd</p></div>");
 
   emblem = w(
@@ -81,12 +83,12 @@ QUnit.test("indentation may vary between parent/child, must be consistent within
     "       How are you?",
     "     Excellent."
   );
-  assert.throws(function(){
+  QUnit.throws(function(){
     Emblem.compile(emblem);
   });
 });
 
-QUnit.test("indentation may vary between parent/child, must be consistent within inline-block pt 2", function(assert){
+QUnit.test("indentation may vary between parent/child, must be consistent within inline-block pt 2", function(){
   var emblem = w(
     "div",
     "  span Hello,",
@@ -94,12 +96,12 @@ QUnit.test("indentation may vary between parent/child, must be consistent within
     "       Excellent."
   );
 
-  assert.compilesTo(emblem,
+  compilesTo(emblem,
     "<div><span>Hello, How are you? Excellent.</span></div>");
 });
 
 
-QUnit.test("w/ mustaches", function(assert){
+QUnit.test("w/ mustaches", function(){
   var emblem = w(
     "div",
     "  span Hello,",
@@ -107,45 +109,45 @@ QUnit.test("w/ mustaches", function(assert){
     "       Excellent."
   );
 
-  assert.compilesTo(emblem,
+  compilesTo(emblem,
     "<div><span>Hello, {{foo}} are you? Excellent.</span></div>");
 });
 
 // FIXME: This test seems to test nonsense syntax ?
-QUnit.test("w/ block mustaches", function(assert){
+QUnit.test("w/ block mustaches", function(){
   var emblem = w(
     "p Hello, #{ sally | Hello},",
     "  and {{sally: span Hello}}!"
   );
 
-  assert.compilesTo(emblem,
+  compilesTo(emblem,
     '<p>Hello, {{sally | Hello}}, and {{sally: span Hello}}!</p>');
 
   emblem = "p Hello, #{ sally: span: a Hello}!";
-  assert.compilesTo(emblem,
+  compilesTo(emblem,
     '<p>Hello, {{sally: span: a Hello}}!</p>');
 });
 
-QUnit.test("with followup", function(assert){
+QUnit.test("with followup", function(){
   var emblem = w(
     "p This is",
     "  pretty cool.",
     "p Hello."
   );
-  assert.compilesTo(emblem, "<p>This is pretty cool.</p><p>Hello.</p>");
+  compilesTo(emblem, "<p>This is pretty cool.</p><p>Hello.</p>");
 });
 
-QUnit.test("can start with angle bracket html and go to multiple lines", function(assert){
+QUnit.test("can start with angle bracket html and go to multiple lines", function(){
   var emblem = w(
     "<span>Hello dude,",
     "      what's up?</span>"
   );
-  assert.compilesTo(emblem, "<span>Hello dude, what's up?</span>");
+  compilesTo(emblem, "<span>Hello dude, what's up?</span>");
 });
 
 QUnit.module("html: nested");
 
-test("basic", function(assert){
+test("basic", function(){
   var emblem = w(
     "p",
     "  span Hello",
@@ -153,28 +155,28 @@ test("basic", function(assert){
     "div",
     "  p Hooray"
   );
-  assert.compilesTo(emblem,
+  compilesTo(emblem,
     '<p><span>Hello</span><strong>Hi</strong></p><div><p>Hooray</p></div>');
 });
 
-test("empty nest", function(assert){
+test("empty nest", function(){
   var emblem = w(
     "p",
     "  span",
     "    strong",
     "      i"
   );
-  assert.compilesTo(emblem, '<p><span><strong><i></i></strong></span></p>');
+  compilesTo(emblem, '<p><span><strong><i></i></strong></span></p>');
 });
 
-test("empty nest w/ attribute shorthand", function(assert){
+test("empty nest w/ attribute shorthand", function(){
   var emblem = w(
     "p.woo",
     "  span#yes",
     "    strong.no.yes",
     "      i"
   );
-  assert.compilesTo(emblem,
+  compilesTo(emblem,
     '<p class="woo"><span id="yes"><strong class="no yes"><i></i></strong></span></p>');
 });
 
@@ -182,21 +184,21 @@ test("empty nest w/ attribute shorthand", function(assert){
 /*
 QUnit.module("html: self-closing html tags");
 
-test("br", function(assert) {
+test("br", function() {
   var emblem;
   emblem = "br";
-  assert.compilesTo(emblem, '<br />');
+  compilesTo(emblem, '<br />');
 });
 
-test("br paragraph example", function(assert) {
+test("br paragraph example", function() {
   var emblem;
   emblem = "p\n  | LOL!\n  br\n  | BORF!";
-  assert.compilesTo(emblem, '<p>LOL!<br />BORF!</p>');
+  compilesTo(emblem, '<p>LOL!<br />BORF!</p>');
 });
 
-test("input", function(assert) {
+test("input", function() {
   var emblem;
   emblem = "input type=\"text\"";
-  assert.compilesTo(emblem, '<input type="text" />');
+  compilesTo(emblem, '<input type="text" />');
 });
 */

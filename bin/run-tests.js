@@ -19,13 +19,17 @@ function runBrowserTests(command, args) {
       var string = data.toString();
       var lines = string.split('\n');
 
-      lines.forEach(function(line) {
-        if (line.indexOf('0 failed.') > -1) {
-          console.log(chalk.green(line));
-        } else {
-          console.log(line);
-        }
-      });
+      if (lines.length > 1) {
+        lines.forEach(function(line) {
+          if (line.indexOf('0 failed.') > -1) {
+            console.log(chalk.green(line));
+          } else {
+            console.log(line);
+          }
+        });
+      } else {
+        process.stdout.write(string);
+      }
       result.output.push(string);
     });
 
@@ -47,13 +51,32 @@ function runBrowserTests(command, args) {
   });
 }
 
+function walkSync(dir, filelist) {
+
+  if (dir[dir.length-1] != '/') {
+    dir = dir.concat('/');
+  }
+
+  var files = fs.readdirSync(dir);
+  files.forEach(function(file) {
+    if (fs.statSync(dir + file).isDirectory()) {
+      walkSync(dir + file + '/', filelist);
+    }
+    else {
+      filelist.push(dir+file);
+    }
+  });
+};
+
 function runNodeTests(testDir) {
-  var nodeTests = fs.readdirSync(testDir),
+  var nodeTests = [],
       testPaths = [];
+
+  walkSync(testDir, nodeTests);
 
   for (var i=0;i<nodeTests.length;i++){
     if (nodeTests[i].match(/.*-test\.js$/)) {
-      testPaths.push(testDir+nodeTests[i]);
+      testPaths.push(nodeTests[i]);
     }
   }
 
@@ -91,7 +114,7 @@ function runNodeTests(testDir) {
 var testRuns = RSVP.resolve();
 
 testRuns.then(function(){
-  return runBrowserTests('./node_modules/.bin/testem', ['ci', '--launch', 'PhantomJS']);
+  return runBrowserTests('./node_modules/.bin/testem', ['ci', '-R', 'dot']);
 }).then(function(){
   return runNodeTests('dist/cjs/tests/');
 }).then(function(){

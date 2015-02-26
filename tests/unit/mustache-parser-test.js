@@ -1,5 +1,5 @@
 /* global QUnit */
-import parse from 'emblem/mustache-parser';
+import parse from '../../emblem/mustache-parser';
 
 QUnit.module('mustache-parser');
 

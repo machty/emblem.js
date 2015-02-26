@@ -1,4 +1,7 @@
 /*global QUnit*/
+
+import { compilesTo } from '../support/integration-assertions';
+
 QUnit.module("subexpressions");
 
 /*
@@ -21,55 +24,55 @@ Handlebars.registerHelper('equal', function(x, y) {
 });
 */
 
-test("arg-less helper", function(assert) {
+test("arg-less helper", function() {
   var emblem = 'p {{echo (hello)}}';
-  assert.compilesTo(emblem, '<p>{{echo (hello)}}</p>');
+  compilesTo(emblem, '<p>{{echo (hello)}}</p>');
 
   emblem = '= echo (hello)';
-  assert.compilesTo(emblem, '{{echo (hello)}}');
+  compilesTo(emblem, '{{echo (hello)}}');
 });
 
-test("helper w args", function(assert) {
+test("helper w args", function() {
   var emblem = 'p {{echo (equal 1 1)}}';
-  assert.compilesTo(emblem, '<p>{{echo (equal 1 1)}}</p>');
+  compilesTo(emblem, '<p>{{echo (equal 1 1)}}</p>');
 
   emblem = '= echo (equal 1 1)';
-  assert.compilesTo(emblem, '{{echo (equal 1 1)}}');
+  compilesTo(emblem, '{{echo (equal 1 1)}}');
 });
 
-test("supports much nesting", function(assert) {
+test("supports much nesting", function() {
   var emblem  = 'p {{echo (equal (equal 1 1) true)}}';
-  assert.compilesTo(emblem, '<p>{{echo (equal (equal 1 1) true)}}</p>');
+  compilesTo(emblem, '<p>{{echo (equal (equal 1 1) true)}}</p>');
   emblem = '= echo (equal (equal 1 1) true)';
-  assert.compilesTo(emblem, '{{echo (equal (equal 1 1) true)}}');
+  compilesTo(emblem, '{{echo (equal (equal 1 1) true)}}');
 });
 
-test("with hashes", function(assert) {
+test("with hashes", function() {
   var emblem  = 'p {{echo (equal (equal 1 1) true fun="yes")}}';
-  assert.compilesTo(emblem, '<p>{{echo (equal (equal 1 1) true fun="yes")}}</p>');
+  compilesTo(emblem, '<p>{{echo (equal (equal 1 1) true fun="yes")}}</p>');
   emblem = '= echo (equal (equal 1 1) true fun="yes")';
-  assert.compilesTo(emblem, '{{echo (equal (equal 1 1) true fun="yes")}}');
+  compilesTo(emblem, '{{echo (equal (equal 1 1) true fun="yes")}}');
 });
 
 
-test("as hashes", function(assert) {
+test("as hashes", function() {
   var emblem  = 'p {{echofun fun=(equal 1 1)}}';
-  assert.compilesTo(emblem, '<p>{{echofun fun=(equal 1 1)}}</p>');
+  compilesTo(emblem, '<p>{{echofun fun=(equal 1 1)}}</p>');
 
   // FIXME failing test:
   /*
   emblem = '= echofun fun=(equal 1 1)';
-  assert.compilesTo(emblem, '{{echofun fun=(equal 1 1)}}');
+  compilesTo(emblem, '{{echofun fun=(equal 1 1)}}');
   */
 });
 
-test("complex expression", function(assert) {
+test("complex expression", function() {
   var emblem  = 'p {{echofun true (hello how="are" you=false) 1 not=true fun=(equal "ECHO hello" (echo (hello))) win="yes"}}';
-  assert.compilesTo(emblem, '<p>{{echofun true (hello how="are" you=false) 1 not=true fun=(equal "ECHO hello" (echo (hello))) win="yes"}}</p>');
+  compilesTo(emblem, '<p>{{echofun true (hello how="are" you=false) 1 not=true fun=(equal "ECHO hello" (echo (hello))) win="yes"}}</p>');
 
   // FIXME failing tests:
   /*
   emblem = '= echofun true (hello how="are" you=false) 1 not=true fun=(equal "ECHO hello" (echo (hello))) win="yes"';
-  assert.compilesTo(emblem, '{{echofun true (hello how="are" you=false) 1 not=true fun=(equal "ECHO hello" (echo (hello))) win="yes"}}');
+  compilesTo(emblem, '{{echofun true (hello how="are" you=false) 1 not=true fun=(equal "ECHO hello" (echo (hello))) win="yes"}}');
   */
 });

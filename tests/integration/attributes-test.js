@@ -136,24 +136,25 @@ test("when literal class is used", function() {
   return compilesTo('p.foo class="bar"', '<p class="foo bar"></p>');
 });
 
-/* FIXME multiple classes is not well-defined
 test("when ember expression is used with variable", function() {
-  return compilesTo('p.foo class=bar',
-                           '<p {{bind-attr class=":foo bar"}}></p>');
+  compilesTo('p.foo class=bar',
+             '<p {{bind-attr class=":foo bar"}}></p>');
 });
 
 test("when ember expression is used with variable in braces", function() {
-  compilesTo('p.foo class={ bar }', '<p {{bind-attr class=":foo bar"}}></p>');
+  compilesTo('p.foo class={ bar }',
+             '<p {{bind-attr class=":foo bar"}}></p>');
 });
 
 test("when ember expression is used with constant in braces", function() {
-  compilesTo('p.foo class={ :bar }', '<p {{bind-attr class=":foo :bar"}}></p>');
+  compilesTo('p.foo class={ :bar }',
+             '<p class="foo bar"></p>');
 });
 
 test("when ember expression is used with constant and variable in braces", function() {
-  compilesTo('p.foo class={ :bar bar }', '<p {{bind-attr class=":foo :bar bar"}}></p>');
+  compilesTo('p.foo class={ :bar bar }',
+             '<p {{bind-attr class=":foo :bar bar"}}></p>');
 });
-*/
 
 QUnit.module("attributes: shorthand: mustache DOM attribute shorthand");
 

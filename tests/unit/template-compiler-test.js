@@ -26,7 +26,7 @@ QUnit.test("compiles element node AST", function(assert){
         tagName: 'div',
         attrStaches: [
           { type: 'attribute',
-            name: 'class',
+            name: 'data-name',
             content: 'red' }
         ] }
     ]
@@ -34,7 +34,7 @@ QUnit.test("compiles element node AST", function(assert){
 
   var result = compile(ast);
 
-  assert.equal(result, '<div class="red"></div>', 'content is output');
+  assert.equal(result, '<div data-name="red"></div>', 'content is output');
 });
 
 QUnit.test("compiles block node AST", function(assert){
@@ -152,4 +152,51 @@ QUnit.test("compiles boolean attribute", function(assert){
   var result = compile(ast);
 
   assert.equal(result, '<input disabled></input>');
+});
+
+QUnit.test("compiles complex classNameBindings to a bind-attr", function(assert){
+  var ast = {
+    type: 'program',
+    childNodes: [
+      { type: 'element',
+        tagName: 'div',
+        classNameBindings: [{
+          type: 'classNameBinding',
+          name: ':size'
+        }, {
+          type: 'classNameBinding',
+          name: 'color'
+        }, {
+          type: 'classNameBinding',
+          name: 'isHeavy:oof:whee'
+        }]
+      }
+    ]
+  };
+
+  var result = compile(ast);
+
+  assert.equal(result, '<div {{bind-attr class=":size color isHeavy:oof:whee"}}></div>');
+});
+
+QUnit.test("compiles simple classNameBindings to a class attribute", function(assert){
+  var ast = {
+    type: 'program',
+    childNodes: [
+      { type: 'element',
+        tagName: 'div',
+        classNameBindings: [{
+          type: 'classNameBinding',
+          name: ':size'
+        }, {
+          type: 'classNameBinding',
+          name: ':color'
+        }]
+      }
+    ]
+  };
+
+  var result = compile(ast);
+
+  assert.equal(result, '<div class="size color"></div>');
 });

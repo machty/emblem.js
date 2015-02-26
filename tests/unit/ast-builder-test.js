@@ -39,6 +39,7 @@ QUnit.test('element node', function(assert){
       type: 'element',
       tagName: 'h1',
       isVoid: false,
+      classNameBindings: [],
       attrStaches: [],
       childNodes: []
     }]
@@ -56,6 +57,7 @@ QUnit.test('void element node', function(assert){
       type: 'element',
       tagName: 'hr',
       isVoid: true,
+      classNameBindings: [],
       attrStaches: [],
       childNodes: []
     }]
@@ -78,6 +80,7 @@ QUnit.test('attribute node', function(assert){
       type: 'element',
       tagName: 'h1',
       isVoid: false,
+      classNameBindings: [],
       attrStaches: [{
         type: 'attribute',
         name: attrName,
@@ -103,6 +106,7 @@ QUnit.test('nested element nodes', function(assert){
       type: 'element',
       tagName: 'h1',
       isVoid: false,
+      classNameBindings: [],
       attrStaches: [],
       childNodes: [{
         type: 'text',
@@ -129,6 +133,7 @@ QUnit.test('nested element nodes enter and exit', function(assert){
       type: 'element',
       tagName: 'h1',
       isVoid: false,
+      classNameBindings: [],
       attrStaches: [],
       childNodes: [{
         type: 'text',

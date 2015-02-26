@@ -31,11 +31,12 @@ function program(childNodes){
   };
 }
 
-function element(tagName, childNodes, attrStaches){
+function element(tagName, childNodes, attrStaches, classNameBindings){
   return {
     type: 'element',
     tagName: tagName,
     isVoid: isVoidElement(tagName),
+    classNameBindings: classNameBindings || [],
     attrStaches: attrStaches || [],
     childNodes: childNodes || []
   };
@@ -53,6 +54,13 @@ function attribute(attrName, attrContent){
     type: 'attribute',
     name: attrName,
     content: attrContent
+  };
+}
+
+function classNameBinding(name){
+  return {
+    type: 'classNameBinding',
+    name: name
   };
 }
 
@@ -81,7 +89,7 @@ astTest('simple element', 'h1 my great element', function(assert, ast){
 astTest('simple element with single class name', 'h1.my-class', function(assert, ast){
   assert.deepEqual(
     ast,
-    program([element('h1', [], [attribute('class', 'my-class')])])
+    program([element('h1', [], [], [classNameBinding(':my-class')])])
   );
 });
 
@@ -95,16 +103,22 @@ astTest('simple element with id', 'h1#my-id', function(assert, ast){
 astTest('simple element with id and class', 'h1#my-id.my-class', function(assert, ast){
   assert.deepEqual(
     ast,
-    program([ element('h1', [], [attribute('id', 'my-id'),
-                                 attribute('class', 'my-class')]) ])
+    program([ element('h1', [], [
+      attribute('id', 'my-id')
+    ], [
+      classNameBinding(':my-class')
+    ]) ])
   );
 });
 
 astTest('element with shorthand attributes', '#my-id.my-class', function(assert, ast){
   assert.deepEqual(
     ast,
-    program([ element('div', [], [attribute('id', 'my-id'),
-                                 attribute('class', 'my-class')]) ])
+    program([ element('div', [], [
+      attribute('id', 'my-id')
+    ], [
+      classNameBinding(':my-class')
+    ]) ])
   );
 });
 
@@ -146,8 +160,8 @@ astTest('html attributes', 'button.close data-dismiss="modal" x', function(asser
     program([
       element('button',
               [text('x')],
-              [attribute('data-dismiss', 'modal'),
-               attribute('class', 'close')])
+              [attribute('data-dismiss', 'modal')],
+              [classNameBinding(':close')])
     ])
   );
 });

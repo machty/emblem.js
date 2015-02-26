@@ -15,7 +15,7 @@ test("basic (click) followed by attr", function(){
   compilesTo(emblem, '<button {{action "submitComment" on="click"}} class="foo">Submit Comment</button>');
 
   emblem = 'button click="submitComment \'omg\'" class="foo" Submit Comment';
-  compilesTo(emblem, '<button {{action "submitComment" \'omg\' on="click"}} class="foo">Submit Comment</button>');
+  compilesTo(emblem, '<button {{action submitComment \'omg\' on="click"}} class="foo">Submit Comment</button>');
 });
 
 test("nested (mouseEnter)", function(){
@@ -23,7 +23,17 @@ test("nested (mouseEnter)", function(){
     "a mouseEnter='submitComment target=view'",
     "  | Submit Comment"
   );
-  compilesTo(emblem, '<a {{action "submitComment" target=view on="mouseEnter"}}>Submit Comment</a>');
+  compilesTo(emblem, '<a {{action submitComment target=view on="mouseEnter"}}>Submit Comment</a>');
+});
+
+test('explicitly single-quoted action name stays quoted', function(){
+  var emblem = 'a mouseEnter="\'hello\' target=controller"';
+  compilesTo(emblem, '<a {{action \'hello\' target=controller on="mouseEnter"}}></a>');
+});
+
+test('explicitly dobule-quoted action name stays quoted', function(){
+  var emblem = 'a mouseEnter=\'"hello" target=controller\'';
+  compilesTo(emblem, '<a {{action "hello" target=controller on="mouseEnter"}}></a>');
 });
 
 test("nested (mouseEnter, singlequoted)", function(){
@@ -31,7 +41,7 @@ test("nested (mouseEnter, singlequoted)", function(){
     "a mouseEnter='submitComment target=\"view\"'",
     "  | Submit Comment"
   );
-  compilesTo(emblem, '<a {{action "submitComment" target="view" on="mouseEnter"}}>Submit Comment</a>');
+  compilesTo(emblem, '<a {{action submitComment target="view" on="mouseEnter"}}>Submit Comment</a>');
 });
 
 test("nested (mouseEnter, doublequoted)", function(){
@@ -39,7 +49,7 @@ test("nested (mouseEnter, doublequoted)", function(){
     "a mouseEnter=\"submitComment target='view'\"",
     "  | Submit Comment"
   );
-  compilesTo(emblem, '<a {{action "submitComment" target=\'view\' on="mouseEnter"}}>Submit Comment</a>');
+  compilesTo(emblem, '<a {{action submitComment target=\'view\' on="mouseEnter"}}>Submit Comment</a>');
 });
 
 test("manual", function(){
@@ -67,11 +77,8 @@ test("double quote test", function() {
   compilesTo(emblem, '<button {{action "p" on="click"}}>Frank</button>');
 });
 
-// FIXME -- fails. Should this be {{action p}} or {{action "p"}} ?
-/*
-test("no quote test", function() {
+test("no quote remains unquoted in output", function() {
   var emblem;
   emblem = "button click=p Frank";
   compilesTo(emblem, '<button {{action p on="click"}}>Frank</button>');
 });
-*/

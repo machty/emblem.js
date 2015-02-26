@@ -97,3 +97,12 @@ test("../path as inMustacheParam recognized correctly as pathIdNode instead of c
   compilesTo(emblem, '{{#each children}}{{jumpToParent ../parentLink}}{{/each}}');
 });
 */
+
+/*
+test("exclamation modifier (vanilla)", function() {
+  var emblem = 'p class=foo!';
+  return shouldCompileTo(emblem, {
+    foo: "YEAH"
+  }, '<p class="YEAH"></p>');
+});
+*/

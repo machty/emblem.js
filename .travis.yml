@@ -1,10 +1,23 @@
+---
 language: node_js
-node_js:
-- '0.10'
-before_script: grunt build
+
+sudo: false
+
+cache:
+  directories:
+    - node_modules
+
+before_install:
+  - "npm config set spin false"
+  - "npm install -g npm@^2"
+
+install:
+  - npm install -g bower
+  - npm install
+  - bower install
+
+script:
+  - npm test
+
 notifications:
   email: false
-env:
-  global:
-  - secure: Oqr6tnsBraZQno/K1iQ8027tKhHI7iAVXqI8tw32kdOkFZn7zcZ+Vg6yCd+CSat+OGqCmIPq7fLU/sl9fvCg491N7jTnuDIrhy+8SWL8KhiZxSGxWIErSQm0PXt8Qlhak4n1hKuZZQE/M8bOZ3zEh9xbDPxAwXRoPF2wyjRwnVU=
-  - secure: Kmp/VG4/SZqjta9M6W2e7K7s9yvo2bnVs8j7kak+HlfC+/HYlkUT41bTc0bXm0jd3ES6RpPHAl6nqibwEBqIjPh3e96dWcWhdqWDn5eQSbXL2fgkub0ykVOFe9vln4+2lb5aEkPva32Kjh5FNLGcVffsKCm57LTakgRAH1MW4+o=

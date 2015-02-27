@@ -35,7 +35,7 @@
     "broccoli-inject-livereload": "^0.1.1",
     "broccoli-jshint": "~0.5.1",
     "broccoli-merge-trees": "^0.2.1",
-    "broccoli-pegjs-import": "0.0.1",
+    "broccoli-pegjs-import": "0.0.2",
     "broccoli-replace": "~0.1.6",
     "broccoli-stew": "^0.2.0",
     "chalk": "^0.5.1",

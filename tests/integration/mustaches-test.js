@@ -303,3 +303,13 @@ test('bracketed nested block', function(){
   compilesTo(
     emblem, '{{#sally \'foo\' something="false"}}<p>Bracketed helper attrs!</p>{{/sally}}');
 });
+
+test("single-line mustaches can have elements right after", function(){
+  var emblem = w(
+    'div',
+    '  = thing',
+    '  div' // significantly, this has no return character
+  );
+  compilesTo(emblem,
+    '<div>{{thing}}<div></div></div>');
+});

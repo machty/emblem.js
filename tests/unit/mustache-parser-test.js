@@ -234,27 +234,6 @@ test('mustache with multiple shorthands', function(assert){
   });
 });
 
-test('mustache with bracketed attributes', function(assert){
-  var newline = '\n';
-
-  var rawText = w('sally [',
-                  '  foo ]');
-  var text = processSync(rawText);
-
-  // the preprocessor adds term, indent and dedent symbols,
-  // but the mustache-only parser that we are unit testing here
-  // does not match on the final newline + DEDENT so we strip them:
-  text = text.slice(0, (text.length - 3));
-
-  var expected = `sally [${TERM_SYMBOL}${newline}${INDENT_SYMBOL}  foo ]`;
-  assert.equal(text, expected, 'sanity check that the preprocessed string is correct');
-
-  assert.deepEqual( parse(expected), {
-    name: 'sally',
-    attrs: ['foo']
-  });
-});
-
 test('mustache cannot start with a dot, a dash or a digit', function(assert){
   assert.throws( function() { parse('.frank'); } );
   assert.throws( function() { parse('-frank'); } );

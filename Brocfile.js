@@ -8,6 +8,7 @@ var es6to5 = require('broccoli-6to5-transpiler');
 var broccoliStew = require('broccoli-stew');
 var broccoliCoffee = require('broccoli-coffee');
 var injectLivereload = require('broccoli-inject-livereload');
+var package = require('./package.json');
 
 var outputDir = '/';
 
@@ -23,10 +24,21 @@ function buildSrcTree(){
     exclude: ['**/*.rb', '**/*.pegjs'],
     destDir: outputDir + 'emblem'
   });
+  lib = replaceVersion(lib, ['emblem/main.js'] );
 
   lib = broccoliStew.mv(lib, 'emblem/main.js', 'emblem.js');
   lib = transpileES6(lib);
   return lib;
+}
+
+function replaceVersion(tree, files){
+  return replace(tree, {
+    files: files,
+    patterns: [ {
+      match: /VERSION_STRING_PLACEHOLDER/,
+      replacement: package.version,
+    } ]
+  });
 }
 
 function buildPegTree(){

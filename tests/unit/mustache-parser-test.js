@@ -1,5 +1,7 @@
 /* global QUnit */
 import parse from '../../emblem/mustache-parser';
+import { w } from '../support/utils';
+import { processSync, INDENT_SYMBOL, TERM_SYMBOL } from '../../emblem/preprocessor';
 
 QUnit.module('mustache-parser');
 
@@ -92,8 +94,14 @@ test('attr value is complex subexpression', function(assert){
 });
 
 test('attr value is empty string', function(assert){
-  var text = 'input placeholder=""';
-  assert.deepEqual( parse(text), {
+  var doubleQuote = 'input placeholder=""';
+  var singleQuote = "input placeholder=''";
+
+  assert.deepEqual( parse(singleQuote), {
+    name: 'input',
+    attrs: ["placeholder=''"]
+  });
+  assert.deepEqual( parse(doubleQuote), {
     name: 'input',
     attrs: ['placeholder=""']
   });
@@ -223,6 +231,27 @@ test('mustache with multiple shorthands', function(assert){
   assert.deepEqual( parse(text), {
     name: 'frank',
     attrs: ['tagName="span"', 'elementId="my-id"', 'class="class-name"']
+  });
+});
+
+test('mustache with bracketed attributes', function(assert){
+  var newline = '\n';
+
+  var rawText = w('sally [',
+                  '  foo ]');
+  var text = processSync(rawText);
+
+  // the preprocessor adds term, indent and dedent symbols,
+  // but the mustache-only parser that we are unit testing here
+  // does not match on the final newline + DEDENT so we strip them:
+  text = text.slice(0, (text.length - 3));
+
+  var expected = `sally [${TERM_SYMBOL}${newline}${INDENT_SYMBOL}  foo ]`;
+  assert.equal(text, expected, 'sanity check that the preprocessed string is correct');
+
+  assert.deepEqual( parse(expected), {
+    name: 'sally',
+    attrs: ['foo']
   });
 });
 

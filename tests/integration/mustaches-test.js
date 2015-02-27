@@ -284,15 +284,12 @@ test('explicit mustache with "/" in name', function(){
   compilesTo(emblem, '{{navigation/button-list}}');
 });
 
-
-// FIXME
-/*
 test('bracketed nested statement', function(){
   var emblem = w('',
                  'sally [',
                  '  \'foo\'',
                  '  something="false" ]',
-                 '  |  Bracketed helper attrs!');
+                 '  | Bracketed helper attrs!');
   compilesTo(
     emblem, '{{#sally \'foo\' something="false"}}Bracketed helper attrs!{{/sally}}');
 });
@@ -306,4 +303,3 @@ test('bracketed nested block', function(){
   compilesTo(
     emblem, '{{#sally \'foo\' something="false"}}<p>Bracketed helper attrs!</p>{{/sally}}');
 });
-*/

@@ -21,6 +21,13 @@ QUnit.test("with more complex text", function(){
   );
 });
 
+QUnit.test("with inline html", function(){
+  compilesTo(
+    "p Hello, how are you <strong>man</strong>",
+    "<p>Hello, how are you <strong>man</strong></p>"
+  );
+});
+
 QUnit.test("with trailing space", function(){
   compilesTo("p Hello   ", "<p>Hello   </p>");
 });

@@ -138,6 +138,21 @@ test('mustache name with dash', function(assert){
   });
 });
 
+test('mustache name with "/"', function(assert){
+  var text = 'navigation/button-list';
+
+  assert.deepEqual( parse(text), {
+    name: 'navigation/button-list',
+    attrs: []
+  });
+});
+
+test('mustache value that is a bare "/" is not valid', function(assert){
+  var text = 'navigation/button-list / omg';
+
+  assert.throws( function() { parse(text); } );
+});
+
 test('mustache with quoted param', function(assert){
   var text = 'link-to "abc.def"';
 

@@ -279,6 +279,11 @@ test('mustache with empty attr value (double-quoted string)', function(){
   compilesTo(emblem, '{{input placeholder=""}}');
 });
 
+test('explicit mustache with "/" in name', function(){
+  var emblem = '= navigation/button-list';
+  compilesTo(emblem, '{{navigation/button-list}}');
+});
+
 
 // FIXME
 /*

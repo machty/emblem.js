@@ -22,8 +22,8 @@ Also check out the
 
 ### Installation with Ember-CLI
 
-To use Emblem with [Ember-CLI](http://ember-cli.com/), use the [ember-cli-emblem-hbs-printer](https://github.com/201-created/ember-cli-emblem-hbs-printer)i
-addon:.
+To use Emblem with [Ember-CLI](http://ember-cli.com/), use the [ember-cli-emblem-hbs-printer](https://github.com/201-created/ember-cli-emblem-hbs-printer)
+addon.
 
 ### Handlebars Version Dependencies
 

@@ -7,14 +7,10 @@ for information.
 
 # Emblem.js
 
-Emblem.js is an indentation-based templating language that compiles
-down to the [Handlebars.js](https://github.com/wycats/handlebars.js/)
-runtime. It is therefore:
-
-1. Efficiently/easily precompilable
-1. Compilable in the browser
-1. Fully compatible with Ember.js's auto-updating templates (with
-   Ember-targeting/friendly syntax)
+Emblem.js is an indentation-based templating language that prints
+[Handlebars.js](http://handlebarsjs.com/)
+templates. Specifically, it targets [Ember.js](http://emberjs.com/)
+templates.
 
 Emblem's syntax most closely resembles that of the
 [Slim templating language](http://slim-lang.com/). Please see the
@@ -24,31 +20,35 @@ of the syntax.
 Also check out the
 [Embercast on Emblem.js](http://www.embercasts.com/episodes/2)
 
-## Handlebars Version Dependencies
+### Installation with Ember-CLI
 
-_Updated: July 2013_
+To use Emblem with [Ember-CLI](http://ember-cli.com/), use the [ember-cli-emblem-hbs-printer](https://github.com/201-created/ember-cli-emblem-hbs-printer)i
+addon:.
 
-In the push to Handlebars 1.0.0, some changes were made to the Handlebars
-internals that broke Emblem, but Emblem's been fixed as of July 1, 2013.
-Here are the versions you should be using:
+### Handlebars Version Dependencies
 
-- HTMLBars: coming very soon
-- Handlebars 2.0.0: Use Emblem ~0.4.0
-- Handlebars 1.0.0: Use Emblem ~0.3.0
-- Handlebars <= 1.0.0.rc4: Use Emblem <= 0.2.9
+As of Emblem 0.5.0, the compiler is really a template printer. Previous
+versions compiled to Handlebars AST nodes and were forced to target
+specific versions of Handlebars. The move to printing has eliminated that
+restriction, and Emblem 0.5.0 should be compatible with any version
+of Handlebars.
 
-## Query params
+For posterity, here is a history of Emblem and Handelbars compatibility
+across revisions.
 
-_Updated: March 2014_
+- HTMLBars: Emblem 0.5.0+
+- Handlebars 2.0.0: Use Emblem ~0.4.0, or 0.5.0+
+- Handlebars 1.0.0: Use Emblem ~0.3.0, or 0.5.0+
+- Handlebars <= 1.0.0.rc4: Use Emblem <= 0.2.9, or 0.5.0+
 
-Handlebars >= 1.3.0 is required to use query params.
+### Query params
 
 Emblem uses the following syntax:
 `= link-to 'index' (query-params foo="wat")`
 
 [Ember query params documentation](http://emberjs.com/guides/routing/query-params/)
 
-## Syntax Examples
+### Syntax Examples
 
 - [Read the syntax documentation](http://www.emblemjs.com/syntax).
 - [Watch the Embercast](http://www.embercasts.com/episodes/2)
@@ -59,19 +59,26 @@ Emblem uses the following syntax:
 
 ![Emblem.js Syntax](https://s3.amazonaws.com/machty/emblem-sample.png)
 
-## Using Emblem in your application
+### Using Emblem in your application
 
-You can use Emblem to compile either to vanilla Handlebars or Emberized
-Handlebars. Let's assume you're compiling to Emberized Handlebars
-for use with an Ember app.
+Previous versions of Emblem have supported a "vanilla" Handlebars
+mode. The intent was that Ember-specific helpers could be avoided.
+
+Emblem 0.5.0 dropped support for vanilla template compilation, but
+we would like to bring it back. Please refer to
+[VANILLA_HANDLEBARS.md](https://github.com/machty/emblem.js/blob/43f1557f034893ce1d77bceb79c8f1ffadae0f7d/VANILLA_HANDLEBARS.md)
+for more context.
 
 ### Compiling in the Browser
 
-Follow the pattern in [this JSBin](http://jsbin.com/ulegec/337/edit):
+For pre-0.5.0, follow the pattern in [this JSBin](http://jsbin.com/ulegec/337/edit):
 
 1. Include Handlebars
-1. Include Emblem
-1. Include Ember
+2. Include Emblem
+3. Include Ember
+
+A globals build of Emblem appropriate for JSBins should be completed
+before 0.5.1 is released. See [#212](https://github.com/machty/emblem.js/issues/212).
 
 ### Via Rails 3.1+
 
@@ -91,20 +98,28 @@ which uses the above configuration.
 Updates to Emblem syntax do not require an update to `emblem-rails`. To
 update to the latest Emblem, you can run:
 
-    bundle update emblem-source
+```
+bundle update emblem-source
+```
 
-### Emblem Plugins
+### Emblem Build Tools
+
+Compatible with 0.5.0+:
+
+1. [ember-cli-emblem-hbs-printer](https://github.com/201-created/ember-cli-emblem-hbs-printer)
+
+Compatible with pre-0.5.0:
 
 1. [emblem-rails](https://github.com/alexspeller/emblem-rails)
-1. [barber-emblem](https://github.com/machty/barber-emblem), a
+2. [barber-emblem](https://github.com/machty/barber-emblem), a
    Precompilation library for Ruby (used in `ember-rails`)
-1. [emblem-brunch](https://github.com/machty/emblem-brunch), Emblem
+3. [emblem-brunch](https://github.com/machty/emblem-brunch), Emblem
    support for Brunch.io
-1. [Mimosa (support for Emblem since v 0.10.1)](https://github.com/dbashford/mimosa)
-1. [grunt-emblem](https://github.com/wordofchristian/grunt-emblem), Emblem support for Grunt (and Yeoman)
-1. [gulp-emblem](https://github.com/Aulito/gulp-emblem), Emblem support for gulp
+4. [Mimosa (support for Emblem since v 0.10.1)](https://github.com/dbashford/mimosa)
+5. [grunt-emblem](https://github.com/wordofchristian/grunt-emblem), Emblem support for Grunt (and Yeoman)
+6. [gulp-emblem](https://github.com/Aulito/gulp-emblem), Emblem support for gulp
 
-## Building Emblem.js
+### Building Emblem.js
 
 Clone the repo, then run:
 
@@ -128,7 +143,7 @@ To run tests in Phantom and Node (which is how CI runs), use:
 npm test
 ```
 
-## Syntax Highlighting
+### Syntax Highlighting
 
 Check out [vim-emblem](https://github.com/heartsentwined/vim-emblem)
 for Vim editor support for Emblem.
@@ -139,7 +154,7 @@ from Ember's. At some point, we'll have something even more
 custom tailored to Emblem (feel free to take a swing at it
 and send in a PR).
 
-## Reporting Bugs
+### Reporting Bugs
 
 If you find a bug in Emblem syntax, please try to reproduce it in
 its simplest form with
@@ -148,4 +163,9 @@ issue, which will help me nail down the source of the issue.
 
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/machty/emblem.js/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
+*Emblem was authored and released by [Alex Matchneer](http://github.com/machty/) ([@machty](https://twitter.com/machty)).*
 
+*The Emblem 0.5.0 release was generously funded by [Vestorly](http://www.vestorly.com/).
+Vestorly is a technology company solving the client acquisition problem for professionals
+in wealth management, and the enterprises that support them. Vestorly's user interface
+is built entirely with Ember.js and modern web technologies. [Vestorly is hiring](http://www.vestorly.com/careers/)!*

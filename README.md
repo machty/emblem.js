@@ -22,7 +22,7 @@ Also check out the
 
 ### Installation with Ember-CLI
 
-To use Emblem with [Ember-CLI](http://ember-cli.com/), use the [ember-cli-emblem-hbs-printer](https://github.com/201-created/ember-cli-emblem-hbs-printer)
+To use Emblem 0.5.0 with [Ember-CLI](http://ember-cli.com/), use the [ember-cli-emblem-hbs-printer](https://github.com/201-created/ember-cli-emblem-hbs-printer)
 addon.
 
 ### Handlebars Version Dependencies
@@ -82,7 +82,7 @@ before 0.5.1 is released. See [#212](https://github.com/machty/emblem.js/issues/
 
 ### Via Rails 3.1+
 
-Add the following to your Gemfile:
+For pre-0.5.0, add the following to your Gemfile:
 
 ```
 gem 'emblem-rails'

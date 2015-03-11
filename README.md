@@ -165,7 +165,12 @@ issue, which will help me nail down the source of the issue.
 
 *Emblem was authored and released by [Alex Matchneer](http://github.com/machty/) ([@machty](https://twitter.com/machty)).*
 
-*The Emblem 0.5.0 release was generously funded by [Vestorly](http://www.vestorly.com/).
-Vestorly is a technology company solving the client acquisition problem for professionals
-in wealth management, and the enterprises that support them. Vestorly's user interface
-is built entirely with Ember.js and modern web technologies. [Vestorly is hiring](http://www.vestorly.com/careers/)!*
+<a href="http://vestorly.github.io/">
+<img src="https://s3.amazonaws.com/assets-vestorly/vestorly-50px-height_360.png" height="50" width="169" />
+</a>
+
+*The Emblem 0.5.0 release was generously funded by Vestorly. Vestorly
+is a technology company solving the content marketing problem for
+individual professionals, small businesses, and the enterprises that
+support them. Vestorly's user interface is built entirely with Ember.js and modern
+web technologies. Vestorly is hiring!*

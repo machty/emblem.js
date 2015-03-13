@@ -55,13 +55,22 @@ test("multiple words work too", function(){
     '{{my-helper as |foo bar|}}');
 });
 
-test("block form works", function(){
+test("block form works for the 'with' helper", function(){
   var emblem = w(
-    "= each foos as foo",
-    "  p each content"
+    "= with car.manufacturer as make",
+    "  p {{make.name}}"
   );
   compilesTo(emblem,
-    '{{#each foos as |foo|}}<p>each content</p>{{/each}}');
+    '{{#with car.manufacturer as |make|}}<p>{{make.name}}</p>{{/with}}');
+});
+
+test("block form works for components", function(){
+  var emblem = w(
+    "= my-component as item",
+    "  p {{item.name}}"
+  );
+  compilesTo(emblem,
+    '{{#my-component as |item|}}<p>{{item.name}}</p>{{/my-component}}');
 });
 
 QUnit.module("mustache: capitalized line-starter");

@@ -41,15 +41,20 @@ QUnit.module("mustache: block params");
 
 test("anything after 'as' goes in block params", function(){
   var emblem = w(
-    "= each foos as foo"
+    "= each foos as |foo|"
   );
   compilesTo(emblem,
     '{{each foos as |foo|}}');
 });
 
+test("spaces between '||' and params are removed", function(){
+  compilesTo("= each foos as |foo|", '{{each foos as |foo|}}');
+  compilesTo("= each foos as | foo |", '{{each foos as |foo|}}');
+});
+
 test("multiple words work too", function(){
   var emblem = w(
-    "= my-helper as foo bar"
+    "= my-helper as |foo bar|"
   );
   compilesTo(emblem,
     '{{my-helper as |foo bar|}}');
@@ -57,7 +62,7 @@ test("multiple words work too", function(){
 
 test("block form works for the 'with' helper", function(){
   var emblem = w(
-    "= with car.manufacturer as make",
+    "= with car.manufacturer as |make|",
     "  p {{make.name}}"
   );
   compilesTo(emblem,
@@ -66,7 +71,7 @@ test("block form works for the 'with' helper", function(){
 
 test("block form works for components", function(){
   var emblem = w(
-    "= my-component as item",
+    "= my-component as |item|",
     "  p {{item.name}}"
   );
   compilesTo(emblem,

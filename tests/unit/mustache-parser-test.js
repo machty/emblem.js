@@ -288,7 +288,7 @@ test("conditional modifier", function(assert) {
 });
 
 test('block params', function(assert){
-  var text = 'frank foo=bar boo=far as steve';
+  var text = 'frank foo=bar boo=far as |steve|';
 
   assert.deepEqual( parse(text), {
     name: 'frank',
@@ -298,7 +298,7 @@ test('block params', function(assert){
 });
 
 test('multiple block params', function(assert){
-  var text = 'frank foo=bar boo=far as steve dave';
+  var text = 'frank foo=bar boo=far as |steve dave|';
 
   assert.deepEqual( parse(text), {
     name: 'frank',

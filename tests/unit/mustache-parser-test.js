@@ -10,7 +10,8 @@ test('capitalized start', function(assert){
 
   assert.deepEqual( parse(text), {
     name: 'App.Funview',
-    attrs: []
+    attrs: [],
+    blockParams: null
   });
 });
 
@@ -19,7 +20,8 @@ test('lowercase start', function(assert){
 
   assert.deepEqual( parse(text), {
     name: 'frank',
-    attrs: []
+    attrs: [],
+    blockParams: null
   });
 });
 
@@ -28,7 +30,8 @@ test('lowercase unquoted attr value', function(assert){
 
   assert.deepEqual( parse(text), {
     name: 'frank',
-    attrs: ['foo=bar']
+    attrs: ['foo=bar'],
+    blockParams: null
   });
 });
 
@@ -37,7 +40,8 @@ test('attrs with spaces', function(assert){
 
   assert.deepEqual( parse(text), {
     name: 'frank',
-    attrs: ['foo=bar', 'boo=far']
+    attrs: ['foo=bar', 'boo=far'],
+    blockParams: null
   });
 });
 
@@ -46,7 +50,8 @@ test('multiple attrs', function(assert){
 
   assert.deepEqual( parse(text), {
     name: 'frank',
-    attrs: ['foo=bar', 'boo=far']
+    attrs: ['foo=bar', 'boo=far'],
+    blockParams: null
   });
 });
 
@@ -55,7 +60,8 @@ test('lowercase double-quoted attr value', function(assert){
 
   assert.deepEqual( parse(doubleQuote), {
     name: 'input',
-    attrs: ['placeholder="\'100% /^%&*()x12#"']
+    attrs: ['placeholder="\'100% /^%&*()x12#"'],
+    blockParams: null
   });
 });
 
@@ -64,7 +70,8 @@ test('lowercase single-quoted attr value', function(assert){
 
   assert.deepEqual( parse(singleQuote), {
     name: 'input',
-    attrs: ["placeholder='\"100% /^%&*()x12#'"]
+    attrs: ["placeholder='\"100% /^%&*()x12#'"],
+    blockParams: null
   });
 });
 
@@ -72,7 +79,8 @@ test('attr value with underscore', function(assert){
   var text = 'input placeholder=cat_name';
   assert.deepEqual( parse(text), {
     name: 'input',
-    attrs: ["placeholder=cat_name"]
+    attrs: ["placeholder=cat_name"],
+    blockParams: null
   });
 });
 
@@ -80,7 +88,8 @@ test('attr value is subexpression', function(assert){
   var text = 'echofun fun=(equal 1 1)';
   assert.deepEqual( parse(text), {
     name: 'echofun',
-    attrs: ["fun=(equal 1 1)"]
+    attrs: ["fun=(equal 1 1)"],
+    blockParams: null
   });
 });
 
@@ -89,7 +98,8 @@ test('attr value is complex subexpression', function(assert){
   assert.deepEqual( parse(text), {
     name: 'echofun',
     attrs: ["true", '(hello how="are" you=false)', '1', 'not=true',
-            'fun=(equal "ECHO hello" (echo (hello)))', 'win="yes"']
+            'fun=(equal "ECHO hello" (echo (hello)))', 'win="yes"'],
+    blockParams: null
   });
 });
 
@@ -99,11 +109,13 @@ test('attr value is empty string', function(assert){
 
   assert.deepEqual( parse(singleQuote), {
     name: 'input',
-    attrs: ["placeholder=''"]
+    attrs: ["placeholder=''"],
+    blockParams: null
   });
   assert.deepEqual( parse(doubleQuote), {
     name: 'input',
-    attrs: ['placeholder=""']
+    attrs: ['placeholder=""'],
+    blockParams: null
   });
 });
 
@@ -112,7 +124,8 @@ test('query-params', function(assert){
 
   assert.deepEqual( parse(text), {
     name: 'frank',
-    attrs: ['(query-params groupId=defaultGroup.id)']
+    attrs: ['(query-params groupId=defaultGroup.id)'],
+    blockParams: null
   });
 });
 
@@ -121,7 +134,8 @@ test('nested query-params', function(assert){
 
   assert.deepEqual( parse(text), {
     name: 'frank',
-    attrs: ['(query-params groupId=defaultGroup.id (more-qp x=foo))']
+    attrs: ['(query-params groupId=defaultGroup.id (more-qp x=foo))'],
+    blockParams: null
   });
 });
 
@@ -133,7 +147,8 @@ test('mixed query-params and key-value attrs', function(assert){
             'fob=bob',
             '(qp-2 dog=fog)',
             'dab=tab'],
-    name: 'frank'
+    name: 'frank',
+    blockParams: null
   });
 });
 
@@ -142,7 +157,8 @@ test('mustache name with dash', function(assert){
 
   assert.deepEqual( parse(text), {
     name: 'link-to',
-    attrs: ['foo=bar']
+    attrs: ['foo=bar'],
+    blockParams: null
   });
 });
 
@@ -151,7 +167,8 @@ test('mustache name with "/"', function(assert){
 
   assert.deepEqual( parse(text), {
     name: 'navigation/button-list',
-    attrs: []
+    attrs: [],
+    blockParams: null
   });
 });
 
@@ -166,7 +183,8 @@ test('mustache with quoted param', function(assert){
 
   assert.deepEqual( parse(text), {
     name: 'link-to',
-    attrs: ['"abc.def"']
+    attrs: ['"abc.def"'],
+    blockParams: null
   });
 });
 
@@ -175,7 +193,8 @@ test('mustache with unquoted param', function(assert){
 
   assert.deepEqual( parse(text), {
     name: 'link-to',
-    attrs: ['dog']
+    attrs: ['dog'],
+    blockParams: null
   });
 });
 
@@ -184,7 +203,8 @@ test('mustache with multiple params', function(assert){
 
   assert.deepEqual( parse(text), {
     name: 'link-to',
-    attrs: ['"dog.tag"', 'dog']
+    attrs: ['"dog.tag"', 'dog'],
+    blockParams: null
   });
 });
 
@@ -193,7 +213,8 @@ test('mustache with shorthand % syntax', function(assert){
 
   assert.deepEqual( parse(text), {
     name: 'frank',
-    attrs: ['tagName="span"']
+    attrs: ['tagName="span"'],
+    blockParams: null
   });
 });
 
@@ -202,7 +223,8 @@ test('mustache with shorthand # syntax', function(assert){
 
   assert.deepEqual( parse(text), {
     name: 'frank',
-    attrs: ['elementId="id-name"']
+    attrs: ['elementId="id-name"'],
+    blockParams: null
   });
 });
 
@@ -211,7 +233,8 @@ test('mustache with shorthand . syntax with required space', function(assert){
 
   assert.deepEqual( parse(text), {
     name: 'frank',
-    attrs: ['class="class-name"']
+    attrs: ['class="class-name"'],
+    blockParams: null
   });
 });
 
@@ -221,7 +244,8 @@ test('mustache with multiple classes', function(assert){
   assert.deepEqual( parse(text), {
     name: 'frank',
     attrs: ['class="class-name1"',
-            'class="class-name2"']
+            'class="class-name2"'],
+    blockParams: null
   });
 });
 
@@ -230,7 +254,8 @@ test('mustache with multiple shorthands', function(assert){
 
   assert.deepEqual( parse(text), {
     name: 'frank',
-    attrs: ['tagName="span"', 'elementId="my-id"', 'class="class-name"']
+    attrs: ['tagName="span"', 'elementId="my-id"', 'class="class-name"'],
+    blockParams: null
   });
 });
 
@@ -246,7 +271,8 @@ test("bang modifier", function(assert) {
   assert.deepEqual( parse(text), {
     name: 'foo',
     attrs: [],
-    modifier: '!'
+    modifier: '!',
+    blockParams: null
   });
 });
 
@@ -256,6 +282,28 @@ test("conditional modifier", function(assert) {
   assert.deepEqual( parse(text), {
     name: 'foo',
     attrs: [],
-    modifier: '?'
+    modifier: '?',
+    blockParams: null
   });
 });
+
+test('block params', function(assert){
+  var text = 'frank foo=bar boo=far as |steve|';
+
+  assert.deepEqual( parse(text), {
+    name: 'frank',
+    attrs: ['foo=bar', 'boo=far'],
+    blockParams: ['steve']
+  });
+});
+
+test('multiple block params', function(assert){
+  var text = 'frank foo=bar boo=far as |steve dave|';
+
+  assert.deepEqual( parse(text), {
+    name: 'frank',
+    attrs: ['foo=bar', 'boo=far'],
+    blockParams: ['steve', 'dave']
+  });
+});
+

@@ -107,6 +107,7 @@ bundle update emblem-source
 Compatible with 0.5.0+:
 
 1. [ember-cli-emblem-hbs-printer](https://github.com/201-created/ember-cli-emblem-hbs-printer)
+2. [gulp-emblem-printer](https://github.com/kay-is/gulp-emblem-printer)
 
 Compatible with pre-0.5.0:
 

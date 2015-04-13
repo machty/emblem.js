@@ -22,7 +22,7 @@ Also check out the
 
 ### Installation with Ember-CLI
 
-To use Emblem 0.5.0 with [Ember-CLI](http://ember-cli.com/), use the [ember-cli-emblem-hbs-printer](https://github.com/201-created/ember-cli-emblem-hbs-printer)
+To use Emblem 0.5.0 with [Ember-CLI](http://ember-cli.com/), use the [ember-cli-emblem](https://github.com/Vestorly/ember-cli-emblem)
 addon.
 
 ### Handlebars Version Dependencies
@@ -106,7 +106,7 @@ bundle update emblem-source
 
 Compatible with 0.5.0+:
 
-1. [ember-cli-emblem-hbs-printer](https://github.com/201-created/ember-cli-emblem-hbs-printer)
+1. [ember-cli-emblem](https://github.com/Vestorly/ember-cli-emblem)
 2. [gulp-emblem-printer](https://github.com/kay-is/gulp-emblem-printer)
 
 Compatible with pre-0.5.0:

@@ -176,7 +176,7 @@ QUnit.test("compiles complex classNameBindings to a bind-attr", function(assert)
 
   var result = compile(ast);
 
-  assert.equal(result, '<div {{bind-attr class=":size color isHeavy:oof:whee"}}></div>');
+  assert.equal(result, '<div class="size {{color}} {{if isHeavy \'oof\' \'whee\'}}"></div>');
 });
 
 QUnit.test("compiles simple classNameBindings to a class attribute", function(assert){

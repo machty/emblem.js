@@ -138,12 +138,12 @@ test("when literal class is used", function() {
 
 test("when ember expression is used with variable", function() {
   compilesTo('p.foo class=bar',
-             '<p {{bind-attr class=":foo bar"}}></p>');
+             '<p class="foo {{bar}}"></p>');
 });
 
 test("when ember expression is used with variable in braces", function() {
   compilesTo('p.foo class={ bar }',
-             '<p {{bind-attr class=":foo bar"}}></p>');
+             '<p class="foo {{bar}}"></p>');
 });
 
 test("when ember expression is used with constant in braces", function() {
@@ -153,7 +153,7 @@ test("when ember expression is used with constant in braces", function() {
 
 test("when ember expression is used with constant and variable in braces", function() {
   compilesTo('p.foo class={ :bar bar }',
-             '<p {{bind-attr class=":foo :bar bar"}}></p>');
+             '<p class="foo bar {{bar}}"></p>');
 });
 
 QUnit.module("attributes: shorthand: mustache DOM attribute shorthand");
@@ -202,11 +202,11 @@ QUnit.module("attributes: bound and unbound");
 
 test("path with dot", function(){
   var emblem = 'iframe src=post.pdfAttachment';
-  compilesTo(emblem, '<iframe {{bind-attr src=post.pdfAttachment}}></iframe>');
+  compilesTo(emblem, '<iframe src={{post.pdfAttachment}}></iframe>');
 
   emblem = 'iframe src=post.pdfAttachmentUrl width="96%" height="400" view="FitV" frameborder="0" style="z-index: 0 !important;"';
   compilesTo(emblem,
-                    '<iframe {{bind-attr src=post.pdfAttachmentUrl}} width="96%" height="400" view="FitV" frameborder="0" style="z-index: 0 !important;"></iframe>');
+                    '<iframe src={{post.pdfAttachmentUrl}} width="96%" height="400" view="FitV" frameborder="0" style="z-index: 0 !important;"></iframe>');
 });
 
 test('mustache in attribute', function(){
@@ -226,7 +226,7 @@ test('mustache attribute value has comma', function(){
 
 test("mustache class binding", function(){
   var emblem = 'iframe.foo class=dog';
-  compilesTo(emblem, '<iframe {{bind-attr class=":foo dog"}}></iframe>');
+  compilesTo(emblem, '<iframe class="foo {{dog}}"></iframe>');
 });
 
 test("numbers in shorthand", function() {
@@ -247,4 +247,61 @@ test("booleans with and without quoting", function(){
   compilesTo('foo what=false', '{{foo what=false}}');
   compilesTo('foo what="false"', '{{foo what="false"}}');
   compilesTo("foo what='false'", '{{foo what=\'false\'}}');
+});
+
+test("bound attributes from within strings", function() {
+  var emblem = 'div style="width: {{userProvidedWidth}}px;"';
+  compilesTo(emblem, '<div style="width: {{userProvidedWidth}}px;"></div>');
+});
+
+QUnit.module("attributes with inline if");
+
+test("with attribute and bound values", function() {
+  var emblem = 'div style={ if isActive foo bar }';
+  compilesTo(emblem, '<div style={{if isActive foo bar}}></div>');
+});
+
+test("with attribute", function() {
+  var emblem = 'a href={ if isActive \'http://google.com\' \'http://bing.com\' }';
+  compilesTo(emblem, '<a href={{if isActive \'http://google.com\' \'http://bing.com\'}}></a>');
+});
+
+test("with attribute and bound values", function() {
+  var emblem = 'a href={ if isActive google bing }';
+  compilesTo(emblem, '<a href={{if isActive google bing}}></a>');
+});
+
+test("unbound attributes", function() {
+  var emblem = 'div class={ if isActive \'foo\' \'bar\' }';
+  compilesTo(emblem, '<div class={{if isActive \'foo\' \'bar\'}}></div>');
+});
+
+test("bound attributes", function() {
+  var emblem = 'div class={ if isActive foo bar }';
+  compilesTo(emblem, '<div class={{if isActive foo bar}}></div>');
+});
+
+test("mixed attributes", function() {
+  var emblem = 'div class={ if isActive \'foo\' bar }';
+  compilesTo(emblem, '<div class={{if isActive \'foo\' bar}}></div>');
+});
+
+test("unbound attributes with full quote", function() {
+  var emblem = 'div class={ if isActive \"foo\" bar }';
+  compilesTo(emblem, '<div class={{if isActive \"foo\" bar}}></div>');
+});
+
+test("one unbound option", function() {
+  var emblem = 'div class={ if isActive \"foo\" }';
+  compilesTo(emblem, '<div class={{if isActive \"foo\"}}></div>');
+});
+
+test("one bound option", function() {
+  var emblem = 'div class={ if isActive foo }';
+  compilesTo(emblem, '<div class={{if isActive foo}}></div>');
+});
+
+test("within a string", function() {
+  var emblem = 'div style="{{ if isActive \"15\" \"25\" }}px"';
+  compilesTo(emblem, '<div style=\"{{if isActive \\"15\\" \\"25\\" }}px\"></div>');
 });

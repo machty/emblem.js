@@ -363,3 +363,37 @@ test("single-line mustaches can have elements right after", function(){
   compilesTo(emblem,
     '<div>{{thing}}<div></div></div>');
 });
+
+test("several bracketed attributes with closing bracket on final line", function() {
+  var emblem = w(
+    "= asdf-asdf [",
+    "  thing=res1",
+    "  thi2ng='res2'",
+    "  otherThing=res3",
+    "]"
+  );
+  return compilesTo(emblem, '{{asdf-asdf thing=res1 thi2ng=\'res2\' otherThing=res3}}');
+});
+
+test("several bracketed attributes without a block", function() {
+  var emblem = w(
+    "= asdf-asdf [",
+    "  thing=res1",
+    "  thi2ng='res2'",
+    "  otherThing=res3",
+    "]",
+    "p Hi there"
+  );
+  return compilesTo(emblem, '{{asdf-asdf thing=res1 thi2ng=\'res2\' otherThing=res3}}<p>Hi there</p>');
+});
+
+test("several brackets with closing bracket on final line with a view", function() {
+  var emblem = w(
+    "Ember.Select [",
+    "  thing=res1",
+    "  thi2ng='res2'",
+    "  otherThing=\"res3\"",
+    "]"
+  );
+  return compilesTo(emblem, '{{view Ember.Select thing=res1 thi2ng=\'res2\' otherThing="res3"}}');
+});

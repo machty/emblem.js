@@ -1,5 +1,6 @@
 /*global QUnit*/
 
+import { w } from '../support/utils';
 import { compilesTo } from '../support/integration-assertions';
 
 QUnit.module("attributes: shorthand");
@@ -304,4 +305,20 @@ test("one bound option", function() {
 test("within a string", function() {
   var emblem = 'div style="{{ if isActive \"15\" \"25\" }}px"';
   compilesTo(emblem, '<div style=\"{{if isActive \\"15\\" \\"25\\" }}px\"></div>');
+});
+
+test("with dot params", function() {
+  var emblem = w(
+    "li class={ if content.length 'just-one' }",
+    "  |Thing"
+  );
+  compilesTo(emblem, "<li class={{if content.length 'just-one'}}>Thing</li>");
+});
+
+test("mixed with subexpressions", function() {
+  var emblem = w(
+    "li class={ if (has-one content.length) 'just-one' }",
+    "  |Thing"
+  );
+  compilesTo(emblem, "<li class={{if (has-one content.length) 'just-one'}}>Thing</li>");
 });

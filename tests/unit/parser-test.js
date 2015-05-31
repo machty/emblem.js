@@ -210,3 +210,20 @@ astTest('nested elements interspersed with content',
     ])
   );
 });
+
+astTest('action in bracketed attributes',
+    ['p [',
+      'click="test" ]'].join('\n'), function(assert, ast){
+      assert.deepEqual(
+          ast,
+          program([
+            element('p', [],  [{
+                  type: 'mustache',
+                  escaped: true,
+                  content: 'action "test" on="click"'
+                }]
+            )
+          ])
+      );
+    }
+);

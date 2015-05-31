@@ -345,6 +345,15 @@ test('bracketed nested block', function(){
     emblem, '{{#sally \'foo\' something="false"}}<p>Bracketed helper attrs!</p>{{/sally}}');
 });
 
+test('bracketed action attribute', function(){
+  var emblem = w('',
+                 'button [',
+                 '  click="doSomething" ]',
+                 '  | click here');
+  compilesTo(
+      emblem, '<button {{action "doSomething" on="click"}}>click here</button>');
+});
+
 test("single-line mustaches can have elements right after", function(){
   var emblem = w(
     'div',

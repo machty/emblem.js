@@ -1,10 +1,5 @@
 [![Build Status](https://travis-ci.org/machty/emblem.js.svg?branch=master)](https://travis-ci.org/machty/emblem.js)
 
-## LOOKING FOR NEW MAINTAINER OF EMBLEM.JS
-
-Please see [this issue](https://github.com/machty/emblem.js/issues/189)
-for information.
-
 # Emblem.js
 
 Emblem.js is an indentation-based templating language that prints

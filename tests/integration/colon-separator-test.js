@@ -53,8 +53,7 @@ test("with text terminator", function() {
 });
 
 test("test from heartsentwined", function() {
-  compilesTo('li data-foo=bar: a',
-                    '<li {{bind-attr data-foo=bar}}><a></a></li>');
+  compilesTo('li data-foo=bar: a', '<li data-foo={{bar}}><a></a></li>');
   compilesTo("li data-foo='bar': a", '<li data-foo="bar"><a></a></li>');
 });
 
@@ -62,7 +61,7 @@ test("mixture of colon and indentation", function() {
   var emblem;
   emblem = "li data-foo=bar: a\n  baz";
   return compilesTo(emblem,
-                           '<li {{bind-attr data-foo=bar}}><a>{{baz}}</a></li>');
+                           '<li data-foo={{bar}}><a>{{baz}}</a></li>');
 });
 
 test("mixture of colon and indentation pt.2", function() {
@@ -72,7 +71,7 @@ test("mixture of colon and indentation pt.2", function() {
              "  li data-foo='bar': a quux",
              "  li data-foo=bar href='#': a quux");
   compilesTo(emblem,
-    '<ul><li {{bind-attr data-foo=bar}}><a>quux</a></li><li data-foo="bar"><a>quux</a></li><li {{bind-attr data-foo=bar}} href="#"><a>quux</a></li></ul>');
+    '<ul><li data-foo={{bar}}><a>quux</a></li><li data-foo="bar"><a>quux</a></li><li data-foo={{bar}} href="#"><a>quux</a></li></ul>');
 });
 
 test("condensed nesting", function(){

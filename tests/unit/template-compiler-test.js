@@ -119,10 +119,17 @@ QUnit.test("compiles block with inverse AST", function(assert){
             content: 'hello there'
           }
         ],
-        inverseChildNodes: [
+        invertibleNodes: [
           {
-            type: 'text',
-            content: 'not hello there'
+            content: [
+              [
+                {
+                  type: 'text',
+                  content: 'not hello there'
+                }
+              ]
+            ],
+            name: 'else'
           }
         ]
       }

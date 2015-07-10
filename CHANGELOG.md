@@ -1,4 +1,17 @@
-# 0.5.1 (unreleased)
+# 0.6.0
+
+Emblem no longer outputs `{{bind-attr}}`s for attribute bindings,
+but instead outputs HTMLBars bound attribute syntax, e.g.
+
+    p class=foo Hello
+
+generates:
+
+    <p class={{foo}}>Hello</p>
+
+# 0.5.1
+
+Added support for block params.
 
 # [0.5.0](https://github.com/machty/emblem.js/releases/tag/0.5.0)
 

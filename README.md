@@ -17,7 +17,7 @@ Also check out the
 
 ### Installation with Ember-CLI
 
-To use Emblem 0.5.0 with [Ember-CLI](http://ember-cli.com/), use the [ember-cli-emblem](https://github.com/Vestorly/ember-cli-emblem)
+To use Emblem with [Ember-CLI](http://ember-cli.com/), use the [ember-cli-emblem](https://github.com/Vestorly/ember-cli-emblem)
 addon.
 
 ### Handlebars Version Dependencies

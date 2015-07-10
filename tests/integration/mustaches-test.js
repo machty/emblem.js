@@ -397,3 +397,25 @@ test("several brackets with closing bracket on final line with a view", function
   );
   return compilesTo(emblem, '{{view Ember.Select thing=res1 thi2ng=\'res2\' otherThing="res3"}}');
 });
+
+test("single-line mustaches can have array indexes", function(){
+  var emblem = w('my-component value=child.[0]');
+  compilesTo(emblem,
+    '{{my-component value=child.[0]}}');
+});
+
+test("single-line mustaches can have array indexes with bound indexes (not supported by Ember)", function(){
+  var emblem = w('my-component value=child.[someIndex]');
+  compilesTo(emblem,
+    '{{my-component value=child.[someIndex]}}');
+});
+
+test("multi-line mustaches can have array indexes with blocks", function(){
+  var emblem = w(
+    'my-component [',
+    '  value=child.[0] ]',
+    '  | Thing'
+  );
+  compilesTo(emblem,
+    '{{#my-component value=child.[0]}}Thing{{/my-component}}');
+});

@@ -9,6 +9,12 @@ generates:
 
     <p class={{foo}}>Hello</p>
 
+Likewise, colon syntax for class names will map to an inline if:
+
+    div class=foo:bar:baz                        =>    <div class={{ if foo 'bar' 'baz' }}>
+    .alert class=foo:bar:baz                     =>    <div class="alert {{ if foo 'bar' 'baz' }}">
+    .alert class={ foo:bar:baz one:two:three }   =>    <div class="alert {{ if foo 'bar' 'baz'}} {{if one 'two' 'three'}}">
+
 # 0.5.1
 
 Added support for block params.

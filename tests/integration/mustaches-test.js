@@ -198,6 +198,12 @@ test("# can be only thing on line", function(){
     "<span>#</span>");
 });
 
+test("brace works with text pipe", function() {
+  var emblem = `= link-to 'users.view' user | View user #{ user.name } #{ user.id }`;
+  compilesTo(emblem, '{{#link-to \'users.view\' user}}View user {{user.name }} {{user.id }}{{/link-to}}');
+});
+
+
 QUnit.module("mustache: inline block helper");
 
 test("text only", function() {

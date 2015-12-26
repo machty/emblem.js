@@ -25,6 +25,12 @@ test("multiple", function() {
   compilesTo(emblem, '<p id="yup" data-thinger={{yeah}} class={{foo}}>Hooray</p>');
 });
 
+test("in brackets", function() {
+  var emblem;
+  emblem = "p [\n  id=id some-data=data.ok]\n";
+  return compilesTo(emblem, '<p id={{id}} some-data={{data.ok}}></p>');
+});
+
 test("class special syntax with 2 vals", function() {
   var emblem = 'p class=foo:bar:baz';
   compilesTo(emblem, '<p class={{if foo \'bar\' \'baz\'}}></p>');

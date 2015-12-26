@@ -366,6 +366,11 @@ test("class special syntax with only 1st val", function() {
   compilesTo(emblem, '<p class={{if foo \'baz\'}}></p>');
 });
 
+test("class special syntax with slashes", function() {
+  var emblem = 'p class=foo/bar:baz';
+  compilesTo(emblem, '<p class={{if foo/bar \'baz\'}}></p>');
+});
+
 test("Inline binding with mixed classes", function() {
   var emblem = ".notice class={ test::active }";
   compilesTo(emblem, '<div class=\"notice {{if test \'\' \'active\'}}\"></div>');

@@ -3,7 +3,7 @@ var Funnel = require('broccoli-funnel');
 var mergeTrees = require('broccoli-merge-trees');
 var concat = require('broccoli-concat');
 var replace = require('broccoli-replace');
-var peg = require('broccoli-pegjs-import');
+var pegBuilder = require('broccoli-pegjs-import');
 var es6to5 = require('broccoli-6to5-transpiler');
 var broccoliStew = require('broccoli-stew');
 var broccoliCoffee = require('broccoli-coffee');
@@ -43,12 +43,12 @@ function replaceVersion(tree, files){
 }
 
 function buildPegTree(){
-  var pegTree = new Funnel('lib', {
-    include: ['*.pegjs'],
+  var pegFunnel = new Funnel('lib', {
+    include: ['**/*.pegjs'],
     destDir: outputDir + 'emblem'
   });
 
-  pegTree = peg(pegTree, {
+  var pegTree = pegBuilder(pegFunnel, {
     peg: pegjsImport,
     wrapper: function (src, parser) {
       return ['/*jshint newcap: false, laxbreak: true */',

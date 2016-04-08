@@ -2,6 +2,7 @@
 
 import { w } from '../support/utils';
 import { compilesTo } from '../support/integration-assertions';
+import Emblem from '../../emblem';
 
 QUnit.module("actions");
 
@@ -81,4 +82,31 @@ test("no quote remains unquoted in output", function() {
   var emblem;
   emblem = "button click=p Frank";
   compilesTo(emblem, '<button {{action p on="click"}}>Frank</button>');
+});
+
+test("more advanced subexpressions work", function() {
+  var emblem;
+  emblem = "select change={ action (mut vehicle) value=\"target.value\" }";
+  compilesTo(emblem, '<select {{action (mut vehicle) value="target.value"  on="change"}}></select>');
+});
+
+test("actions with HTML events and mustache content", function() {
+  var emblem;
+  emblem = "select onChange={ action (mut vehicle) value=\"target.value\" }";
+  compilesTo(emblem, '<select onchange={{action (mut vehicle) value="target.value" }}></select>');
+});
+
+test("actions with HTML events and mixing mustache actions and bound attrs", function() {
+  var emblem;
+  emblem = "button.small onClick={ action this.attrs.completeTask model } disabled=isEditing";
+  compilesTo(emblem, '<button onclick={{action this.attrs.completeTask model }} disabled={{isEditing}} class=\"small\"></button>');
+});
+
+test("trying to use a string action on a dom event will blow up", function() {
+  var emblem;
+  emblem = "button.small onClick=\"completeTask\"";
+
+  QUnit.throws( function(){
+    Emblem.compile(emblem);
+  }, /Using string actions on DOM events is not supported/i);
 });

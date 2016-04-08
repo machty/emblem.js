@@ -54,6 +54,8 @@ function buildPegTree(){
       return ['/*jshint newcap: false, laxbreak: true */',
               "import { generateBuilder } from './ast-builder';",
               "import { INDENT_SYMBOL, DEDENT_SYMBOL, UNMATCHED_DEDENT_SYMBOL, TERM_SYMBOL } from './preprocessor';",
+              "import { HTML_EVENTS, ALIAS_EVENTS } from './html/events';",
+              "import KNOWN_TAGS from './html/tags';",
               'var Parser = ' + parser + ';',
               'var parse = Parser.parse, ParserSyntaxError = Parser.SyntaxError;',
               'export {ParserSyntaxError, parse};',

@@ -47,6 +47,12 @@ test("bracketed attributes", function() {
   return compilesTo(emblem, '<p id="yes" class="no">Bracketed Attributes FTW!</p>');
 });
 
+test("bracketed mustache attributes", function() {
+  var emblem;
+  emblem = "p [\n  onclick={ action 'foo' }\n  class=\"no\" ]\n  | Bracketed Attributes FTW!";
+  return compilesTo(emblem, '<p onclick={{action \'foo\' }} class="no">Bracketed Attributes FTW!</p>');
+});
+
 test("bracketed text", function() {
   var emblem;
   emblem = "p [ Bracketed text is cool ]";

@@ -28,7 +28,7 @@
   ],
   "devDependencies": {
     "qunit": "1.17.1",
-    "loader.js": "ember-cli/loader.js",
+    "loader.js": "3.0.0",
     "ember": "1.11.3",
     "jquery": "~2.1.3"
   }

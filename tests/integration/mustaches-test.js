@@ -425,3 +425,27 @@ test("multi-line mustaches can have array indexes with blocks", function(){
   compilesTo(emblem,
     '{{#my-component value=child.[0]}}Thing{{/my-component}}');
 });
+
+test("mustaches with else statement", function(){
+  var emblem = w(
+    'some-component-with-inverse-yield',
+    '  |foo',
+    'else',
+    '  |bar'
+  );
+  compilesTo(emblem,
+    '{{#some-component-with-inverse-yield}}foo{{else}}bar{{/some-component-with-inverse-yield}}');
+});
+
+test("mustaches with blocks and comments", function(){
+  var emblem = w(
+    '/ Hi',
+    '= if foo',
+    '  p Hi',
+    '/ Bye',
+    '= else if bar',
+    '  p bye'
+  );
+  compilesTo(emblem,
+    '{{#if foo}}<p>Hi</p>{{else if bar}}<p>bye</p>{{/if}}');
+});

@@ -237,7 +237,7 @@ astTest('action in bracketed attributes with dom event',
             element('p', [],  [{
                 type: 'assignedMustache',
                 key:  'onclick',
-                content: 'action "test" '
+                content: 'action "test"'
               }]
             )
           ])

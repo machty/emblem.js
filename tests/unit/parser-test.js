@@ -38,6 +38,7 @@ function element(tagName, childNodes, attrStaches, classNameBindings){
     isVoid: isVoidElement(tagName),
     classNameBindings: classNameBindings || [],
     attrStaches: attrStaches || [],
+    inTagText: [],
     childNodes: childNodes || []
   };
 }

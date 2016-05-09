@@ -341,7 +341,7 @@ test('bracketed nested statement', function(){
     emblem, '{{#sally \'foo\' something="false"}}Bracketed helper attrs!{{/sally}}');
 });
 
-test('bracketed nested block', function(){
+test('bracketed nested block params with block', function(){
   var emblem = w('',
                  'sally [',
                  '  \'foo\'',
@@ -349,6 +349,47 @@ test('bracketed nested block', function(){
                  '  p Bracketed helper attrs!');
   compilesTo(
     emblem, '{{#sally \'foo\' something="false"}}<p>Bracketed helper attrs!</p>{{/sally}}');
+});
+
+test('bracketed nested block params', function(){
+  var emblem = w('',
+                 'sally [',
+                 '  \'foo\'',
+                 '  something="false" ] as |foo|');
+  compilesTo(
+    emblem, '{{#sally \'foo\' something="false" as |foo|}}{{/sally}}');
+});
+
+test('bracketed with block params and block', function(){
+  var emblem = w('',
+                 'sally [',
+                 '  \'foo\'',
+                 '  something="false" ] as |foo|',
+                 '  p = foo');
+  compilesTo(
+    emblem, '{{#sally \'foo\' something="false" as |foo|}}<p>{{foo}}</p>{{/sally}}');
+});
+
+test('bracketed with close on newline and with block', function(){
+  var emblem = w('',
+                 'sally [',
+                 '  \'foo\'',
+                 '  something="false"',
+                 ']',
+                 '  p = foo');
+  compilesTo(
+    emblem, '{{#sally \'foo\' something="false"}}<p>{{foo}}</p>{{/sally}}');
+});
+
+test('bracketed with close on newline, with block params and block', function(){
+  var emblem = w('',
+                 'sally [',
+                 '  \'foo\'',
+                 '  something="false"',
+                 '] as |foo|',
+                 '  p = foo');
+  compilesTo(
+    emblem, '{{#sally \'foo\' something="false" as |foo|}}<p>{{foo}}</p>{{/sally}}');
 });
 
 test('bracketed action attribute', function(){

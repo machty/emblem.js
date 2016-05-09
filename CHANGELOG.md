@@ -1,3 +1,20 @@
+# 0.8.0
+- Add a wider variety of support for bracketed attributes and blocks / block params
+- Initial support for glimmer components using `%` helper
+- Fix issue with comments breaking if / else block indentation
+- Fix issue with multiple nested subexpressions
+- Allow for a wider range of attribute options on dom elements (i.e. full range of closure action syntax)
+
+# 0.7.1
+- Allow slashes in attr values
+
+# 0.7.0
+- Added new spacing helper:
+  `+` will add an extra space before line
+- Fixed a bug with bound attributes in brackets
+- Fixed a bug with using a pipe and a bound variable
+
+
 # 0.6.0
 
 Emblem no longer outputs `{{bind-attr}}`s for attribute bindings,

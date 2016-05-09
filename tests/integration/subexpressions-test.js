@@ -54,6 +54,15 @@ test("with hashes", function() {
   compilesTo(emblem, '{{echo (equal (equal 1 1) true fun="yes")}}');
 });
 
+test("with multiple", function() {
+  var emblem  = 'if (and (or true true) true)';
+  compilesTo(emblem, '{{if (and (or true true) true)}}');
+});
+
+test("with multiple p2", function() {
+  var emblem  = 'if (and (or true true) (or true true))';
+  compilesTo(emblem, '{{if (and (or true true) (or true true))}}');
+});
 
 test("as hashes", function() {
   var emblem  = 'p {{echofun fun=(equal 1 1)}}';

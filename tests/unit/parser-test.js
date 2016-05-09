@@ -38,6 +38,7 @@ function element(tagName, childNodes, attrStaches, classNameBindings){
     isVoid: isVoidElement(tagName),
     classNameBindings: classNameBindings || [],
     attrStaches: attrStaches || [],
+    inTagText: [],
     childNodes: childNodes || []
   };
 }
@@ -237,7 +238,7 @@ astTest('action in bracketed attributes with dom event',
             element('p', [],  [{
                 type: 'assignedMustache',
                 key:  'onclick',
-                content: 'action "test" '
+                content: 'action "test"'
               }]
             )
           ])

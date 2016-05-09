@@ -108,6 +108,7 @@ test('lowercase double-quoted attr value', function(assert){
         ],
         "childNodes": [],
         "classNameBindings": [],
+        "inTagText": [],
         "isVoid": true,
         "tagName": "input",
         "type": "element"
@@ -132,6 +133,7 @@ test('lowercase single-quoted attr value', function(assert){
         ],
         "childNodes": [],
         "classNameBindings": [],
+        "inTagText": [],
         "isVoid": true,
         "tagName": "input",
         "type": "element"
@@ -155,6 +157,7 @@ test('attr value with underscore', function(assert){
         ],
         "childNodes": [],
         "classNameBindings": [],
+        "inTagText": [],
         "isVoid": true,
         "tagName": "input",
         "type": "element"
@@ -208,6 +211,7 @@ test('attr value is empty string', function(assert){
         ],
         "childNodes": [],
         "classNameBindings": [],
+        "inTagText": [],
         "isVoid": true,
         "tagName": "input",
         "type": "element"
@@ -227,6 +231,7 @@ test('attr value is empty string', function(assert){
         ],
         "childNodes": [],
         "classNameBindings": [],
+        "inTagText": [],
         "isVoid": true,
         "tagName": "input",
         "type": "element"

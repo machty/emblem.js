@@ -39,7 +39,7 @@
     "broccoli-replace": "~0.1.6",
     "broccoli-stew": "^0.2.0",
     "chalk": "^0.5.1",
-    "ember-cli": "0.1.12",
+    "ember-cli": "0.2.7",
     "pegjs-import": "^0.2.6",
     "qunit": "0.7.5",
     "rsvp": "^3.0.16",

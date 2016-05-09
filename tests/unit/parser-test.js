@@ -218,10 +218,27 @@ astTest('action in bracketed attributes',
           ast,
           program([
             element('p', [],  [{
-                  type: 'mustache',
-                  escaped: true,
-                  content: 'action "test" on="click"'
-                }]
+                type: 'mustache',
+                escaped: true,
+                content: 'action "test" on="click"'
+              }]
+            )
+          ])
+      );
+    }
+);
+
+astTest('action in bracketed attributes with dom event',
+    ['p [',
+      'onclick={ action "test" } ]'].join('\n'), function(assert, ast){
+      assert.deepEqual(
+          ast,
+          program([
+            element('p', [],  [{
+                type: 'assignedMustache',
+                key:  'onclick',
+                content: 'action "test" '
+              }]
             )
           ])
       );

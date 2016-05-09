@@ -1,21 +1,21 @@
-# 0.8.0
+# [0.8.0](https://github.com/machty/emblem.js/releases/tag/0.8.0)
 - Add a wider variety of support for bracketed attributes and blocks / block params
 - Initial support for glimmer components using `%` helper
 - Fix issue with comments breaking if / else block indentation
 - Fix issue with multiple nested subexpressions
 - Allow for a wider range of attribute options on dom elements (i.e. full range of closure action syntax)
 
-# 0.7.1
+# [0.7.1](https://github.com/machty/emblem.js/releases/tag/0.7.1)
 - Allow slashes in attr values
 
-# 0.7.0
+# [0.7.0](https://github.com/machty/emblem.js/releases/tag/0.7.0)
 - Added new spacing helper:
   `+` will add an extra space before line
 - Fixed a bug with bound attributes in brackets
 - Fixed a bug with using a pipe and a bound variable
 
 
-# 0.6.0
+# [0.6.0](https://github.com/machty/emblem.js/releases/tag/0.6.0)
 
 Emblem no longer outputs `{{bind-attr}}`s for attribute bindings,
 but instead outputs HTMLBars bound attribute syntax, e.g.
@@ -32,7 +32,7 @@ Likewise, colon syntax for class names will map to an inline if:
     .alert class=foo:bar:baz                     =>    <div class="alert {{ if foo 'bar' 'baz' }}">
     .alert class={ foo:bar:baz one:two:three }   =>    <div class="alert {{ if foo 'bar' 'baz'}} {{if one 'two' 'three'}}">
 
-# 0.5.1
+# [0.5.1](https://github.com/machty/emblem.js/releases/tag/0.5.1)
 
 Added support for block params.
 

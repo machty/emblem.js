@@ -19,8 +19,7 @@
   },
   "dependencies": {
     "handlebars": "^2.0.0",
-    "optimist": "^0.3.7",
-    "uglify-js": "^1.2.6"
+    "optimist": "^0.3.7"
   },
   "devDependencies": {
     "StringScanner": "~0.0.3",

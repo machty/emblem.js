@@ -16,64 +16,6 @@ var optimist = require('optimist')
         'type': 'string',
         'description': 'Output File',
         'alias': 'output'
-      },
-      'a': {
-        'type': 'boolean',
-        'description': 'Exports amd style (require.js)',
-        'alias': 'amd'
-      },
-      'c': {
-        'type': 'string',
-        'description': 'Exports CommonJS style, path to emblem module',
-        'alias': 'commonjs',
-        'default': null
-      },
-      'h': {
-        'type': 'string',
-        'description': 'Path to emblem.js (only valid for amd-style)',
-        'alias': 'emblemPath',
-        'default': ''
-      },
-      'k': {
-        'type': 'string',
-        'description': 'Known helpers',
-        'alias': 'known'
-      },
-      'o': {
-        'type': 'boolean',
-        'description': 'Known helpers only',
-        'alias': 'knownOnly'
-      },
-      'm': {
-        'type': 'boolean',
-        'description': 'Minimize output',
-        'alias': 'min'
-      },
-      'n': {
-        'type': 'string',
-        'description': 'Template namespace',
-        'alias': 'namespace',
-        'default': 'Ember.TEMPLATES'
-      },
-      's': {
-        'type': 'boolean',
-        'description': 'Output template function only.',
-        'alias': 'simple'
-      },
-      'r': {
-        'type': 'string',
-        'description': 'Template root. Base value that will be stripped from template names.',
-        'alias': 'root'
-      },
-      'p' : {
-        'type': 'boolean',
-        'description': 'Compiling a partial template',
-        'alias': 'partial'
-      },
-      'd' : {
-        'type': 'boolean',
-        'description': 'Include data when compiling',
-        'alias': 'data'
       }
     })
 
@@ -93,98 +35,21 @@ var optimist = require('optimist')
           throw 'Unable to open template file "' + template + '"';
         }
       });
-    })
-    .check(function(argv) {
-      if (argv.simple && argv.min) {
-        throw 'Unable to minimze simple output';
-      }
-      if (argv.simple && (argv._.length !== 1 || fs.statSync(argv._[0]).isDirectory())) {
-        throw 'Unable to output multiple templates in simple mode';
-      }
     });
 
-var fs = require('fs'),
-    emblem = require('../lib/emblem'),
-    basename = require('path').basename,
-    uglify = require('uglify-js');
+var fs = require('fs');
+var emblem = require('../dist/cjs/emblem.js')['default'];
 
-var argv = optimist.argv,
-    template = argv._[0];
-   
+var argv = optimist.argv;
+var template = argv._[0];
+
 if(argv.version) {
   console.log(emblem.VERSION);
   return;
 }
 
-// Convert the known list into a hash
-var known = {};
-if (argv.known && !Array.isArray(argv.known)) {
-  argv.known = [argv.known];
-}
-if (argv.known) {
-  for (var i = 0, len = argv.known.length; i < len; i++) {
-    known[argv.known[i]] = true;
-  }
-}
-
-var output = [];
-if (!argv.simple) {
-  if (argv.amd) {
-    output.push('define([\'' + argv.emblemPath + 'emblem\'], function(Emblem) {\n');
-  } else if (argv.commonjs) {
-    output.push('var Emblem = require("' + argv.commonjs + '");');
-  } else {
-    output.push('(function() {\n');
-  }
-  output.push('  var template = Emblem.template, templates = ');
-  output.push(argv.namespace);
-  output.push(' = ');
-  output.push(argv.namespace);
-  output.push(' || {};\n');
-}
-
 function processData(data) {
-  var options = {
-    knownHelpers: known,
-    knownHelpersOnly: argv.o
-  };
-
-  if (argv.data) {
-    options.data = true;
-  }
-
-  // Clean the template name
-  if (!root) {
-    template = basename(template);
-  } else if (template.indexOf(root) === 0) {
-    template = template.substring(root.length+1);
-  }
-  template = template.replace(/\.emblem$/, '');
-
-  if (argv.simple) {
-    output.push(emblem.precompile(data, options) + '\n');
-  } else if (argv.partial) {
-    output.push('Emblem.partials[\'' + template + '\'] = template(' + emblem.precompile(data, options) + ');\n');
-  } else {
-    output.push('templates[\'' + template + '\'] = template(' + emblem.precompile(data, options) + ');\n');
-  }
-
-  // Output the content
-  if (!argv.simple) {
-    if (argv.amd) {
-      output.push('});');
-    } else if (!argv.commonjs) {
-      output.push('})();');
-    }
-  }
-  output = output.join('');
-
-  if (argv.min) {
-    var ast = uglify.parser.parse(output);
-    ast = uglify.uglify.ast_mangle(ast);
-    ast = uglify.uglify.ast_squeeze(ast);
-    output = uglify.uglify.gen_code(ast);
-  }
+  var output = emblem.compile(data);
 
   if (argv.output) {
     fs.writeFileSync(argv.output, output, 'utf8');
@@ -193,30 +58,31 @@ function processData(data) {
   }
 }
 
-function processTemplate(template, root) {
-  var path = template,
-      stat = fs.statSync(path);
+function processFile(templatePath) {
+  var stat = fs.statSync(templatePath);
+
   if (stat.isDirectory()) {
-    fs.readdirSync(template).map(function(file) {
-      var path = template + '/' + file;
+    fs.readdirSync(templatePath).map(function(file) {
+      var path = templatePath + '/' + file;
 
       if (/\.emblem$/.test(path) || fs.statSync(path).isDirectory()) {
-        processTemplate(path, root || template);
+        processFile(path);
       }
     });
   } else {
-    var data = fs.readFileSync(path, 'utf8');
+    var data = fs.readFileSync(templatePath, 'utf8');
+
     processData(data);
   }
 }
 
 if(argv.stdin) {
   var input = "";
- 
+
   template = (argv.stdin === true ? 'template' : argv.stdin );
 
   process.stdin.on('data', function(data) {
-    input += data; 
+    input += data;
   });
 
   process.stdin.on('end', function() {
@@ -227,8 +93,8 @@ if(argv.stdin) {
   process.stdin.resume();
 
 } else {
-  argv._.forEach(function(template) {
-    processTemplate(template, argv.root);
+  argv._.forEach(function(templatePath) {
+    processFile(templatePath);
   });
 }
 

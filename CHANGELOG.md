@@ -1,3 +1,6 @@
+# [0.8.1](https://github.com/machty/emblem.js/releases/tag/0.8.0)
+- Fix issue with bracketed attributes without blocks
+
 # [0.8.0](https://github.com/machty/emblem.js/releases/tag/0.8.0)
 - Add a wider variety of support for bracketed attributes and blocks / block params
 - Initial support for glimmer components using `%` helper

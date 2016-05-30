@@ -357,7 +357,7 @@ test('bracketed nested block params', function(){
                  '  \'foo\'',
                  '  something="false" ] as |foo|');
   compilesTo(
-    emblem, '{{#sally \'foo\' something="false" as |foo|}}{{/sally}}');
+    emblem, '{{sally \'foo\' something="false" as |foo|}}');
 });
 
 test('bracketed with block params and block', function(){

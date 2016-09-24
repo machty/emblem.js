@@ -64,6 +64,11 @@ test("with multiple p2", function() {
   compilesTo(emblem, '{{if (and (or true true) (or true true))}}');
 });
 
+test("with multiple (mixed) p3", function() {
+  var emblem = 'yield (hash title=(component "panel-title") body=(component "panel-content"))'
+  compilesTo(emblem, '{{yield (hash title=(component \"panel-title\") body=(component \"panel-content\"))}}');
+});
+
 test("as hashes", function() {
   var emblem  = 'p {{echofun fun=(equal 1 1)}}';
   compilesTo(emblem, '<p>{{echofun fun=(equal 1 1)}}</p>');

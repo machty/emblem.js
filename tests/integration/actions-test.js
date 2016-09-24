@@ -11,6 +11,16 @@ test("basic (click)", function(){
   compilesTo(emblem, '<button {{action "submitComment" on="click"}}>Submit Comment</button>');
 });
 
+test("basic (click) preceded by action keyword", function(){
+  var emblem = 'button click="action submitComment" Submit Comment';
+  compilesTo(emblem, '<button {{action submitComment on="click"}}>Submit Comment</button>');
+});
+
+test("action has action in its name", function(){
+  var emblem = 'button click="submitTransaction" Submit Comment';
+  compilesTo(emblem, '<button {{action "submitTransaction" on="click"}}>Submit Comment</button>');
+});
+
 test("basic (click) followed by attr", function(){
   var emblem = 'button click="submitComment" class="foo" Submit Comment';
   compilesTo(emblem, '<button {{action "submitComment" on="click"}} class="foo">Submit Comment</button>');

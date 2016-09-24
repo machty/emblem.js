@@ -1,4 +1,9 @@
-# [0.8.1](https://github.com/machty/emblem.js/releases/tag/0.8.0)
+# [0.8.2](https://github.com/machty/emblem.js/releases/tag/0.8.2)
+- Fix variation on subexpressions
+- Add menuitem as HTML element
+- Fix bug with actions that have 'action' as a value
+
+# [0.8.1](https://github.com/machty/emblem.js/releases/tag/0.8.1)
 - Fix issue with bracketed attributes without blocks
 
 # [0.8.0](https://github.com/machty/emblem.js/releases/tag/0.8.0)

@@ -331,6 +331,15 @@ test('explicit mustache with "/" in name', function(){
   compilesTo(emblem, '{{navigation/button-list}}');
 });
 
+test('bracketed statement with comment', function() {
+  var emblem = w('sally [',
+                 '  \'foo\'',
+                 '  / We need to add more',
+                 ']');
+  compilesTo(
+    emblem, '{{sally \'foo\'}}');
+});
+
 test('bracketed nested statement', function(){
   var emblem = w('',
                  'sally [',
@@ -478,6 +487,18 @@ test("mustaches with else statement", function(){
     '{{#some-component-with-inverse-yield}}foo{{else}}bar{{/some-component-with-inverse-yield}}');
 });
 
+test('mustache with else if', function() {
+  var emblem = w(
+    '= if foo',
+    '  p Hi!',
+    '= else if foo',
+    '  p bye'
+  );
+
+  compilesTo(emblem,
+    '{{#if foo}}<p>Hi!</p>{{else if foo}}<p>bye</p>{{/if}}');
+});
+
 test("mustaches with blocks and comments", function(){
   var emblem = w(
     '/ Hi',
@@ -489,4 +510,19 @@ test("mustaches with blocks and comments", function(){
   );
   compilesTo(emblem,
     '{{#if foo}}<p>Hi</p>{{else if bar}}<p>bye</p>{{/if}}');
+});
+
+test('mustache with else if and complex statements', function() {
+  var emblem = w(
+    '= if foo',
+    '  p Hi!',
+    '= else if (eq 1 (and-or [',
+    '  a=b',
+    '  showHidden=(eq 1 2)',
+    ']))',
+    '  p Wow what was that?'
+  );
+
+  compilesTo(emblem,
+    '{{#if foo}}<p>Hi!</p>{{else if (eq 1 (and-or a=b showHidden=(eq 1 2)))}}<p>Wow what was that?</p>{{/if}}');
 });

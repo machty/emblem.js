@@ -1,5 +1,6 @@
 /*global QUnit*/
 
+import { w } from '../support/utils';
 import { compilesTo } from '../support/integration-assertions';
 
 QUnit.module("subexpressions");
@@ -84,4 +85,72 @@ test("complex expression", function() {
   emblem = '= echofun true (hello how="are" you=false) 1 not=true fun=(equal "ECHO hello" (echo (hello))) win="yes"';
   var expected = '{{echofun true (hello how="are" you=false) 1 not=true fun=(equal "ECHO hello" (echo (hello))) win="yes"}}';
   compilesTo(emblem, expected);
+});
+
+
+test('subexpression brackets', function() {
+  var emblem = w(
+    '= my-component (hash [',
+    '  foo',
+    '])'
+  );
+  compilesTo(emblem,
+    '{{my-component (hash foo)}}');
+});
+
+test('subexpression brackets and comment', function() {
+  var emblem = w(
+    '= my-component (hash [',
+    '  foo',
+    '  / There was another thing but oh well',
+    '])'
+  );
+  compilesTo(emblem,
+    '{{my-component (hash foo)}}');
+});
+
+test('subexpression brackets with subexpression', function() {
+  var emblem = w(
+    '= my-component (hash [',
+    '  foo',
+    '  bar=(eq 1 2)',
+    '])'
+  );
+  compilesTo(emblem,
+    '{{my-component (hash foo bar=(eq 1 2))}}');
+});
+
+test('subexpression brackets with nested brackets', function() {
+  var emblem = w(
+    '= my-component (hash [',
+    '  foo',
+    '  bar=(eq [',
+    '    1',
+    '    2',
+    '    overwrite=true',
+    '  ])',
+    '])'
+  );
+  compilesTo(emblem,
+    '{{my-component (hash foo bar=(eq 1 2 overwrite=true))}}');
+});
+
+test('yield with hash example (I-292)', function() {
+  var emblem = w(
+    '= yield (hash buttons=(hash [',
+    '  saveSheet=(component [',
+    '    \'save-sheet\'',
+    '    isReadonly=isReadonly',
+    '    buttonAction=(action saveComponent)',
+    '  ])',
+    '  fontFamily=(component [',
+    '    \'font-family\'',
+    '    isReadonly=isReadonly',
+    '    buttonAction=(action applyStyles)',
+    '  ])',
+    ']))'
+  );
+
+  compilesTo(emblem,
+    '{{yield (hash buttons=(hash saveSheet=(component \'save-sheet\' isReadonly=isReadonly buttonAction=(action saveComponent)) fontFamily=(component \'font-family\' isReadonly=isReadonly buttonAction=(action applyStyles))))}}');
 });

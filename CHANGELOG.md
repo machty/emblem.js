@@ -1,3 +1,10 @@
+# [0.9.0](https://github.com/machty/emblem.js/releases/tag/0.9.0)
+- Support bracket params in subexpressions
+- block params no longer allow subexpressions
+- else / else if nodes should now accept the full range of mustache attrs
+- bracketed attrs can have comments (sort of)
+- added yarn
+
 # [0.8.2](https://github.com/machty/emblem.js/releases/tag/0.8.2)
 - Fix variation on subexpressions
 - Add menuitem as HTML element

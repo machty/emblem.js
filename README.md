@@ -10,7 +10,7 @@ templates.
 Emblem's syntax most closely resembles that of the
 [Slim templating language](http://slim-lang.com/). Please see the
 [Emblem docs site](http://www.emblemjs.com) for a full explanation
-of the syntax, and check out [Try Emblem](http://bantic.github.io/try-emblem/).
+of the syntax, and check out [Try Emblem](https://mammothhr.github.io/try-emblem/).
 
 Also check out the
 [Embercast on Emblem.js](http://www.embercasts.com/episodes/2)

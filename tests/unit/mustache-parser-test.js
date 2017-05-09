@@ -511,4 +511,3 @@ test('multiple block params', function(assert){
     "type": "program"
   });
 });
-

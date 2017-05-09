@@ -137,6 +137,16 @@ test("static", function() {
   compilesTo('option selected=true Thingeroo', '<option selected>Thingeroo</option>');
 });
 
+QUnit.module("attributes: numbers");
+
+test('number literals as attributes', function() {
+  compilesTo('td colspan=3', '<td colspan=3></td>');
+});
+
+test('large number literals as attributes', function() {
+  compilesTo('td colspan=35234', '<td colspan=35234></td>');
+});
+
 QUnit.module("attributes: class name coalescing");
 
 test("when literal class is used", function() {

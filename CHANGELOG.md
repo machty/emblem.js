@@ -1,3 +1,7 @@
+# [0.9.1](https://github.com/machty/emblem.js/releases/tag/v0.9.1)
+- Fix issue with number literals as HTML attributes
+- Tests run on Node 4
+
 # [0.9.0](https://github.com/machty/emblem.js/releases/tag/v0.9.0)
 - Support bracket params in subexpressions
 - block params no longer allow subexpressions

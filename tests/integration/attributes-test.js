@@ -236,6 +236,11 @@ test('mustache in attribute with exclamation point', function(){
   compilesTo(emblem, '<a href="{{unbound postLink}}" target="_blank"></a>');
 });
 
+test('mustache with multiple path segments in attribute with exclamation point', function(){
+  var emblem = "a href=model.postLink! target='_blank'";
+  compilesTo(emblem, '<a href="{{unbound model.postLink}}" target="_blank"></a>');
+});
+
 test('mustache attribute value has comma', function(){
   var emblem = "a name='my, cool, name'";
   compilesTo(emblem, '<a name="my, cool, name"></a>');

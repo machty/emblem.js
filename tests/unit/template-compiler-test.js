@@ -207,3 +207,26 @@ QUnit.test("compiles simple classNameBindings to a class attribute", function(as
 
   assert.equal(result, '<div class="size color"></div>');
 });
+
+QUnit.test("bound attribute values get quoted", function(assert){
+  var ast = {
+    type: 'program',
+    childNodes: [{
+      type: 'element',
+      tagName: 'img',
+      inTagText: [],
+      isVoid: true,
+      classNameBindings: [],
+      attrStaches: [{
+        type: 'assignedMustache',
+        key: 'alt',
+        content: 'alt_text'
+      }],
+      childNodes: []
+    }]
+  };
+
+  var result = compile(ast);
+
+  assert.equal(result, '<img alt="{{alt_text}}">');
+});

@@ -17,6 +17,9 @@ test("various one-liners", function(){
     '{{foo}}{{arf}}<p>{{foo}}</p><span class="foo"></span><p data-foo="yes">{{goo}}</p>');
 });
 
+test('named argument syntax', function() {
+  compilesTo('= @bar', '{{@bar}}');
+});
 
 test("double =='s un-escape", function(){
   var emblem = w(

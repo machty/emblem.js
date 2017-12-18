@@ -10,7 +10,7 @@ test("basic syntax", function(){
     "% my-component value=foo data-hint='not-my-component%%::'"
   );
   compilesTo(emblem,
-    '<my-component value={{foo}} data-hint=\"not-my-component%%::\"></my-component>');
+    '<my-component value=\"{{foo}}\" data-hint=\"not-my-component%%::\"></my-component>');
 });
 
 test("names with :", function(){
@@ -18,7 +18,7 @@ test("names with :", function(){
     "% inputs:my-component value=foo"
   );
   compilesTo(emblem,
-    '<inputs:my-component value={{foo}}></inputs:my-component>');
+    '<inputs:my-component value=\"{{foo}}\"></inputs:my-component>');
 });
 
 // @TODO
@@ -30,7 +30,7 @@ test("Blocks", function() {
     "  |Hi!"
   );
   compilesTo(emblem,
-    '<my-component value={{foo}}>Hi!</my-component>');
+    '<my-component value=\"{{foo}}\">Hi!</my-component>');
 });
 
 test("Block params", function() {
@@ -39,7 +39,7 @@ test("Block params", function() {
     "  = comp.name"
   );
   compilesTo(emblem,
-    '<my-component value={{foo}} as |comp1 comp2|>{{comp.name}}</my-component>');
+    '<my-component value=\"{{foo}}\" as |comp1 comp2|>{{comp.name}}</my-component>');
 });
 
 // @TODO: What should the result of this be?
@@ -51,7 +51,7 @@ test('brackets with string', function(){
                  '  foo=bar',
                  '  baz=\'food\' ]');
   compilesTo(
-    emblem, '<my-component foo={{bar}} baz=\"food\"></my-component>');
+    emblem, '<my-component foo=\"{{bar}}\" baz=\"food\"></my-component>');
 });
 
 // Invalid
@@ -74,7 +74,7 @@ test('bracketed nested with actions', function(){
                  '  something="false" ]',
                  '  p Bracketed helper attrs!');
   compilesTo(
-    emblem, '<my-component onclick={{action \'doSometing\' foo bar}} {{action \"otherAction\" on=\"change\"}} something=\"false\"><p>Bracketed helper attrs!</p></my-component>');
+    emblem, '<my-component onclick=\"{{action \'doSometing\' foo bar}}\" {{action \"otherAction\" on=\"change\"}} something=\"false\"><p>Bracketed helper attrs!</p></my-component>');
 });
 
 // @TODO: should these support mustache-like syntax?  (i.e. %my-component value=(foo) )
@@ -83,7 +83,7 @@ test("Sub-expressions", function() {
     "% my-component value={ (or (eq foo 'bar') (eq foo 'baz')) }"
   );
   compilesTo(emblem,
-    '<my-component value={{(or (eq foo \'bar\') (eq foo \'baz\'))}}></my-component>');
+    '<my-component value=\"{{(or (eq foo \'bar\') (eq foo \'baz\'))}}\"></my-component>');
 });
 
 test('recursive nesting part 2', function(){

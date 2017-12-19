@@ -74,7 +74,7 @@ test('bracketed nested with actions', function(){
                  '  something="false" ]',
                  '  p Bracketed helper attrs!');
   compilesTo(
-    emblem, '<my-component onclick=\"{{action \'doSometing\' foo bar}}\" {{action \"otherAction\" on=\"change\"}} something=\"false\"><p>Bracketed helper attrs!</p></my-component>');
+    emblem, '<my-component onclick={{action \'doSometing\' foo bar}} {{action \"otherAction\" on=\"change\"}} something=\"false\"><p>Bracketed helper attrs!</p></my-component>');
 });
 
 // @TODO: should these support mustache-like syntax?  (i.e. %my-component value=(foo) )

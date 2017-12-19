@@ -103,11 +103,11 @@ test("more advanced subexpressions work", function() {
 test("actions with HTML events and mustache content", function() {
   var emblem;
   emblem = "select onchange={ action (mut vehicle) value=\"target.value\" }";
-  compilesTo(emblem, '<select onchange=\"{{action (mut vehicle) value="target.value"}}\"></select>');
+  compilesTo(emblem, '<select onchange={{action (mut vehicle) value="target.value"}}></select>');
 });
 
 test("actions with HTML events and mixing mustache actions and bound attrs", function() {
   var emblem;
   emblem = "button.small onclick={ action this.attrs.completeTask model } disabled=isEditing";
-  compilesTo(emblem, '<button onclick=\"{{action this.attrs.completeTask model}}\" disabled=\"{{isEditing}}\" class=\"small\"></button>');
+  compilesTo(emblem, '<button onclick={{action this.attrs.completeTask model}} disabled=\"{{isEditing}}\" class=\"small\"></button>');
 });

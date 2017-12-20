@@ -23,6 +23,14 @@ test("basic syntax with legacy quoting", function(){
     });
 });
 
+test("boolean attribute passed in as component input", function() {
+  var emblem = w(
+    "% my-component @multiselect=false"
+  );
+  compilesTo(emblem,
+    '<my-component @multiselect={{false}}></my-component>');
+});
+
 test("names with :", function(){
   var emblem = w(
     "% inputs:my-component @value=foo"

@@ -1,3 +1,7 @@
+# [0.9.2](https://github.com/machty/emblem.js/releases/tag/v0.9.1)
+- Properly quote mustache for non-event HTML attributes
+- Add some missing event aliases
+
 # [0.9.1](https://github.com/machty/emblem.js/releases/tag/v0.9.1)
 - Fix issue with number literals as HTML attributes
 - Tests run on Node 4

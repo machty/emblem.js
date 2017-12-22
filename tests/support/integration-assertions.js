@@ -3,8 +3,14 @@
 import { w } from '../support/utils';
 import Emblem from '../../emblem';
 
-export function compilesTo( emblem, handlebars, message ) {
-  var output = Emblem.compile(emblem);
+var defaultOptions = {
+  legacyAttributeQuoting: false
+};
+
+export function compilesTo(emblem, handlebars, message, emblemOptions) {
+  var options = emblemOptions || defaultOptions;
+  var output = Emblem.compile(emblem, options);
+
   if (!message) {
     var maxLenth = 40;
     var messageEmblem = emblem.replace(/\n/g, "\\n");

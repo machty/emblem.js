@@ -219,11 +219,11 @@ QUnit.module("attributes: bound and unbound");
 
 test("path with dot", function(){
   var emblem = 'iframe src=post.pdfAttachment';
-  compilesTo(emblem, '<iframe src=\"{{post.pdfAttachment}}\"></iframe>');
+  compilesTo(emblem, '<iframe src={{post.pdfAttachment}}></iframe>');
 
   emblem = 'iframe src=post.pdfAttachmentUrl width="96%" height="400" view="FitV" frameborder="0" style="z-index: 0 !important;"';
   compilesTo(emblem,
-                    '<iframe src=\"{{post.pdfAttachmentUrl}}\" width="96%" height="400" view="FitV" frameborder="0" style="z-index: 0 !important;"></iframe>');
+                    '<iframe src={{post.pdfAttachmentUrl}} width="96%" height="400" view="FitV" frameborder="0" style="z-index: 0 !important;"></iframe>');
 });
 
 test('mustache in attribute', function(){
@@ -275,17 +275,31 @@ QUnit.module("attributes with inline if");
 
 test("with attribute and bound values", function() {
   var emblem = 'div style={ if isActive foo bar }';
-  compilesTo(emblem, '<div style=\"{{if isActive foo bar}}\"></div>');
+  compilesTo(emblem, '<div style={{if isActive foo bar}}></div>');
+});
+
+test("with attribute and bound values and legacy quoting", function() {
+  var emblem = 'div style={ if isActive foo bar }';
+  compilesTo(emblem, '<div style=\"{{if isActive foo bar}}\"></div>', null, {
+    legacyAttributeQuoting: true
+  });
 });
 
 test("with attribute", function() {
   var emblem = 'a href={ if isActive \'http://google.com\' \'http://bing.com\' }';
-  compilesTo(emblem, '<a href=\"{{if isActive \'http://google.com\' \'http://bing.com\'}}\"></a>');
+  compilesTo(emblem, '<a href={{if isActive \'http://google.com\' \'http://bing.com\'}}></a>');
+});
+
+test("with attribute and legacy quoting", function() {
+  var emblem = 'a href={ if isActive \'http://google.com\' \'http://bing.com\' }';
+  compilesTo(emblem, '<a href=\"{{if isActive \'http://google.com\' \'http://bing.com\'}}\"></a>', null, {
+    legacyAttributeQuoting: true
+  });
 });
 
 test("with attribute and bound values", function() {
   var emblem = 'a href={ if isActive google bing }';
-  compilesTo(emblem, '<a href=\"{{if isActive google bing}}\"></a>');
+  compilesTo(emblem, '<a href={{if isActive google bing}}></a>');
 });
 
 test("unbound attributes", function() {
@@ -358,13 +372,20 @@ test("subproperties", function() {
 
 test("multiple", function() {
   var emblem = 'p class=foo id="yup" data-thinger=yeah Hooray';
-  compilesTo(emblem, '<p id="yup" data-thinger=\"{{yeah}}\" class={{foo}}>Hooray</p>');
+  compilesTo(emblem, '<p id="yup" data-thinger={{yeah}} class={{foo}}>Hooray</p>');
+});
+
+test("multiple with legacy quoting", function() {
+  var emblem = 'p class=foo id="yup" data-thinger=yeah Hooray';
+  compilesTo(emblem, '<p id="yup" data-thinger=\"{{yeah}}\" class={{foo}}>Hooray</p>', null, {
+    legacyAttributeQuoting: true
+  });
 });
 
 test("in brackets", function() {
   var emblem;
   emblem = "p [\n  id=id some-data=data.ok]\n";
-  return compilesTo(emblem, '<p id=\"{{id}}\" some-data=\"{{data.ok}}\"></p>');
+  return compilesTo(emblem, '<p id={{id}} some-data={{data.ok}}></p>');
 });
 
 test("class special syntax with 2 vals", function() {

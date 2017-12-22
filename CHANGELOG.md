@@ -1,4 +1,7 @@
-# [0.9.2](https://github.com/machty/emblem.js/releases/tag/v0.9.1)
+# [0.9.3](https://github.com/machty/emblem.js/releases/tag/v0.9.3)
+- Move HTML attribute quoting behind a feature toggle
+
+# [0.9.2](https://github.com/machty/emblem.js/releases/tag/v0.9.2)
 - Properly quote mustache for non-event HTML attributes
 - Add some missing event aliases
 

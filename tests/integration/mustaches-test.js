@@ -313,7 +313,7 @@ test('use of "this"', function(){
 
 test('mustache attr with underscore', function(){
   var emblem = 'input placeholder=cat_name';
-  compilesTo(emblem,'<input placeholder="{{cat_name}}">');
+  compilesTo(emblem,'<input placeholder={{cat_name}}>');
 });
 
 test('mustache with empty attr value (single-quoted string)', function(){

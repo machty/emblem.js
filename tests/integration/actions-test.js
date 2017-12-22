@@ -109,5 +109,13 @@ test("actions with HTML events and mustache content", function() {
 test("actions with HTML events and mixing mustache actions and bound attrs", function() {
   var emblem;
   emblem = "button.small onclick={ action this.attrs.completeTask model } disabled=isEditing";
-  compilesTo(emblem, '<button onclick={{action this.attrs.completeTask model}} disabled=\"{{isEditing}}\" class=\"small\"></button>');
+  compilesTo(emblem, '<button onclick={{action this.attrs.completeTask model}} disabled={{isEditing}} class=\"small\"></button>');
+});
+
+test("actions with legacy quoting", function() {
+  var emblem;
+  emblem = "button.small onclick={ action this.attrs.completeTask model } disabled=isEditing";
+  compilesTo(emblem, '<button onclick={{action this.attrs.completeTask model}} disabled=\"{{isEditing}}\" class=\"small\"></button>', null, {
+    legacyAttributeQuoting: true
+  });
 });

@@ -226,7 +226,9 @@ QUnit.test("bound attribute values get quoted", function(assert){
     }]
   };
 
-  var result = compile(ast);
+  var result = compile(ast, {
+    legacyAttributeQuoting: true
+  });
 
   assert.equal(result, '<img alt="{{alt_text}}">');
 });

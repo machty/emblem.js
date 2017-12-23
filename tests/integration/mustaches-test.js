@@ -17,6 +17,9 @@ test("various one-liners", function(){
     '{{foo}}{{arf}}<p>{{foo}}</p><span class="foo"></span><p data-foo="yes">{{goo}}</p>');
 });
 
+test('named argument syntax', function() {
+  compilesTo('= @bar', '{{@bar}}');
+});
 
 test("double =='s un-escape", function(){
   var emblem = w(
@@ -525,4 +528,28 @@ test('mustache with else if and complex statements', function() {
 
   compilesTo(emblem,
     '{{#if foo}}<p>Hi!</p>{{else if (eq 1 (and-or a=b showHidden=(eq 1 2)))}}<p>Wow what was that?</p>{{/if}}');
+});
+
+test('named block support', function() {
+  var emblem = w(
+    '= x-modal',
+    '  % @header as |@title|',
+    '    |Header #{title}',
+    '  % @body',
+    '    |Body',
+    '  % @footer',
+    '    |Footer'
+  )
+
+  compilesTo(emblem, '{{#x-modal}}<@header as |@title|>Header {{title}}</@header><@body>Body</@body><@footer>Footer</@footer>{{/x-modal}}');
+});
+
+test('named block with block param', function() {
+  var emblem = w(
+    '= x-layout as |@widget|',
+    '  = @widget as |a b c|',
+    '    |Hi.'
+  )
+
+  compilesTo(emblem, '{{#x-layout as |@widget|}}{{#@widget as |a b c|}}Hi.{{/@widget}}{{/x-layout}}');
 });

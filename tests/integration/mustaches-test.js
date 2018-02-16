@@ -365,6 +365,13 @@ test('bracketed nested block params with block', function(){
     emblem, '{{#sally \'foo\' something="false"}}<p>Bracketed helper attrs!</p>{{/sally}}');
 });
 
+test('bracketed statement with multiple initial arguments', function() {
+  var emblem = w('= component foo [',
+                 '  bar=baz',
+                 ']');
+  compilesTo(emblem, '{{component foo bar=baz}}');
+});
+
 test('bracketed nested block params', function(){
   var emblem = w('',
                  'sally [',

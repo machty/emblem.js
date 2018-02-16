@@ -78,6 +78,7 @@ test('brackets with string', function(){
 test('bracketed nested block', function(){
   var emblem = w('',
                  '%my-component [',
+                 '  ',
                  '  @something="false" ]',
                  '  p Bracketed helper attrs!');
   compilesTo(

@@ -334,9 +334,11 @@ test('explicit mustache with "/" in name', function(){
   compilesTo(emblem, '{{navigation/button-list}}');
 });
 
-test('bracketed statement with comment', function() {
+test('bracketed statement with comment and blank lines', function() {
   var emblem = w('sally [',
                  '  \'foo\'',
+                 '',
+                 '  ',
                  '  / We need to add more',
                  ']');
   compilesTo(

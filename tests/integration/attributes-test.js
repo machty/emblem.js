@@ -388,6 +388,15 @@ test("in brackets", function() {
   return compilesTo(emblem, '<p id={{id}} some-data={{data.ok}}></p>');
 });
 
+test('brackets with empty lines', function() {
+  var emblem = w('p [',
+                 '  id=id',
+                 '  ',
+                 '',
+                 '  some-data=data.ok]');
+  compilesTo(emblem, '<p id={{id}} some-data={{data.ok}}></p>');
+});
+
 test("class special syntax with 2 vals", function() {
   var emblem = 'p class=foo:bar:baz';
   compilesTo(emblem, '<p class={{if foo \'bar\' \'baz\'}}></p>');

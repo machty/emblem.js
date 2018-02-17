@@ -65,6 +65,26 @@ test("bracketed text indented", function() {
   return compilesTo(emblem, '<p>[ Bracketed text is cool ]</p>');
 });
 
+test('bracketed statement with comment and blank lines', function() {
+  var emblem = w('div [',
+                 '  foo=bar',
+                 '',
+                 '  ',
+                 '  / We need to add more',
+                 ']');
+  compilesTo(
+    emblem, '<div foo={{bar}}></div>');
+});
+
+test('bracketed statement end bracket', function() {
+  var emblem = w('div [',
+                 '  foo=bar',
+                 '  ',
+                 '  data=baz ]');
+  compilesTo(
+    emblem, '<div foo={{bar}} data={{baz}}></div>');
+});
+
 test("nesting", function() {
   var emblem;
   emblem = "p class=\"hello\" data-foo=\"gnarly\"\n  span Yes";

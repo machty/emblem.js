@@ -1,3 +1,8 @@
+# [0.10.0](https://github.com/machty/emblem.js/releases/tag/v0.10.0)
+- Refactoring for clarity and consistency of bracketed attributes, both for mustache and HTML elements [#312](https://github.com/machty/emblem.js/pull/312)
+- Fix attributes with bound classes and unless [#311](https://github.com/machty/emblem.js/pull/311)
+- Named Args and Named Blocks Syntax [#301](https://github.com/machty/emblem.js/pull/301)
+
 # [0.9.3](https://github.com/machty/emblem.js/releases/tag/v0.9.3)
 - Move HTML attribute quoting behind a feature toggle
 

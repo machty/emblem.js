@@ -334,9 +334,11 @@ test('explicit mustache with "/" in name', function(){
   compilesTo(emblem, '{{navigation/button-list}}');
 });
 
-test('bracketed statement with comment', function() {
+test('bracketed statement with comment and blank lines', function() {
   var emblem = w('sally [',
                  '  \'foo\'',
+                 '',
+                 '  ',
                  '  / We need to add more',
                  ']');
   compilesTo(
@@ -361,6 +363,13 @@ test('bracketed nested block params with block', function(){
                  '  p Bracketed helper attrs!');
   compilesTo(
     emblem, '{{#sally \'foo\' something="false"}}<p>Bracketed helper attrs!</p>{{/sally}}');
+});
+
+test('bracketed statement with multiple initial arguments', function() {
+  var emblem = w('= component foo [',
+                 '  bar=baz',
+                 ']');
+  compilesTo(emblem, '{{component foo bar=baz}}');
 });
 
 test('bracketed nested block params', function(){

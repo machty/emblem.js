@@ -72,12 +72,23 @@ test('brackets with string', function(){
     emblem, '<my-component @foo={{bar}} @baz=\"food\"></my-component>');
 });
 
+test('brackets with dedent end', function(){
+  var emblem = w('',
+                 '%my-component [',
+                 '  @foo=bar',
+                 '  @baz=\'food\'',
+                 ']');
+  compilesTo(
+    emblem, '<my-component @foo={{bar}} @baz=\"food\"></my-component>');
+});
+
 // Invalid
 // test('brackets with positional params')
 
 test('bracketed nested block', function(){
   var emblem = w('',
                  '%my-component [',
+                 '  ',
                  '  @something="false" ]',
                  '  p Bracketed helper attrs!');
   compilesTo(

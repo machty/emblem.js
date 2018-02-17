@@ -332,6 +332,10 @@ test("one bound option", function() {
   compilesTo(emblem, '<div class={{if isActive foo}}></div>');
 });
 
+test('with unless', function() {
+  compilesTo("div class={ unless isActive 'bar' }", '<div class={{unless isActive \'bar\'}}></div>')
+});
+
 test("within a string", function() {
   var emblem = 'div style="{{ if isActive \"15\" \"25\" }}px"';
   compilesTo(emblem, '<div style=\"{{if isActive \\"15\\" \\"25\\" }}px\"></div>');

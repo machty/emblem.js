@@ -124,4 +124,3 @@ QUnit.test("on same line as colon syntax", function(){
   );
   compilesTo(emblem, "<ul><li><span>Hello</span></li></ul>");
 });
-

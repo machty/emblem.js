@@ -5,7 +5,7 @@ import { compilesTo } from '../support/integration-assertions';
 
 QUnit.module("conditionals");
 
-test("simple if statement", function(){
+QUnit.test("simple if statement", function(){
   var emblem = w(
     "if foo",
     "  | Foo",
@@ -15,7 +15,7 @@ test("simple if statement", function(){
   compilesTo(emblem, "{{#if foo}}Foo{{/if}}{{#if bar}}Bar{{/if}}");
 });
 
-test("simple if else statement", function(){
+QUnit.test("simple if else statement", function(){
   var emblem = w(
     "if foo",
     "  | Foo",
@@ -25,7 +25,7 @@ test("simple if else statement", function(){
   compilesTo(emblem, "{{#if foo}}Foo{{else}}Bar{{/if}}");
 });
 
-test("if else ", function(){
+QUnit.test("if else ", function(){
   var emblem = w(
     "if foo",
     "  | Foo",
@@ -43,7 +43,7 @@ test("if else ", function(){
   compilesTo(emblem, "{{#if foo}}Foo{{#if bar}}Bar{{else}}Woot{{/if}}{{else}}WRONG{{/if}}{{#if bar}}WRONG{{else}}Hooray{{/if}}");
 });
 
-test("else with preceding `=`", function(){
+QUnit.test("else with preceding `=`", function(){
   var emblem = w(
   "= if foo",
   "  p Yeah",
@@ -62,7 +62,7 @@ test("else with preceding `=`", function(){
 });
 
 
-test("unless", function(){
+QUnit.test("unless", function(){
   var emblem = w(
   "unless bar",
   "  | Foo",
@@ -80,7 +80,7 @@ test("unless", function(){
   compilesTo(emblem, "{{#unless bar}}Foo{{#unless foo}}Bar{{else}}Woot{{/unless}}{{else}}WRONG{{/unless}}{{#unless foo}}WRONG{{else}}Hooray{{/unless}}");
 });
 
-test("else followed by newline doesn't gobble else content", function(){
+QUnit.test("else followed by newline doesn't gobble else content", function(){
   var emblem = w(
   "if something",
   "  p something",
@@ -94,7 +94,7 @@ test("else followed by newline doesn't gobble else content", function(){
   compilesTo(emblem, "{{#if something}}<p>something</p>{{else}}{{#if nothing}}<p>nothing</p>{{else}}<p>not nothing</p>{{/if}}{{/if}}");
 });
 
-test("else if block", function(){
+QUnit.test("else if block", function(){
   var emblem = w(
   "if something",
   "  p something",
@@ -104,7 +104,7 @@ test("else if block", function(){
   compilesTo(emblem, "{{#if something}}<p>something</p>{{else if somethingElse}}<p>nothing</p>{{/if}}");
 });
 
-test("else if with else block", function(){
+QUnit.test("else if with else block", function(){
   var emblem = w(
   "if something",
   "  p something",
@@ -116,7 +116,7 @@ test("else if with else block", function(){
   compilesTo(emblem, "{{#if something}}<p>something</p>{{else if somethingElse}}<p>otherThing</p>{{else}}<p>nothing</p>{{/if}}");
 });
 
-test("else if twice with else block", function(){
+QUnit.test("else if twice with else block", function(){
   var emblem = w(
   "if something",
   "  p something",
@@ -130,7 +130,7 @@ test("else if twice with else block", function(){
   compilesTo(emblem, "{{#if something}}<p>something</p>{{else if somethingElse}}<p>otherThing</p>{{else if anotherSomethingElse}}<p>otherThing2</p>{{else}}<p>nothing</p>{{/if}}");
 });
 
-test("else if with extra nodes", function(){
+QUnit.test("else if with extra nodes", function(){
   var emblem = w(
   "if something",
   "  p something",
@@ -156,7 +156,7 @@ test("else if with extra nodes", function(){
                      "{{else}}<p>nothing</p>{{/if}}");
 });
 
-test("else if with component block", function() {
+QUnit.test("else if with component block", function() {
   var emblem = w(
     "if something",
     "  = my-component/widget-a value=model.options as |component indexWidget|",
@@ -169,21 +169,21 @@ test("else if with component block", function() {
                      '{{else if somethingElse}}<h5>Danger!</h5>{{/if}}');
 });
 
-test("inline if with unbound statements", function() {
+QUnit.test("inline if with unbound statements", function() {
   var emblem = w(
     "if something 'something' 'somethingElse'"
   );
   compilesTo(emblem, "{{if something 'something' 'somethingElse'}}");
 });
 
-test("inline if with bound statements", function() {
+QUnit.test("inline if with bound statements", function() {
   var emblem = w(
     "if something something 'somethingElse'"
   );
   compilesTo(emblem, "{{if something something 'somethingElse'}}");
 });
 
-test("truth helpers syntax test 1", function() {
+QUnit.test("truth helpers syntax test 1", function() {
   var emblem = w(
     "if (eq 1 2)",
     "  |1 == 2",
@@ -193,7 +193,7 @@ test("truth helpers syntax test 1", function() {
   compilesTo(emblem, "{{#if (eq 1 2)}}1 == 2{{/if}}{{#unless (eq 1 2)}}1 != 2{{/unless}}");
 });
 
-test("truth helpers syntax test 2", function() {
+QUnit.test("truth helpers syntax test 2", function() {
   var emblem = w(
     "if (is-array siblings)",
     "  each siblings as |sibling|",

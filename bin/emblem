@@ -38,7 +38,7 @@ var optimist = require('optimist')
     });
 
 var fs = require('fs');
-var emblem = require('../dist/cjs/emblem.js')['default'];
+var emblem = require('../dist/cjs/emblem.js');
 
 var argv = optimist.argv;
 var template = argv._[0];
@@ -97,5 +97,3 @@ if(argv.stdin) {
     processFile(templatePath);
   });
 }
-
-

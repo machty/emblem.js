@@ -1,23 +1,23 @@
 /*global QUnit*/
 
 import { w } from '../support/utils';
-import Emblem from '../../emblem';
 import { compilesTo } from '../support/integration-assertions';
+import { compile } from 'emblem';
 
 QUnit.module("text: pipe character");
 
-test('pipe (|) creates text', function(){
+QUnit.test('pipe (|) creates text', function(){
   compilesTo('| hello there', 'hello there');
 });
 
-test('pipe (|) multiline creates text', function(){
+QUnit.test('pipe (|) multiline creates text', function(){
   compilesTo(w(
     '| hello there',
     '   and more'
   ), 'hello there and more');
 });
 
-test('pipe lines preserves leading spaces', function(){
+QUnit.test('pipe lines preserves leading spaces', function(){
   let fourSpaces = '    ';
   let threeSpaces = '   ';
   compilesTo(
@@ -25,7 +25,7 @@ test('pipe lines preserves leading spaces', function(){
     threeSpaces + 'hello there');
 });
 
-test('multiple pipe lines are concatenated', function(){
+QUnit.test('multiple pipe lines are concatenated', function(){
   compilesTo(w(
     '| hi there',
     '| and more'
@@ -34,13 +34,13 @@ test('multiple pipe lines are concatenated', function(){
 
 QUnit.module("text: whitespace fussiness");
 
-test("spaces after html elements", function(){
+QUnit.test("spaces after html elements", function(){
   compilesTo("p \n  span asd", "<p><span>asd</span></p>");
   compilesTo("p \nspan  \n\ndiv\nspan",
     "<p></p><span></span><div></div><span></span>");
 });
 
-test("spaces after mustaches", function(){
+QUnit.test("spaces after mustaches", function(){
   compilesTo("each foo    \n  p \n  span",
     "{{#each foo}}<p></p><span></span>{{/each}}");
 });
@@ -81,14 +81,14 @@ QUnit.test("it handles preceding indentation and newlines pt 2", function(){
   compilesTo(emblem, "<p>Woot</p><p>Ha</p>");
 });
 
-test('multiple text lines', function(){
+QUnit.test('multiple text lines', function(){
   var emblem = `
      span Your name is name
        and my name is name`;
   compilesTo(emblem, '<span>Your name is name and my name is name</span>');
 });
 
-test('use an "\'" to add a space', function(){
+QUnit.test('use an "\'" to add a space', function(){
   var emblem = `span
                  ' trailing space`;
   compilesTo(emblem, '<span>trailing space </span>');
@@ -96,7 +96,7 @@ test('use an "\'" to add a space', function(){
 
 QUnit.module("text: copy paste html");
 
-test("indented", function() {
+QUnit.test("indented", function() {
   var emblem;
   emblem = w("<p>",
              "  <span>This be some text</span>",
@@ -105,7 +105,7 @@ test("indented", function() {
   compilesTo(emblem, '<p> <span>This be some text</span> <title>Basic HTML Sample Page</title></p>');
 });
 
-test("flatlina", function() {
+QUnit.test("flatlina", function() {
   var emblem;
   emblem = "<p>\n<span>This be some text</span>\n<title>Basic HTML Sample Page</title>\n</p>";
   compilesTo(emblem, '<p><span>This be some text</span><title>Basic HTML Sample Page</title></p>');
@@ -113,7 +113,7 @@ test("flatlina", function() {
 
 QUnit.module("text: indentation");
 
-test("it doesn't throw when indenting after a line with inline content", function(){
+QUnit.test("it doesn't throw when indenting after a line with inline content", function(){
   var emblem = w(
     "p Hello",
     "  p invalid"
@@ -121,18 +121,18 @@ test("it doesn't throw when indenting after a line with inline content", functio
   compilesTo(emblem, "<p>Hello p invalid</p>");
 });
 
-test("it throws on half dedent", function(){
+QUnit.test("it throws on half dedent", function(){
   var emblem = w(
     "p",
     "    span This is ok",
     "  span This aint"
   );
   QUnit.throws(function(){
-    Emblem.compile(emblem);
+    compile(emblem);
   });
 });
 
-test("new indentation levels don't have to match parents'", function(){
+QUnit.test("new indentation levels don't have to match parents'", function(){
   var emblem = w(
     "p ",
     "  span",
@@ -142,26 +142,26 @@ test("new indentation levels don't have to match parents'", function(){
   compilesTo(emblem, "<p><span><div><span>yes</span></div></span></p>");
 });
 
-test("Windows line endings", function() {
+QUnit.test("Windows line endings", function() {
   var emblem;
   emblem = ".navigation\r\n  p Hello\r\n#main\r\n  | hi";
   compilesTo(
     emblem, '<div class="navigation"><p>Hello</p></div><div id="main">hi</div>');
 });
 
-test("backslash doesn't cause infinite loop", function() {
+QUnit.test("backslash doesn't cause infinite loop", function() {
   var emblem;
   emblem = '| \\';
   compilesTo(emblem, "\\");
 });
 
-test("backslash doesn't cause infinite loop with letter", function() {
+QUnit.test("backslash doesn't cause infinite loop with letter", function() {
   var emblem;
   emblem = '| \\a';
   compilesTo(emblem, "\\a");
 });
 
-test("self closing tag with forward slash", function() {
+QUnit.test("self closing tag with forward slash", function() {
   var emblem = 'hr/';
   compilesTo(emblem, '<hr>');
 
@@ -170,13 +170,13 @@ test("self closing tag with forward slash", function() {
   compilesTo(emblem, '<p></p>');
 });
 
-test("tagnames and attributes with colons", function() {
+QUnit.test("tagnames and attributes with colons", function() {
   var emblem;
   emblem = '%al:ex match:neer="snork" Hello!';
   compilesTo(emblem, '<al:ex match:neer="snork">Hello!</al:ex>');
 });
 
-test("windows newlines", function() {
+QUnit.test("windows newlines", function() {
   var emblem;
   emblem = "\r\n  \r\n  p Hello\r\n\r\n";
   compilesTo(emblem, '<p>Hello</p>');
@@ -184,7 +184,7 @@ test("windows newlines", function() {
 
 QUnit.module("text: EOL Whitespace");
 
-test("shouldn't be necessary to insert a space", function() {
+QUnit.test("shouldn't be necessary to insert a space", function() {
   var emblem;
   emblem = "p Hello,\n  How are you?\np I'm fine, thank you.";
   compilesTo(emblem, "<p>Hello, How are you?</p><p>I'm fine, thank you.</p>");
@@ -192,7 +192,7 @@ test("shouldn't be necessary to insert a space", function() {
 
 QUnit.module('text: indent/predent');
 
-test("mixture", function() {
+QUnit.test("mixture", function() {
   var emblem;
   emblem = "        \n";
   emblem += "  p Hello\n";
@@ -202,7 +202,7 @@ test("mixture", function() {
   return compilesTo(emblem, '<p>Hello</p><p>Woot</p><span>yes</span>');
 });
 
-test("mixture w/o opening blank", function() {
+QUnit.test("mixture w/o opening blank", function() {
   var emblem;
   emblem = "  p Hello\n";
   emblem += "  p\n";
@@ -211,7 +211,7 @@ test("mixture w/o opening blank", function() {
   return compilesTo(emblem, '<p>Hello</p><p>Woot</p><span>yes</span>');
 });
 
-test("w/ blank lines", function() {
+QUnit.test("w/ blank lines", function() {
   var emblem;
   emblem = "  p Hello\n";
   emblem += "  p\n";
@@ -222,7 +222,7 @@ test("w/ blank lines", function() {
   return compilesTo(emblem, '<p>Hello</p><p>Woot</p><span>yes</span>');
 });
 
-test("w/ blank whitespaced lines", function() {
+QUnit.test("w/ blank whitespaced lines", function() {
   var emblem;
   emblem = "  p Hello\n";
   emblem += "  p\n";

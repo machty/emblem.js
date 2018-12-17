@@ -38,4 +38,3 @@ QUnit.test("it handles preceding indentation and newlines pt 2", function(){
   );
   compilesTo(emblem, "<p>Woot</p><p>Ha</p>");
 });
-

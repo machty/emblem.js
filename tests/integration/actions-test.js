@@ -2,26 +2,25 @@
 
 import { w } from '../support/utils';
 import { compilesTo } from '../support/integration-assertions';
-import Emblem from '../../emblem';
 
-QUnit.module("actions");
+QUnit.module('actions');
 
-test("basic (click)", function(){
+QUnit.test("basic (click)", function(){
   var emblem = 'button click="submitComment" Submit Comment';
   compilesTo(emblem, '<button {{action "submitComment" on="click"}}>Submit Comment</button>');
 });
 
-test("basic (click) preceded by action keyword", function(){
+QUnit.test("basic (click) preceded by action keyword", function(){
   var emblem = 'button click="action submitComment" Submit Comment';
   compilesTo(emblem, '<button {{action submitComment on="click"}}>Submit Comment</button>');
 });
 
-test("action has action in its name", function(){
+QUnit.test("action has action in its name", function(){
   var emblem = 'button click="submitTransaction" Submit Comment';
   compilesTo(emblem, '<button {{action "submitTransaction" on="click"}}>Submit Comment</button>');
 });
 
-test("basic (click) followed by attr", function(){
+QUnit.test("basic (click) followed by attr", function(){
   var emblem = 'button click="submitComment" class="foo" Submit Comment';
   compilesTo(emblem, '<button {{action "submitComment" on="click"}} class="foo">Submit Comment</button>');
 
@@ -29,7 +28,7 @@ test("basic (click) followed by attr", function(){
   compilesTo(emblem, '<button {{action submitComment \'omg\' on="click"}} class="foo">Submit Comment</button>');
 });
 
-test("nested (mouseEnter)", function(){
+QUnit.test("nested (mouseEnter)", function(){
   var emblem = w(
     "a mouseEnter='submitComment target=view'",
     "  | Submit Comment"
@@ -37,17 +36,17 @@ test("nested (mouseEnter)", function(){
   compilesTo(emblem, '<a {{action submitComment target=view on="mouseEnter"}}>Submit Comment</a>');
 });
 
-test('explicitly single-quoted action name stays quoted', function(){
+QUnit.test('explicitly single-quoted action name stays quoted', function(){
   var emblem = 'a mouseEnter="\'hello\' target=controller"';
   compilesTo(emblem, '<a {{action \'hello\' target=controller on="mouseEnter"}}></a>');
 });
 
-test('explicitly dobule-quoted action name stays quoted', function(){
+QUnit.test('explicitly dobule-quoted action name stays quoted', function(){
   var emblem = 'a mouseEnter=\'"hello" target=controller\'';
   compilesTo(emblem, '<a {{action "hello" target=controller on="mouseEnter"}}></a>');
 });
 
-test("nested (mouseEnter, singlequoted)", function(){
+QUnit.test("nested (mouseEnter, singlequoted)", function(){
   var emblem = w(
     "a mouseEnter='submitComment target=\"view\"'",
     "  | Submit Comment"
@@ -55,7 +54,7 @@ test("nested (mouseEnter, singlequoted)", function(){
   compilesTo(emblem, '<a {{action submitComment target="view" on="mouseEnter"}}>Submit Comment</a>');
 });
 
-test("nested (mouseEnter, doublequoted)", function(){
+QUnit.test("nested (mouseEnter, doublequoted)", function(){
   var emblem = w(
     "a mouseEnter=\"submitComment target='view'\"",
     "  | Submit Comment"
@@ -63,12 +62,12 @@ test("nested (mouseEnter, doublequoted)", function(){
   compilesTo(emblem, '<a {{action submitComment target=\'view\' on="mouseEnter"}}>Submit Comment</a>');
 });
 
-test("manual", function(){
+QUnit.test("manual", function(){
   var emblem = "a{action someBoundAction target=view} Submit Comment";
   compilesTo(emblem, '<a {{action someBoundAction target=view}}>Submit Comment</a>');
 });
 
-test("manual nested", function(){
+QUnit.test("manual nested", function(){
   var emblem = w(
     "a{action 'submitComment' target=view}",
     "  p Submit Comment"
@@ -76,43 +75,43 @@ test("manual nested", function(){
   compilesTo(emblem, '<a {{action \'submitComment\' target=view}}><p>Submit Comment</p></a>');
 });
 
-test("single quote test", function() {
+QUnit.test("single quote test", function() {
   var emblem;
   emblem = "button click='p' Frank";
   compilesTo(emblem, '<button {{action "p" on="click"}}>Frank</button>');
 });
 
-test("double quote test", function() {
+QUnit.test("double quote test", function() {
   var emblem;
   emblem = "button click=\"p\" Frank";
   compilesTo(emblem, '<button {{action "p" on="click"}}>Frank</button>');
 });
 
-test("no quote remains unquoted in output", function() {
+QUnit.test("no quote remains unquoted in output", function() {
   var emblem;
   emblem = "button click=p Frank";
   compilesTo(emblem, '<button {{action p on="click"}}>Frank</button>');
 });
 
-test("more advanced subexpressions work", function() {
+QUnit.test("more advanced subexpressions work", function() {
   var emblem;
   emblem = "select change={ action (mut vehicle) value=\"target.value\" }";
   compilesTo(emblem, '<select {{action (mut vehicle) value="target.value"  on="change"}}></select>');
 });
 
-test("actions with HTML events and mustache content", function() {
+QUnit.test("actions with HTML events and mustache content", function() {
   var emblem;
   emblem = "select onchange={ action (mut vehicle) value=\"target.value\" }";
   compilesTo(emblem, '<select onchange={{action (mut vehicle) value="target.value"}}></select>');
 });
 
-test("actions with HTML events and mixing mustache actions and bound attrs", function() {
+QUnit.test("actions with HTML events and mixing mustache actions and bound attrs", function() {
   var emblem;
   emblem = "button.small onclick={ action this.attrs.completeTask model } disabled=isEditing";
   compilesTo(emblem, '<button onclick={{action this.attrs.completeTask model}} disabled={{isEditing}} class=\"small\"></button>');
 });
 
-test("actions with legacy quoting", function() {
+QUnit.test("actions with legacy quoting", function() {
   var emblem;
   emblem = "button.small onclick={ action this.attrs.completeTask model } disabled=isEditing";
   compilesTo(emblem, '<button onclick={{action this.attrs.completeTask model}} disabled=\"{{isEditing}}\" class=\"small\"></button>', null, {

@@ -1,7 +1,7 @@
 /*global QUnit*/
 
 import { w } from '../support/utils';
-import Emblem from '../../emblem';
+import { compile } from 'emblem';
 
 var defaultOptions = {
   legacyAttributeQuoting: false
@@ -9,7 +9,7 @@ var defaultOptions = {
 
 export function compilesTo(emblem, handlebars, message, emblemOptions) {
   var options = emblemOptions || defaultOptions;
-  var output = Emblem.compile(emblem, options);
+  var output = compile(emblem, options);
 
   if (!message) {
     var maxLenth = 40;

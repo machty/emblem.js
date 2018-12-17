@@ -1,0 +1,28 @@
+{
+  "test_page": "dist/tests/index.html?hidepassed&nocontainer",
+  "browser_disconnect_timeout": 30,
+  "parallel": 5,
+
+  "launch_in_ci": [
+    "Chrome"
+  ],
+  "launch_in_dev": [
+    "Chrome"
+  ],
+  "browser_args": {
+    "Chrome": {
+      "ci": [
+        "--no-sandbox",
+        "--headless",
+        "--disable-gpu",
+        "--disable-dev-shm-usage",
+        "--disable-software-rasterizer",
+        "--mute-audio",
+        "--remote-debugging-port=0",
+        "--window-size=1440,900",
+        "--proxy-server='direct://'",
+        "--proxy-bypass-list=*"
+      ]
+    }
+  }
+}

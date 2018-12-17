@@ -1,11 +1,12 @@
 {
-  "framework": "qunit",
-  "test_page": "dist/tests/index.html?hidepassed",
-  "launch_in_dev": [
-    "PhantomJS",
+  "test_page": "dist/tests/index.html?hidepassed&nocontainer",
+  "browser_disconnect_timeout": 30,
+  "parallel": 5,
+
+  "launch_in_ci": [
     "Chrome"
   ],
-  "launch_in_ci": [
-    "PhantomJS"
+  "launch_in_dev": [
+    "Chrome"
   ]
 }

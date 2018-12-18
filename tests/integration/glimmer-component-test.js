@@ -136,3 +136,11 @@ test('named block support', function() {
 
   compilesTo(emblem, '<x-modal><@header as |@title|>Header {{title}}</@header><@body>Body</@body><@footer>Footer</@footer></x-modal>');
 });
+
+test('module namespaces', function() {
+  var emblem = w(
+    '% my-addon::foo'
+  )
+
+  compilesTo(emblem, '<my-addon::foo></my-addon::foo>');
+});

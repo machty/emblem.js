@@ -562,3 +562,11 @@ test('named block with block param', function() {
 
   compilesTo(emblem, '{{#x-layout as |@widget|}}{{#@widget as |a b c|}}Hi.{{/@widget}}{{/x-layout}}');
 });
+
+test('module namespaces', function() {
+  var emblem = w(
+    '= my-addon::foo'
+  )
+
+  compilesTo(emblem, '{{my-addon::foo}}');
+});

@@ -16,21 +16,10 @@
   <script src="../emblem.amd.js"></script>
 
   <script>
+    // This is a hack to make the emblem AMD module work with the ES6 imports
     window.emblem = require('emblem');
   </script>
-  <!-- <script src="ember/ember.js"></script> -->
-  <!-- <script src="emblem-tests.amd.js"></script> -->
-
   <script src="tests.js"></script>
 
-  <!-- <script>
-    // FIXME ember-cli should do this
-    require('support/integration-assertions');
-    for (moduleName in requirejs.entries) {
-      if (moduleName.match(/[-_]test$/)) {
-        require(moduleName);
-      }
-    }
-  </script> -->
 </body>
 </html>

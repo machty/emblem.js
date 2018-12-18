@@ -5,43 +5,43 @@ import { compilesTo } from '../support/integration-assertions';
 
 QUnit.module("syntax helpers: bang syntax");
 
-QUnit.test("simple bang helper defaults to `unbound` invocation", function() {
+QUnit.test("simple bang helper defaults to `unbound` invocation", function(assert) {
   var emblem;
   emblem = w("foo!");
-  compilesTo(emblem, '{{unbound foo}}');
+  assert.compilesTo(emblem, '{{unbound foo}}');
 });
 
-QUnit.test("bang helper defaults to `unbound` invocation", function() {
+QUnit.test("bang helper defaults to `unbound` invocation", function(assert) {
   var emblem;
   emblem = w("foo! Yar",
              "= foo!");
-  compilesTo(emblem,
+  assert.compilesTo(emblem,
                     '{{unbound foo Yar}}{{unbound foo}}');
 });
 
-QUnit.test("bang helper works with blocks", function() {
+QUnit.test("bang helper works with blocks", function(assert) {
   var emblem;
   emblem = w("hey! you suck",
              "  = foo!");
-  compilesTo(emblem,
+  assert.compilesTo(emblem,
                     '{{#unbound hey you suck}}{{unbound foo}}{{/unbound}}');
 });
 
 QUnit.module("syntax helpers: question mark");
 
-QUnit.test("? helper defaults to `if` invocation", function() {
+QUnit.test("? helper defaults to `if` invocation", function(assert) {
   var emblem;
   emblem = "foo?\n  p Yeah";
-  return compilesTo(emblem, '{{#if foo}}<p>Yeah</p>{{/if}}');
+  assert.compilesTo(emblem, '{{#if foo}}<p>Yeah</p>{{/if}}');
 });
 
-QUnit.test("else works", function() {
+QUnit.test("else works", function(assert) {
   var emblem;
   emblem = "foo?\n  p Yeah\nelse\n  p No";
-  return compilesTo(emblem, '{{#if foo}}<p>Yeah</p>{{else}}<p>No</p>{{/if}}');
+  assert.compilesTo(emblem, '{{#if foo}}<p>Yeah</p>{{else}}<p>No</p>{{/if}}');
 });
 
-QUnit.test("compound with text", function() {
+QUnit.test("compound with text", function(assert) {
   var emblem;
   emblem = w("p = foo? ",
              "  | Hooray",
@@ -51,17 +51,17 @@ QUnit.test("compound with text", function() {
              "  | Hooray",
              "else",
              "  | No");
-  return compilesTo(emblem,
+  assert.compilesTo(emblem,
                            '<p>{{#if foo}}Hooray{{else}}No{{/if}}</p>' +
                            '<p>{{#if bar}}Hooray{{else}}No{{/if}}</p>');
 });
 
-QUnit.test("compound with variables", function() {
+QUnit.test("compound with variables", function(assert) {
   var emblem;
   emblem = w("p = foo? ",
              "  bar",
              "else",
              "  baz");
-  return compilesTo(emblem,
+  assert.compilesTo(emblem,
                            '<p>{{#if foo}}{{bar}}{{else}}{{baz}}{{/if}}</p>');
 });

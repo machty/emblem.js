@@ -18,15 +18,14 @@
     "node": ">=0.4.7"
   },
   "dependencies": {
-    "broccoli-inject-livereload": "^1.0.0",
     "handlebars": ">=2.0.0",
-    "optimist": "^0.3.7",
-    "rollup-plugin-multi-entry": "^2.1.0"
+    "optimist": "^0.3.7"
   },
   "devDependencies": {
     "@babel/core": "^7.2.2",
     "@babel/preset-env": "^7.2.0",
     "@invisible/pegjs-import": "^1.1.1",
+    "broccoli-inject-livereload": "^1.0.0",
     "StringScanner": "~0.0.3",
     "babel-preset-minify": "^0.5.0",
     "broccoli": "^2.0.1",
@@ -38,9 +37,12 @@
     "broccoli-rollup": "^2.1.1",
     "broccoli-stew": "^2.0.1",
     "chalk": "^2.4.1",
+    "jquery": "^3.3.1",
+    "loader.js": "4.7.0",
     "pegjs": "0.10.0",
     "qunit": "2.8.0",
     "rollup-plugin-babel": "^4.1.0",
+    "rollup-plugin-multi-entry": "^2.1.0",
     "rsvp": "^4.8.4",
     "testem": "^2.14.0"
   },
@@ -49,7 +51,6 @@
     "emblem": "bin/emblem"
   },
   "scripts": {
-    "pretest": "ember build",
     "test": "bin/run-tests.js",
     "start": "ember test --server",
     "build": "ember build"

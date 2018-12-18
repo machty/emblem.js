@@ -8,8 +8,7 @@ const minify = process.env.NODE_ENV === 'production';
 const includeTests = process.env.NODE_ENV === 'test';
 const babelDefaultOptions = {
   plugins: [],
-  presets: [
-  ]
+  presets: []
 };
 
 if (minify) {
@@ -43,12 +42,10 @@ function buildMainBundle() {
   });
 }
 
-// const trees = [buildMainBundle()];
+const trees = [buildMainBundle()];
 
-// if (includeTests) {
-//   trees.push(testBundle());
-// }
+if (includeTests) {
+  trees.push(testBundle);
+}
 
-// module.exports = mergeTrees(trees);
-
-module.exports = mergeTrees([buildMainBundle(), testBundle]);
+module.exports = mergeTrees(trees);

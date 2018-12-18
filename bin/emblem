@@ -38,7 +38,7 @@ var optimist = require('optimist')
     });
 
 var fs = require('fs');
-var emblem = require('../dist/cjs/emblem.js');
+var compile = require('../dist/cjs/emblem.js').compile;
 
 var argv = optimist.argv;
 var template = argv._[0];
@@ -49,7 +49,7 @@ if(argv.version) {
 }
 
 function processData(data) {
-  var output = emblem.compile(data);
+  var output = compile(data);
 
   if (argv.output) {
     fs.writeFileSync(argv.output, output, 'utf8');

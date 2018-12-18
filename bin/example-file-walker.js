@@ -1,8 +1,7 @@
 var walk = require('walk');
 var fs = require('fs');
 var path = require('path');
-var emblem = require('emblem');
-var compile = emblem.default.compile;
+var compile = require('emblem').compile;
 
 var walker = walk.walk("app/templates");
 var compiledCount = 0, totalCount = 0, erroredCount = 0;

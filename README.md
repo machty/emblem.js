@@ -124,12 +124,10 @@ npm install
 ember build -e production
 ```
 
-Running tests in the browser requires [broccoli-cli](https://github.com/broccolijs/broccoli-cli) to be installed.
-
 To run tests in the browser, run:
 
 ```
-broccoli serve
+ember test --serve
 ```
 
 The tests will be available at http://localhost:4200/tests/.

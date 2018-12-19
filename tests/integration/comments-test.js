@@ -5,7 +5,7 @@ import { compilesTo } from '../support/integration-assertions';
 
 QUnit.module("comments");
 
-QUnit.test("it strips out single line '/' comments", function(){
+QUnit.test("it strips out single line '/' comments", function(assert) {
   var emblem = w(
     "p Hello",
     "",
@@ -13,10 +13,10 @@ QUnit.test("it strips out single line '/' comments", function(){
     "",
     "h1 How are you?"
   );
-  compilesTo(emblem, "<p>Hello</p><h1>How are you?</h1>");
+  assert.compilesTo(emblem, "<p>Hello</p><h1>How are you?</h1>");
 });
 
-QUnit.test("it strips out multi-line '/' comments", function(){
+QUnit.test("it strips out multi-line '/' comments", function(assert) {
   var emblem = w(
     "p Hello",
     "",
@@ -26,10 +26,10 @@ QUnit.test("it strips out multi-line '/' comments", function(){
     "",
     "h1 How are you?"
   );
-  compilesTo(emblem, "<p>Hello</p><h1>How are you?</h1>");
+  assert.compilesTo(emblem, "<p>Hello</p><h1>How are you?</h1>");
 });
 
-QUnit.test("it strips out multi-line '/' comments without text on the first line", function(){
+QUnit.test("it strips out multi-line '/' comments without text on the first line", function(assert) {
   var emblem = w(
     "p Hello",
     "",
@@ -40,11 +40,11 @@ QUnit.test("it strips out multi-line '/' comments without text on the first line
     "",
     "h1 How are you?"
   );
-  compilesTo(emblem, "<p>Hello</p><h1>How are you?</h1>");
+  assert.compilesTo(emblem, "<p>Hello</p><h1>How are you?</h1>");
 });
 
 
-QUnit.test("mix and match with various indentation", function(){
+QUnit.test("mix and match with various indentation", function(assert) {
   var emblem = w(
     "/ A test",
     "p Hello",
@@ -59,40 +59,40 @@ QUnit.test("mix and match with various indentation", function(){
     "/",
     "  p Should not show up"
   );
-  compilesTo(emblem, "<p>Hello</p><span><p>Yessir nope.</p></span>");
+  assert.compilesTo(emblem, "<p>Hello</p><span><p>Yessir nope.</p></span>");
 });
 
-QUnit.test("uneven indentation", function(){
+QUnit.test("uneven indentation", function(assert) {
   var emblem = w(
     "/ nop",
     "  nope",
     "    nope"
   );
-  compilesTo(emblem, "");
+  assert.compilesTo(emblem, "");
 });
 
-QUnit.test("uneven indentation 2", function(){
+QUnit.test("uneven indentation 2", function(assert) {
   var emblem = w(
     "/ n",
     "  no",
     "    nop",
     "  nope"
   );
-  compilesTo(emblem, "");
+  assert.compilesTo(emblem, "");
 });
 
-QUnit.test("uneven indentation 3", function(){
+QUnit.test("uneven indentation 3", function(assert) {
   var emblem = w(
     "/ n",
     "  no",
     "    nop",
     "  nope"
   );
-  compilesTo(emblem, "");
+  assert.compilesTo(emblem, "");
 });
 
 
-QUnit.test("empty first line", function(){
+QUnit.test("empty first line", function(assert) {
   var emblem = w(
     "/ ",
     "  nop",
@@ -100,28 +100,27 @@ QUnit.test("empty first line", function(){
     "    nope",
     "  no"
   );
-  compilesTo(emblem, "");
+  assert.compilesTo(emblem, "");
 });
 
-QUnit.test("on same line as html content", function(){
+QUnit.test("on same line as html content", function(assert) {
   var emblem = w(
     ".container / This comment doesn't show up",
     "  .row / Nor does this",
     "    p Hello"
   );
-  compilesTo(emblem, '<div class="container"><div class="row"><p>Hello</p></div></div>');
+  assert.compilesTo(emblem, '<div class="container"><div class="row"><p>Hello</p></div></div>');
 });
 
-QUnit.test("on same line as mustache content", function(){
-  compilesTo('frank text="YES" text2="NO" / omg',
+QUnit.test("on same line as mustache content", function(assert) {
+  assert.compilesTo('frank text="YES" text2="NO" / omg',
     '{{frank text="YES" text2="NO"}}');
 });
 
-QUnit.test("on same line as colon syntax", function(){
+QUnit.test("on same line as colon syntax", function(assert) {
   var emblem = w(
     "ul: li: span / omg",
     "  | Hello"
   );
-  compilesTo(emblem, "<ul><li><span>Hello</span></li></ul>");
+  assert.compilesTo(emblem, "<ul><li><span>Hello</span></li></ul>");
 });
-

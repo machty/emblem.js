@@ -5,7 +5,7 @@ import { compilesTo } from '../support/integration-assertions';
 
 QUnit.module("mustache: simple");
 
-test("various one-liners", function(){
+QUnit.test("various one-liners", function(assert) {
   var emblem = w(
     "= foo",
     "arf",
@@ -13,426 +13,426 @@ test("various one-liners", function(){
     "span.foo",
     'p data-foo="yes" = goo'
   );
-  compilesTo(emblem,
+  assert.compilesTo(emblem,
     '{{foo}}{{arf}}<p>{{foo}}</p><span class="foo"></span><p data-foo="yes">{{goo}}</p>');
 });
 
-test('named argument syntax', function() {
-  compilesTo('= @bar', '{{@bar}}');
+QUnit.test('named argument syntax', function(assert) {
+  assert.compilesTo('= @bar', '{{@bar}}');
 });
 
-test("double =='s un-escape", function(){
+QUnit.test("double =='s un-escape", function(assert) {
   var emblem = w(
     "== foo",
     "foo",
     "p == foo"
   );
-  compilesTo(emblem,
+  assert.compilesTo(emblem,
     '{{{foo}}}{{foo}}<p>{{{foo}}}</p>');
 });
 
-test("nested combo syntax", function(){
+QUnit.test("nested combo syntax", function(assert) {
   var emblem = w(
     "ul = each items",
     "  li = foo"
   );
-  compilesTo(emblem,
+  assert.compilesTo(emblem,
     '<ul>{{#each items}}<li>{{foo}}</li>{{/each}}</ul>');
 });
 
 QUnit.module("mustache: block params");
 
-test("anything after 'as' goes in block params", function(){
+QUnit.test("anything after 'as' goes in block params", function(assert) {
   var emblem = w(
     "= each foos as |foo|"
   );
-  compilesTo(emblem,
+  assert.compilesTo(emblem,
     '{{each foos as |foo|}}');
 });
 
-test("spaces between '||' and params are removed", function(){
-  compilesTo("= each foos as |foo|", '{{each foos as |foo|}}');
-  compilesTo("= each foos as | foo |", '{{each foos as |foo|}}');
+QUnit.test("spaces between '||' and params are removed", function(assert) {
+  assert.compilesTo("= each foos as |foo|", '{{each foos as |foo|}}');
+  assert.compilesTo("= each foos as | foo |", '{{each foos as |foo|}}');
 });
 
-test("multiple words work too", function(){
+QUnit.test("multiple words work too", function(assert) {
   var emblem = w(
     "= my-helper as |foo bar|"
   );
-  compilesTo(emblem,
+  assert.compilesTo(emblem,
     '{{my-helper as |foo bar|}}');
 });
 
-test("block form works for the 'with' helper", function(){
+QUnit.test("block form works for the 'with' helper", function(assert) {
   var emblem = w(
     "= with car.manufacturer as |make|",
     "  p {{make.name}}"
   );
-  compilesTo(emblem,
+  assert.compilesTo(emblem,
     '{{#with car.manufacturer as |make|}}<p>{{make.name}}</p>{{/with}}');
 });
 
-test("block form works for components", function(){
+QUnit.test("block form works for components", function(assert) {
   var emblem = w(
     "= my-component as |item|",
     "  p {{item.name}}"
   );
-  compilesTo(emblem,
+  assert.compilesTo(emblem,
     '{{#my-component as |item|}}<p>{{item.name}}</p>{{/my-component}}');
 });
 
 QUnit.module("mustache: capitalized line-starter");
 
-test("should invoke `view` helper by default", function(){
+QUnit.test("should invoke `view` helper by default", function(assert) {
   var emblem = w(
     "SomeView"
   );
-  compilesTo(emblem, '{{view SomeView}}');
+  assert.compilesTo(emblem, '{{view SomeView}}');
 });
 
-test("should support block mode", function(){
+QUnit.test("should support block mode", function(assert) {
   var emblem = w(
     "SomeView",
     "  p View content"
   );
-  compilesTo(emblem, '{{#view SomeView}}<p>View content</p>{{/view}}');
+  assert.compilesTo(emblem, '{{#view SomeView}}<p>View content</p>{{/view}}');
 });
 
-test("should not kick in if preceded by equal sign", function(){
+QUnit.test("should not kick in if preceded by equal sign", function(assert) {
   var emblem = w(
     "= SomeView"
   );
-  compilesTo(emblem, '{{SomeView}}');
+  assert.compilesTo(emblem, '{{SomeView}}');
 });
 
-test("should not kick in explicit {{mustache}}", function(){
+QUnit.test("should not kick in explicit {{mustache}}", function(assert) {
   var emblem = w(
     "p Yeah {{SomeView}}"
   );
-  compilesTo(emblem, '<p>Yeah {{SomeView}}</p>');
+  assert.compilesTo(emblem, '<p>Yeah {{SomeView}}</p>');
 });
 
 QUnit.module('mustache: lower-case starting string');
 
-test("recognizes double-quoted attrs", function() {
+QUnit.test("recognizes double-quoted attrs", function(assert) {
   var emblem = 'frank text="yes"';
-  compilesTo(emblem, '{{frank text="yes"}}');
+  assert.compilesTo(emblem, '{{frank text="yes"}}');
 });
 
-test("recognizes single-quoted attrs", function() {
+QUnit.test("recognizes single-quoted attrs", function(assert) {
   var emblem = "frank text='yes'";
-  compilesTo(emblem, "{{frank text='yes'}}");
+  assert.compilesTo(emblem, "{{frank text='yes'}}");
 });
 
-test("recognizes unquoted attrs", function() {
+QUnit.test("recognizes unquoted attrs", function(assert) {
   var emblem = "frank foo=bar";
-  compilesTo(emblem, "{{frank foo=bar}}");
+  assert.compilesTo(emblem, "{{frank foo=bar}}");
 });
 
-test("sub-expressions are ok", function() {
+QUnit.test("sub-expressions are ok", function(assert) {
   var emblem = `
     = link-to 'content-manage.social' (query-params groupId=defaultGroup.id) tagName="li"
   `;
-  compilesTo(emblem,
+  assert.compilesTo(emblem,
                     '{{link-to \'content-manage.social\' (query-params groupId=defaultGroup.id) tagName="li"}}');
 });
 
-test('percent sign in quoted attr value', function(){
+QUnit.test('percent sign in quoted attr value', function(assert) {
   var emblem = `
       = input placeholder="100%"
   `;
-  compilesTo(emblem, '{{input placeholder="100%"}}');
+  assert.compilesTo(emblem, '{{input placeholder="100%"}}');
 });
 
-test('colon and semicolon in quoted attr value', function(){
+QUnit.test('colon and semicolon in quoted attr value', function(assert) {
   var emblem = `
       = input style="outline:blue; color:red"
   `;
-  compilesTo(emblem, '{{input style="outline:blue; color:red"}}');
+  assert.compilesTo(emblem, '{{input style="outline:blue; color:red"}}');
 });
 
 QUnit.module('mustache: raw mustache unescaped');
     // _ Bork {{foo}} {{{bar}}}!
 
-test('triple mustache in text line', function(){
+QUnit.test('triple mustache in text line', function(assert) {
   var emblem = `| bork {{{bar}}}`;
-  compilesTo(emblem, 'bork {{{bar}}}');
+  assert.compilesTo(emblem, 'bork {{{bar}}}');
 });
 
-test('double mustache in text line', function(){
+QUnit.test('double mustache in text line', function(assert) {
   var emblem = `| bork {{bar}}`;
-  compilesTo(emblem, 'bork {{bar}}');
+  assert.compilesTo(emblem, 'bork {{bar}}');
 });
 
-test('hash stache in text line', function(){
+QUnit.test('hash stache in text line', function(assert) {
   var emblem = `| bork #{bar}`;
-  compilesTo(emblem, 'bork {{bar}}');
+  assert.compilesTo(emblem, 'bork {{bar}}');
 });
 
 QUnit.module("mustache: hash brace syntax, #{}");
 
-test('acts like {{}}', function(){
+QUnit.test('acts like {{}}', function(assert) {
   var emblem = "span Yo #{foo}, I herd.";
-  compilesTo(emblem,
+  assert.compilesTo(emblem,
     "<span>Yo {{foo}}, I herd.</span>");
 });
 
-test('can start inline content', function(){
+QUnit.test('can start inline content', function(assert) {
   var emblem = "span #{foo}, I herd.";
-  compilesTo(emblem,
+  assert.compilesTo(emblem,
     "<span>{{foo}}, I herd.</span>");
 });
 
-test('can end inline content', function(){
+QUnit.test('can end inline content', function(assert) {
   var emblem = "span I herd #{foo}";
-  compilesTo(emblem,
+  assert.compilesTo(emblem,
     "<span>I herd {{foo}}</span>");
 });
 
-test("doesn't screw up parsing when # used in text nodes", function(){
+QUnit.test("doesn't screw up parsing when # used in text nodes", function(assert) {
   var emblem = "span OMG #YOLO";
-  compilesTo(emblem,
+  assert.compilesTo(emblem,
     "<span>OMG #YOLO</span>");
 });
 
-test("# can be only thing on line", function(){
+QUnit.test("# can be only thing on line", function(assert) {
   var emblem = "span #";
-  compilesTo(emblem,
+  assert.compilesTo(emblem,
     "<span>#</span>");
 });
 
-test("brace works with text pipe", function() {
+QUnit.test("brace works with text pipe", function(assert) {
   var emblem = `= link-to 'users.view' user | View user #{ user.name } #{ user.id }`;
-  compilesTo(emblem, '{{#link-to \'users.view\' user}}View user {{user.name }} {{user.id }}{{/link-to}}');
+  assert.compilesTo(emblem, '{{#link-to \'users.view\' user}}View user {{user.name }} {{user.id }}{{/link-to}}');
 });
 
 
 QUnit.module("mustache: inline block helper");
 
-test("text only", function() {
+QUnit.test("text only", function(assert) {
   var emblem;
   emblem = "view SomeView | Hello";
-  compilesTo(emblem, '{{#view SomeView}}Hello{{/view}}');
+  assert.compilesTo(emblem, '{{#view SomeView}}Hello{{/view}}');
 });
 
-test("multiline", function() {
+QUnit.test("multiline", function(assert) {
   var emblem;
   emblem = w("view SomeView | Hello,",
              "  How are you?",
              "  Sup?");
-  compilesTo(emblem, '{{#view SomeView}}Hello, How are you? Sup?{{/view}}');
+  assert.compilesTo(emblem, '{{#view SomeView}}Hello, How are you? Sup?{{/view}}');
 });
 
-test("more complicated", function() {
+QUnit.test("more complicated", function(assert) {
   var emblem;
   emblem = "view SomeView borf=\"yes\" | Hello, How are you? Sup?";
-  compilesTo(emblem, '{{#view SomeView borf="yes"}}Hello, How are you? Sup?{{/view}}');
+  assert.compilesTo(emblem, '{{#view SomeView borf="yes"}}Hello, How are you? Sup?{{/view}}');
 });
 
-test("GH-26: no need for space before equal sign", function() {
+QUnit.test("GH-26: no need for space before equal sign", function(assert) {
   var emblem;
   emblem = "span= foo";
-  compilesTo(emblem, '<span>{{foo}}</span>');
+  assert.compilesTo(emblem, '<span>{{foo}}</span>');
   emblem = "span.foo= foo";
-  compilesTo(emblem, '<span class="foo">{{foo}}</span>');
+  assert.compilesTo(emblem, '<span class="foo">{{foo}}</span>');
   emblem = "span#hooray.foo= foo";
-  compilesTo(emblem, '<span id="hooray" class="foo">{{foo}}</span>');
+  assert.compilesTo(emblem, '<span id="hooray" class="foo">{{foo}}</span>');
   emblem = "#hooray= foo";
-  compilesTo(emblem, '<div id="hooray">{{foo}}</div>');
+  assert.compilesTo(emblem, '<div id="hooray">{{foo}}</div>');
   emblem = ".hooray= foo";
-  return compilesTo(emblem, '<div class="hooray">{{foo}}</div>');
+  assert.compilesTo(emblem, '<div class="hooray">{{foo}}</div>');
 });
 
 QUnit.module('mustache: in-tag explicit mustache');
 
-test("single", function() {
-  return compilesTo('p{inTagHelper foo}', '<p {{inTagHelper foo}}></p>');
+QUnit.test("single", function(assert) {
+  assert.compilesTo('p{inTagHelper foo}', '<p {{inTagHelper foo}}></p>');
 });
 
-test("double", function() {
-  return compilesTo('p{{inTagHelper foo}}', '<p {{inTagHelper foo}}></p>');
+QUnit.test("double", function(assert) {
+  assert.compilesTo('p{{inTagHelper foo}}', '<p {{inTagHelper foo}}></p>');
 });
 
-test("triple", function() {
-  return compilesTo('p{{{inTagHelper foo}}}', '<p {{{inTagHelper foo}}}></p>');
+QUnit.test("triple", function(assert) {
+  assert.compilesTo('p{{{inTagHelper foo}}}', '<p {{{inTagHelper foo}}}></p>');
 });
 
-test("with singlestache", function() {
-  return compilesTo('p{insertClass foo} Hello', '<p {{insertClass foo}}>Hello</p>');
+QUnit.test("with singlestache", function(assert) {
+  assert.compilesTo('p{insertClass foo} Hello', '<p {{insertClass foo}}>Hello</p>');
 });
 
-test("singlestache can be used in text nodes", function() {
-  return compilesTo('p Hello {dork}', '<p>Hello {dork}</p>');
+QUnit.test("singlestache can be used in text nodes", function(assert) {
+  assert.compilesTo('p Hello {dork}', '<p>Hello {dork}</p>');
 });
 
-test("with doublestache", function() {
-  return compilesTo('p{{insertClass foo}} Hello', '<p {{insertClass foo}}>Hello</p>');
+QUnit.test("with doublestache", function(assert) {
+  assert.compilesTo('p{{insertClass foo}} Hello', '<p {{insertClass foo}}>Hello</p>');
 });
 
-test("with triplestache", function() {
-  return compilesTo('p{{{insertClass foo}}} Hello', '<p {{{insertClass foo}}}>Hello</p>');
+QUnit.test("with triplestache", function(assert) {
+  assert.compilesTo('p{{{insertClass foo}}} Hello', '<p {{{insertClass foo}}}>Hello</p>');
 });
 
-test("multiple", function() {
-  return compilesTo('p{{{insertClass foo}}}{{{insertClass boo}}} Hello', '<p {{{insertClass foo}}} {{{insertClass boo}}}>Hello</p>');
+QUnit.test("multiple", function(assert) {
+  assert.compilesTo('p{{{insertClass foo}}}{{{insertClass boo}}} Hello', '<p {{{insertClass foo}}} {{{insertClass boo}}}>Hello</p>');
 });
 
-test("with nesting", function() {
+QUnit.test("with nesting", function(assert) {
   var emblem;
   emblem = "p{{bind-attr class=\"foo\"}}\n  span Hello";
-  return compilesTo(emblem, '<p {{bind-attr class="foo"}}><span>Hello</span></p>');
+  assert.compilesTo(emblem, '<p {{bind-attr class="foo"}}><span>Hello</span></p>');
 });
 
-test('more nesting', function(){
+QUnit.test('more nesting', function(assert) {
   var emblem = w('',
                  'sally',
                  '  p Hello');
-  compilesTo(emblem, '{{#sally}}<p>Hello</p>{{/sally}}');
+  assert.compilesTo(emblem, '{{#sally}}<p>Hello</p>{{/sally}}');
 });
 
-test('recursive nesting', function(){
+QUnit.test('recursive nesting', function(assert) {
   var emblem = w('',
                  'sally',
                  '  sally',
                  '    p Hello');
-  compilesTo(emblem, '{{#sally}}{{#sally}}<p>Hello</p>{{/sally}}{{/sally}}');
+  assert.compilesTo(emblem, '{{#sally}}{{#sally}}<p>Hello</p>{{/sally}}{{/sally}}');
 });
 
-test('recursive nesting part 2', function(){
+QUnit.test('recursive nesting part 2', function(assert) {
   var emblem = w('',
                  'sally',
                  '  sally thing',
                  '    p Hello');
-  compilesTo(emblem, '{{#sally}}{{#sally thing}}<p>Hello</p>{{/sally}}{{/sally}}');
+  assert.compilesTo(emblem, '{{#sally}}{{#sally thing}}<p>Hello</p>{{/sally}}{{/sally}}');
 });
 
-test('use of "this"', function(){
+QUnit.test('use of "this"', function(assert) {
   var emblem = w('',
                  'each foo',
                  '  p = this',
                  '  this');
-  compilesTo(emblem,'{{#each foo}}<p>{{this}}</p>{{this}}{{/each}}');
+  assert.compilesTo(emblem,'{{#each foo}}<p>{{this}}</p>{{this}}{{/each}}');
 });
 
-test('mustache attr with underscore', function(){
+QUnit.test('mustache attr with underscore', function(assert) {
   var emblem = 'input placeholder=cat_name';
-  compilesTo(emblem,'<input placeholder={{cat_name}}>');
+  assert.compilesTo(emblem,'<input placeholder={{cat_name}}>');
 });
 
-test('mustache with empty attr value (single-quoted string)', function(){
+QUnit.test('mustache with empty attr value (single-quoted string)', function(assert) {
   var emblem = "= input placeholder=''";
-  compilesTo(emblem, "{{input placeholder=''}}");
+  assert.compilesTo(emblem, "{{input placeholder=''}}");
 });
 
-test('mustache with empty attr value (double-quoted string)', function(){
+QUnit.test('mustache with empty attr value (double-quoted string)', function(assert) {
   var emblem = '= input placeholder=""';
-  compilesTo(emblem, '{{input placeholder=""}}');
+  assert.compilesTo(emblem, '{{input placeholder=""}}');
 });
 
-test('explicit mustache with "/" in name', function(){
+QUnit.test('explicit mustache with "/" in name', function(assert) {
   var emblem = '= navigation/button-list';
-  compilesTo(emblem, '{{navigation/button-list}}');
+  assert.compilesTo(emblem, '{{navigation/button-list}}');
 });
 
-test('bracketed statement with comment and blank lines', function() {
+QUnit.test('bracketed statement with comment and blank lines', function(assert) {
   var emblem = w('sally [',
                  '  \'foo\'',
                  '',
                  '  ',
                  '  / We need to add more',
                  ']');
-  compilesTo(
+  assert.compilesTo(
     emblem, '{{sally \'foo\'}}');
 });
 
-test('bracketed nested statement', function(){
+QUnit.test('bracketed nested statement', function(assert) {
   var emblem = w('',
                  'sally [',
                  '  \'foo\'',
                  '  something="false" ]',
                  '  | Bracketed helper attrs!');
-  compilesTo(
+  assert.compilesTo(
     emblem, '{{#sally \'foo\' something="false"}}Bracketed helper attrs!{{/sally}}');
 });
 
-test('bracketed nested block params with block', function(){
+QUnit.test('bracketed nested block params with block', function(assert) {
   var emblem = w('',
                  'sally [',
                  '  \'foo\'',
                  '  something="false" ]',
                  '  p Bracketed helper attrs!');
-  compilesTo(
+  assert.compilesTo(
     emblem, '{{#sally \'foo\' something="false"}}<p>Bracketed helper attrs!</p>{{/sally}}');
 });
 
-test('bracketed statement with multiple initial arguments', function() {
+QUnit.test('bracketed statement with multiple initial arguments', function(assert) {
   var emblem = w('= component foo [',
                  '  bar=baz',
                  ']');
-  compilesTo(emblem, '{{component foo bar=baz}}');
+  assert.compilesTo(emblem, '{{component foo bar=baz}}');
 });
 
-test('bracketed nested block params', function(){
+QUnit.test('bracketed nested block params', function(assert) {
   var emblem = w('',
                  'sally [',
                  '  \'foo\'',
                  '  something="false" ] as |foo|');
-  compilesTo(
+  assert.compilesTo(
     emblem, '{{sally \'foo\' something="false" as |foo|}}');
 });
 
-test('bracketed with block params and block', function(){
+QUnit.test('bracketed with block params and block', function(assert) {
   var emblem = w('',
                  'sally [',
                  '  \'foo\'',
                  '  something="false" ] as |foo|',
                  '  p = foo');
-  compilesTo(
+  assert.compilesTo(
     emblem, '{{#sally \'foo\' something="false" as |foo|}}<p>{{foo}}</p>{{/sally}}');
 });
 
-test('bracketed with close on newline and with block', function(){
+QUnit.test('bracketed with close on newline and with block', function(assert) {
   var emblem = w('',
                  'sally [',
                  '  \'foo\'',
                  '  something="false"',
                  ']',
                  '  p = foo');
-  compilesTo(
+  assert.compilesTo(
     emblem, '{{#sally \'foo\' something="false"}}<p>{{foo}}</p>{{/sally}}');
 });
 
-test('bracketed with close on newline, with block params and block', function(){
+QUnit.test('bracketed with close on newline, with block params and block', function(assert) {
   var emblem = w('',
                  'sally [',
                  '  \'foo\'',
                  '  something="false"',
                  '] as |foo|',
                  '  p = foo');
-  compilesTo(
+  assert.compilesTo(
     emblem, '{{#sally \'foo\' something="false" as |foo|}}<p>{{foo}}</p>{{/sally}}');
 });
 
-test('bracketed action attribute', function(){
+QUnit.test('bracketed action attribute', function(assert) {
   var emblem = w('',
                  'button [',
                  '  click="doSomething" ]',
                  '  | click here');
-  compilesTo(
+  assert.compilesTo(
       emblem, '<button {{action "doSomething" on="click"}}>click here</button>');
 });
 
-test("single-line mustaches can have elements right after", function(){
+QUnit.test("single-line mustaches can have elements right after", function(assert) {
   var emblem = w(
     'div',
     '  = thing',
     '  div' // significantly, this has no return character
   );
-  compilesTo(emblem,
+  assert.compilesTo(emblem,
     '<div>{{thing}}<div></div></div>');
 });
 
-test("several bracketed attributes with closing bracket on final line", function() {
+QUnit.test("several bracketed attributes with closing bracket on final line", function(assert) {
   var emblem = w(
     "= asdf-asdf [",
     "  thing=res1",
@@ -440,10 +440,10 @@ test("several bracketed attributes with closing bracket on final line", function
     "  otherThing=res3",
     "]"
   );
-  return compilesTo(emblem, '{{asdf-asdf thing=res1 thi2ng=\'res2\' otherThing=res3}}');
+  assert.compilesTo(emblem, '{{asdf-asdf thing=res1 thi2ng=\'res2\' otherThing=res3}}');
 });
 
-test("several bracketed attributes without a block", function() {
+QUnit.test("several bracketed attributes without a block", function(assert) {
   var emblem = w(
     "= asdf-asdf [",
     "  thing=res1",
@@ -452,10 +452,10 @@ test("several bracketed attributes without a block", function() {
     "]",
     "p Hi there"
   );
-  return compilesTo(emblem, '{{asdf-asdf thing=res1 thi2ng=\'res2\' otherThing=res3}}<p>Hi there</p>');
+  assert.compilesTo(emblem, '{{asdf-asdf thing=res1 thi2ng=\'res2\' otherThing=res3}}<p>Hi there</p>');
 });
 
-test("several brackets with closing bracket on final line with a view", function() {
+QUnit.test("several brackets with closing bracket on final line with a view", function(assert) {
   var emblem = w(
     "Ember.Select [",
     "  thing=res1",
@@ -463,43 +463,43 @@ test("several brackets with closing bracket on final line with a view", function
     "  otherThing=\"res3\"",
     "]"
   );
-  return compilesTo(emblem, '{{view Ember.Select thing=res1 thi2ng=\'res2\' otherThing="res3"}}');
+  assert.compilesTo(emblem, '{{view Ember.Select thing=res1 thi2ng=\'res2\' otherThing="res3"}}');
 });
 
-test("single-line mustaches can have array indexes", function(){
+QUnit.test("single-line mustaches can have array indexes", function(assert) {
   var emblem = w('my-component value=child.[0]');
-  compilesTo(emblem,
+  assert.compilesTo(emblem,
     '{{my-component value=child.[0]}}');
 });
 
-test("single-line mustaches can have array indexes with bound indexes (not supported by Ember)", function(){
+QUnit.test("single-line mustaches can have array indexes with bound indexes (not supported by Ember)", function(assert) {
   var emblem = w('my-component value=child.[someIndex]');
-  compilesTo(emblem,
+  assert.compilesTo(emblem,
     '{{my-component value=child.[someIndex]}}');
 });
 
-test("multi-line mustaches can have array indexes with blocks", function(){
+QUnit.test("multi-line mustaches can have array indexes with blocks", function(assert) {
   var emblem = w(
     'my-component [',
     '  value=child.[0] ]',
     '  | Thing'
   );
-  compilesTo(emblem,
+  assert.compilesTo(emblem,
     '{{#my-component value=child.[0]}}Thing{{/my-component}}');
 });
 
-test("mustaches with else statement", function(){
+QUnit.test("mustaches with else statement", function(assert) {
   var emblem = w(
     'some-component-with-inverse-yield',
     '  |foo',
     'else',
     '  |bar'
   );
-  compilesTo(emblem,
+  assert.compilesTo(emblem,
     '{{#some-component-with-inverse-yield}}foo{{else}}bar{{/some-component-with-inverse-yield}}');
 });
 
-test('mustache with else if', function() {
+QUnit.test('mustache with else if', function(assert) {
   var emblem = w(
     '= if foo',
     '  p Hi!',
@@ -507,11 +507,11 @@ test('mustache with else if', function() {
     '  p bye'
   );
 
-  compilesTo(emblem,
+  assert.compilesTo(emblem,
     '{{#if foo}}<p>Hi!</p>{{else if foo}}<p>bye</p>{{/if}}');
 });
 
-test("mustaches with blocks and comments", function(){
+QUnit.test("mustaches with blocks and comments", function(assert) {
   var emblem = w(
     '/ Hi',
     '= if foo',
@@ -520,11 +520,11 @@ test("mustaches with blocks and comments", function(){
     '= else if bar',
     '  p bye'
   );
-  compilesTo(emblem,
+  assert.compilesTo(emblem,
     '{{#if foo}}<p>Hi</p>{{else if bar}}<p>bye</p>{{/if}}');
 });
 
-test('mustache with else if and complex statements', function() {
+QUnit.test('mustache with else if and complex statements', function(assert) {
   var emblem = w(
     '= if foo',
     '  p Hi!',
@@ -535,11 +535,11 @@ test('mustache with else if and complex statements', function() {
     '  p Wow what was that?'
   );
 
-  compilesTo(emblem,
+  assert.compilesTo(emblem,
     '{{#if foo}}<p>Hi!</p>{{else if (eq 1 (and-or a=b showHidden=(eq 1 2)))}}<p>Wow what was that?</p>{{/if}}');
 });
 
-test('named block support', function() {
+QUnit.test('named block support', function(assert) {
   var emblem = w(
     '= x-modal',
     '  % @header as |@title|',
@@ -550,17 +550,17 @@ test('named block support', function() {
     '    |Footer'
   )
 
-  compilesTo(emblem, '{{#x-modal}}<@header as |@title|>Header {{title}}</@header><@body>Body</@body><@footer>Footer</@footer>{{/x-modal}}');
+  assert.compilesTo(emblem, '{{#x-modal}}<@header as |@title|>Header {{title}}</@header><@body>Body</@body><@footer>Footer</@footer>{{/x-modal}}');
 });
 
-test('named block with block param', function() {
+QUnit.test('named block with block param', function(assert) {
   var emblem = w(
     '= x-layout as |@widget|',
     '  = @widget as |a b c|',
     '    |Hi.'
   )
 
-  compilesTo(emblem, '{{#x-layout as |@widget|}}{{#@widget as |a b c|}}Hi.{{/@widget}}{{/x-layout}}');
+  assert.compilesTo(emblem, '{{#x-layout as |@widget|}}{{#@widget as |a b c|}}Hi.{{/@widget}}{{/x-layout}}');
 });
 
 test('module namespaces', function() {

@@ -7,24 +7,21 @@
 </head>
 <body>
   <div id="qunit"></div>
-  <script src="qunit/qunit.js"></script>
+
   <script src="/testem.js"></script>
+  <script src="loader.js/loader.js"></script>
+  <script src="qunit/qunit.js"></script>
   <script src="jquery/jquery.js"></script>
   <script src="handlebars/handlebars.js"></script>
-  <script src="ember/ember.js"></script>
 
-  <script src="loader.js/loader.js"></script>
-  <script src="emblem-tests.amd.js"></script>
+  <!-- Used for integration tests -->
   <script src="../emblem.amd.js"></script>
-  <script>
-    // FIXME ember-cli should do this
-    require('support/integration-assertions');
-    for (moduleName in requirejs.entries) {
-      if (moduleName.match(/[-_]test$/)) {
-        require(moduleName);
-      }
-    }
-  </script>
+
+  <!-- Used for unit tests -->
+  <script src="test-app/emblem.js"></script>
+
+  <!-- Tests -->
+  <script src="tests.js"></script>
+
 </body>
 </html>
-

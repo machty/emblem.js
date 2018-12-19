@@ -17,5 +17,4 @@ sauce_connect.log
 spec/qunit_spec.js
 
 dist
-bower_components
 npm-debug.log

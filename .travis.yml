@@ -1,22 +1,24 @@
 ---
 language: node_js
 node_js:
-  - "4.0.0"
+  - "8.11.0"
 
 sudo: false
 
+addons:
+  chrome: stable
+
 cache:
+  yarn: true
   directories:
-    - node_modules
+    - $HOME/.npm
+    - $HOME/.yarn-cache
 
 before_install:
-  - "npm config set spin false"
-  - "npm install -g npm@^2"
+  - google-chrome-stable --headless --disable-gpu --remote-debugging-port=9222 http://localhost &
 
 install:
-  - npm install -g bower
-  - npm install
-  - bower install
+  - yarn install
 
 script:
   - npm test

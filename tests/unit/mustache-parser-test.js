@@ -18,7 +18,7 @@ function parseEmblem(emblem) {
   return ast;
 }
 
-test('capitalized start', function(assert){
+QUnit.test('capitalized start', function(assert){
   var text = 'App.Funview';
 
   assert.deepEqual(parseEmblem(text), {
@@ -33,7 +33,7 @@ test('capitalized start', function(assert){
   });
 });
 
-test('lowercase start', function(assert){
+QUnit.test('lowercase start', function(assert){
   var text = 'frank';
 
   assert.deepEqual(parseEmblem(text), {
@@ -48,7 +48,7 @@ test('lowercase start', function(assert){
   });
 });
 
-test('lowercase unquoted attr value', function(assert){
+QUnit.test('lowercase unquoted attr value', function(assert){
   var text = 'frank foo=bar';
 
   assert.deepEqual(parseEmblem(text), {
@@ -63,7 +63,7 @@ test('lowercase unquoted attr value', function(assert){
   });
 });
 
-test('attrs with spaces', function(assert){
+QUnit.test('attrs with spaces', function(assert){
   var text = 'frank foo = bar boo = far';
 
   assert.deepEqual(parseEmblem(text), {
@@ -78,7 +78,7 @@ test('attrs with spaces', function(assert){
   });
 });
 
-test('multiple attrs', function(assert){
+QUnit.test('multiple attrs', function(assert){
   var text = 'frank foo=bar boo=far';
 
   assert.deepEqual(parseEmblem(text), {
@@ -93,7 +93,7 @@ test('multiple attrs', function(assert){
   });
 });
 
-test('lowercase double-quoted attr value', function(assert){
+QUnit.test('lowercase double-quoted attr value', function(assert){
   var doubleQuote = 'input placeholder="\'100% /^%&*()x12#"';
 
   assert.deepEqual(parseEmblem(doubleQuote), {
@@ -118,7 +118,7 @@ test('lowercase double-quoted attr value', function(assert){
   });
 });
 
-test('lowercase single-quoted attr value', function(assert){
+QUnit.test('lowercase single-quoted attr value', function(assert){
   var singleQuote = "input placeholder='\"100% /^%&*()x12#'";
 
   assert.deepEqual(parseEmblem(singleQuote), {
@@ -143,7 +143,7 @@ test('lowercase single-quoted attr value', function(assert){
   });
 });
 
-test('attr value with underscore', function(assert){
+QUnit.test('attr value with underscore', function(assert){
   var text = 'input placeholder=cat_name';
   assert.deepEqual(parseEmblem(text), {
     "childNodes": [
@@ -167,7 +167,7 @@ test('attr value with underscore', function(assert){
   });
 });
 
-test('attr value is subexpression', function(assert){
+QUnit.test('attr value is subexpression', function(assert){
   var text = 'echofun fun=(equal 1 1)';
   assert.deepEqual(parseEmblem(text), {
     "childNodes": [
@@ -181,7 +181,7 @@ test('attr value is subexpression', function(assert){
   });
 });
 
-test('attr value is complex subexpression', function(assert){
+QUnit.test('attr value is complex subexpression', function(assert){
   var text = 'echofun true (hello how="are" you=false) 1 not=true fun=(equal "ECHO hello" (echo (hello))) win="yes"';
   assert.deepEqual(parseEmblem(text), {
     "childNodes": [
@@ -195,7 +195,7 @@ test('attr value is complex subexpression', function(assert){
   });
 });
 
-test('attr value is empty string', function(assert){
+QUnit.test('attr value is empty string', function(assert){
   var doubleQuote = 'input placeholder=""';
   var singleQuote = "input placeholder=''";
 
@@ -241,7 +241,7 @@ test('attr value is empty string', function(assert){
   });
 });
 
-test('query-params', function(assert){
+QUnit.test('query-params', function(assert){
   var text = 'frank (query-params groupId=defaultGroup.id)';
 
   assert.deepEqual(parseEmblem(text), {
@@ -256,7 +256,7 @@ test('query-params', function(assert){
   });
 });
 
-test('nested query-params', function(assert){
+QUnit.test('nested query-params', function(assert){
   var text = 'frank (query-params groupId=defaultGroup.id (more-qp x=foo))';
 
   assert.deepEqual(parseEmblem(text), {
@@ -271,7 +271,7 @@ test('nested query-params', function(assert){
   });
 });
 
-test('mixed query-params and key-value attrs', function(assert){
+QUnit.test('mixed query-params and key-value attrs', function(assert){
   var text = 'frank (query-params abc=def) fob=bob (qp-2 dog=fog) dab=tab  ';
 
   assert.deepEqual(parseEmblem(text), {
@@ -286,7 +286,7 @@ test('mixed query-params and key-value attrs', function(assert){
   });
 });
 
-test('mustache name with dash', function(assert){
+QUnit.test('mustache name with dash', function(assert){
   var text = 'link-to foo=bar';
 
   assert.deepEqual(parseEmblem(text), {
@@ -301,7 +301,7 @@ test('mustache name with dash', function(assert){
   });
 });
 
-test('mustache name with "/"', function(assert){
+QUnit.test('mustache name with "/"', function(assert){
   var text = 'navigation/button-list';
 
   assert.deepEqual(parseEmblem(text), {
@@ -317,14 +317,14 @@ test('mustache name with "/"', function(assert){
 });
 
 /**
-test('mustache value that is a bare "/" is not valid', function(assert){
+QUnit.test('mustache value that is a bare "/" is not valid', function(assert){
   var text = 'navigation/button-list / omg';
 
   assert.throws( function() { parseEmblem(text); } );
 });
 */
 
-test('mustache with quoted param', function(assert){
+QUnit.test('mustache with quoted param', function(assert){
   var text = 'link-to "abc.def"';
 
   assert.deepEqual(parseEmblem(text), {
@@ -339,7 +339,7 @@ test('mustache with quoted param', function(assert){
   });
 });
 
-test('mustache with unquoted param', function(assert){
+QUnit.test('mustache with unquoted param', function(assert){
   var text = 'link-to dog';
 
   assert.deepEqual(parseEmblem(text), {
@@ -354,7 +354,7 @@ test('mustache with unquoted param', function(assert){
   });
 });
 
-test('mustache with multiple params', function(assert){
+QUnit.test('mustache with multiple params', function(assert){
   var text = 'link-to "dog.tag" dog';
 
   assert.deepEqual(parseEmblem(text), {
@@ -369,7 +369,7 @@ test('mustache with multiple params', function(assert){
   });
 });
 
-test('mustache with shorthand % syntax', function(assert){
+QUnit.test('mustache with shorthand % syntax', function(assert){
   var text = 'frank%span';
 
   assert.deepEqual(parseEmblem(text), {
@@ -384,7 +384,7 @@ test('mustache with shorthand % syntax', function(assert){
   });
 });
 
-test('mustache with shorthand # syntax', function(assert){
+QUnit.test('mustache with shorthand # syntax', function(assert){
   var text = 'frank#id-name';
 
   assert.deepEqual(parseEmblem(text), {
@@ -399,7 +399,7 @@ test('mustache with shorthand # syntax', function(assert){
   });
 });
 
-test('mustache with shorthand . syntax with required space', function(assert){
+QUnit.test('mustache with shorthand . syntax with required space', function(assert){
   var text = 'frank .class-name';
 
   assert.deepEqual(parseEmblem(text), {
@@ -414,7 +414,7 @@ test('mustache with shorthand . syntax with required space', function(assert){
   });
 });
 
-test('mustache with multiple classes', function(assert){
+QUnit.test('mustache with multiple classes', function(assert){
   var text = 'frank .class-name1.class-name2';
 
   assert.deepEqual(parseEmblem(text), {
@@ -429,7 +429,7 @@ test('mustache with multiple classes', function(assert){
   });
 });
 
-test('mustache with multiple shorthands', function(assert){
+QUnit.test('mustache with multiple shorthands', function(assert){
   var text = 'frank%span#my-id.class-name';
 
   assert.deepEqual(parseEmblem(text), {
@@ -445,14 +445,14 @@ test('mustache with multiple shorthands', function(assert){
 });
 
 /**
-test('mustache cannot start with a dot, a dash or a digit', function(assert){
+QUnit.test('mustache cannot start with a dot, a dash or a digit', function(assert){
   assert.throws( function() { parseEmblem('.frank'); } );
   assert.throws( function() { parseEmblem('-frank'); } );
   assert.throws( function() { parseEmblem('9frank'); } );
 });
 */
 
-test("bang modifier", function(assert) {
+QUnit.test("bang modifier", function(assert) {
   var text = 'foo!';
 
   assert.deepEqual(parseEmblem(text), {
@@ -467,7 +467,7 @@ test("bang modifier", function(assert) {
   });
 });
 
-test("conditional modifier", function(assert) {
+QUnit.test("conditional modifier", function(assert) {
   var text = 'foo?';
 
   assert.deepEqual(parseEmblem(text), {
@@ -482,7 +482,7 @@ test("conditional modifier", function(assert) {
   });
 });
 
-test('block params', function(assert){
+QUnit.test('block params', function(assert){
   var text = 'frank foo=bar boo=far as |steve|';
 
   assert.deepEqual(parseEmblem(text), {
@@ -497,7 +497,7 @@ test('block params', function(assert){
   });
 });
 
-test('multiple block params', function(assert){
+QUnit.test('multiple block params', function(assert){
   var text = 'frank foo=bar boo=far as |steve dave|';
 
   assert.deepEqual(parseEmblem(text), {

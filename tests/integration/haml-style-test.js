@@ -4,27 +4,27 @@ import { compilesTo } from '../support/integration-assertions';
 
 QUnit.module("haml style");
 
-test("basic", function() {
+QUnit.test("basic", function(assert) {
   var emblem;
   emblem = "%borf";
-  return compilesTo(emblem, '<borf></borf>');
+  assert.compilesTo(emblem, '<borf></borf>');
 });
 
-test("nested", function() {
+QUnit.test("nested", function(assert) {
   var emblem;
   emblem = "%borf\n    %sporf Hello";
-  return compilesTo(emblem, '<borf><sporf>Hello</sporf></borf>');
+  assert.compilesTo(emblem, '<borf><sporf>Hello</sporf></borf>');
 });
 
-test("capitalized", function() {
+QUnit.test("capitalized", function(assert) {
   var emblem;
   emblem = "%Alex alex\n%Alex\n  %Woot";
-  return compilesTo(emblem, '<Alex>alex</Alex><Alex><Woot></Woot></Alex>');
+  assert.compilesTo(emblem, '<Alex>alex</Alex><Alex><Woot></Woot></Alex>');
 });
 
-test("funky chars", function() {
+QUnit.test("funky chars", function(assert) {
   var emblem;
   emblem = "%borf:narf\n%borf:narf Hello, {{foo}}.\n%alex = foo";
-  return compilesTo(emblem,
+  assert.compilesTo(emblem,
                            '<borf:narf></borf:narf><borf:narf>Hello, {{foo}}.</borf:narf><alex>{{foo}}</alex>');
 });

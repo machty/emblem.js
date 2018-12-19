@@ -5,37 +5,36 @@ import { compilesTo } from '../support/integration-assertions';
 
 QUnit.module("preprocessor");
 
-QUnit.test("it strips out preceding whitespace", function(){
+QUnit.test("it strips out preceding whitespace", function(assert) {
   var emblem = w(
     "",
     "p Hello"
   );
-  compilesTo(emblem, "<p>Hello</p>");
+  assert.compilesTo(emblem, "<p>Hello</p>");
 });
 
-QUnit.test("it handles preceding indentation", function(){
+QUnit.test("it handles preceding indentation", function(assert) {
   var emblem = w(
     "  p Woot",
     "  p Ha"
   );
-  compilesTo(emblem, "<p>Woot</p><p>Ha</p>");
+  assert.compilesTo(emblem, "<p>Woot</p><p>Ha</p>");
 });
 
-QUnit.test("it handles preceding indentation and newlines", function(){
+QUnit.test("it handles preceding indentation and newlines", function(assert) {
   var emblem = w(
     "",
     "  p Woot",
     "  p Ha"
   );
-  compilesTo(emblem, "<p>Woot</p><p>Ha</p>");
+  assert.compilesTo(emblem, "<p>Woot</p><p>Ha</p>");
 });
 
-QUnit.test("it handles preceding indentation and newlines pt 2", function(){
+QUnit.test("it handles preceding indentation and newlines pt 2", function(assert) {
   var emblem = w(
     "  ",
     "  p Woot",
     "  p Ha"
   );
-  compilesTo(emblem, "<p>Woot</p><p>Ha</p>");
+  assert.compilesTo(emblem, "<p>Woot</p><p>Ha</p>");
 });
-

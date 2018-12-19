@@ -1,19 +1,20 @@
 /*global QUnit*/
 
 import { w } from '../support/utils';
-import Emblem from '../../emblem';
+import { compile } from 'emblem';
 
-var defaultOptions = {
+const defaultOptions = {
   legacyAttributeQuoting: false
 };
 
-export function compilesTo(emblem, handlebars, message, emblemOptions) {
-  var options = emblemOptions || defaultOptions;
-  var output = Emblem.compile(emblem, options);
+QUnit.assert.compilesTo = function(emblem, handlebars, message, emblemOptions) {
+  const options = emblemOptions || defaultOptions;
+  const output = compile(emblem, options);
 
   if (!message) {
-    var maxLenth = 40;
-    var messageEmblem = emblem.replace(/\n/g, "\\n");
+    const maxLenth = 40;
+    let messageEmblem = emblem.replace(/\n/g, "\\n");
+
     if (messageEmblem.length > maxLenth) {
       messageEmblem = messageEmblem.slice(0,maxLenth) + '...';
     }
@@ -24,5 +25,13 @@ export function compilesTo(emblem, handlebars, message, emblemOptions) {
       '\tActual:   "' + output + '"'
     )
   }
-  QUnit.push(output === handlebars, output, handlebars, message);
+
+  this.pushResult({
+    result: output === handlebars,
+    expected: output,
+    actual: handlebars,
+    message
+  });
 };
+
+export const compilesTo = null;

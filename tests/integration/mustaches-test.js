@@ -68,6 +68,14 @@ QUnit.test("multiple words work too", function(assert) {
     '{{my-helper as |foo bar|}}');
 });
 
+QUnit.test("values can have @", function(assert) {
+  var emblem = w(
+    "= my-helper as |@foo @bar|"
+  );
+  assert.compilesTo(emblem,
+    '{{my-helper as |@foo @bar|}}');
+});
+
 QUnit.test("block form works for the 'with' helper", function(assert) {
   var emblem = w(
     "= with car.manufacturer as |make|",

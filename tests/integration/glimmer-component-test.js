@@ -61,11 +61,11 @@ QUnit.test("Blocks", function(assert) {
 
 QUnit.test("Block params", function(assert) {
    var emblem = w(
-    "%MyComponent @value=foo as |comp1 comp2|",
+    "%MyComponent @value=foo as |comp1 @comp2|",
     "  = comp.name"
   );
   assert.compilesTo(emblem,
-    '<MyComponent @value={{foo}} as |comp1 comp2|>{{comp.name}}</MyComponent>');
+    '<MyComponent @value={{foo}} as |comp1 @comp2|>{{comp.name}}</MyComponent>');
 });
 
 // @TODO: What should the result of this be?

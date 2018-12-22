@@ -21,6 +21,11 @@ QUnit.test('named argument syntax', function(assert) {
   assert.compilesTo('= @bar', '{{@bar}}');
 });
 
+QUnit.test('names with multiple underscores', function(assert) {
+  assert.compilesTo("= link-to .nav__item 'dashboard' | Foo Bar",
+    "{{#link-to 'dashboard' class=\"nav__item\"}}Foo Bar{{/link-to}}");
+});
+
 QUnit.test("double =='s un-escape", function(assert) {
   var emblem = w(
     "== foo",

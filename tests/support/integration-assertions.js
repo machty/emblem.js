@@ -7,31 +7,37 @@ const defaultOptions = {
   legacyAttributeQuoting: false
 };
 
-QUnit.assert.compilesTo = function(emblem, handlebars, message, emblemOptions) {
-  const options = emblemOptions || defaultOptions;
-  const output = compile(emblem, options);
+export default function loadAssertions() {
+  QUnit.assert.compilesTo = function (emblem, handlebars, message, emblemOptions) {
+    const options = emblemOptions || defaultOptions;
+    const output = compile(emblem, options);
 
-  if (!message) {
-    const maxLenth = 40;
-    let messageEmblem = emblem.replace(/\n/g, "\\n");
+    if (!message) {
+      const maxLenth = 40;
+      let messageEmblem = emblem.replace(/\n/g, "\\n");
 
-    if (messageEmblem.length > maxLenth) {
-      messageEmblem = messageEmblem.slice(0,maxLenth) + '...';
+      if (messageEmblem.length > maxLenth) {
+        messageEmblem = messageEmblem.slice(0, maxLenth) + '...';
+      }
+      message = w(
+        'compilesTo assertion failed:',
+        '\tEmblem:   "' + messageEmblem + '"',
+        '\tExpected: "' + handlebars + '"',
+        '\tActual:   "' + output + '"'
+      )
     }
-    message = w(
-      'compilesTo assertion failed:',
-      '\tEmblem:   "' + messageEmblem + '"',
-      '\tExpected: "' + handlebars + '"',
-      '\tActual:   "' + output + '"'
-    )
+
+    this.pushResult({
+      result: output === handlebars,
+      expected: output,
+      actual: handlebars,
+      message
+    });
+  };
+
+  QUnit.assert.compilerThrows = function (emblem, message) {
+    QUnit.assert.throws(function () {
+      compile(emblem);
+    }, message);
   }
-
-  this.pushResult({
-    result: output === handlebars,
-    expected: output,
-    actual: handlebars,
-    message
-  });
-};
-
-export const compilesTo = null;
+}

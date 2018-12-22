@@ -40,6 +40,11 @@ QUnit.test("nested combo syntax", function(assert) {
     '<ul>{{#each items}}<li>{{foo}}</li>{{/each}}</ul>');
 });
 
+QUnit.test('attributes and values with $ in them', function (assert) {
+  assert.compilesTo('= my-component $foo=bar.$baz', '{{my-component $foo=bar.$baz}}');
+});
+
+
 QUnit.module("mustache: block params");
 
 QUnit.test("anything after 'as' goes in block params", function(assert) {

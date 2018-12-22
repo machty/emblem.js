@@ -40,6 +40,11 @@ QUnit.test("nested combo syntax", function(assert) {
     '<ul>{{#each items}}<li>{{foo}}</li>{{/each}}</ul>');
 });
 
+QUnit.test('attributes and values with $ in them', function (assert) {
+  assert.compilesTo('= my-component $foo=bar.$baz', '{{my-component $foo=bar.$baz}}');
+});
+
+
 QUnit.module("mustache: block params");
 
 QUnit.test("anything after 'as' goes in block params", function(assert) {
@@ -61,6 +66,14 @@ QUnit.test("multiple words work too", function(assert) {
   );
   assert.compilesTo(emblem,
     '{{my-helper as |foo bar|}}');
+});
+
+QUnit.test("values can have @", function(assert) {
+  var emblem = w(
+    "= my-helper as |@foo @bar|"
+  );
+  assert.compilesTo(emblem,
+    '{{my-helper as |@foo @bar|}}');
 });
 
 QUnit.test("block form works for the 'with' helper", function(assert) {
@@ -334,15 +347,29 @@ QUnit.test('explicit mustache with "/" in name', function(assert) {
   assert.compilesTo(emblem, '{{navigation/button-list}}');
 });
 
-QUnit.test('bracketed statement with comment and blank lines', function(assert) {
+QUnit.test('bracketed statement with blank lines', function(assert) {
   var emblem = w('sally [',
+                 '',
                  '  \'foo\'',
                  '',
                  '  ',
-                 '  / We need to add more',
+                 '',
+                 '  baz=true',
                  ']');
   assert.compilesTo(
-    emblem, '{{sally \'foo\'}}');
+    emblem, '{{sally \'foo\' baz=true}}');
+});
+
+QUnit.test('bracketed statement with comments', function(assert) {
+  var emblem = w('sally [ /blah',
+                 '  / foo',
+                 '  \'foo\'',
+                 '  / bar',
+                 '    what is this madness?',
+                 '  baz=true',
+                 ']');
+  assert.compilesTo(
+    emblem, '{{sally \'foo\' baz=true}}');
 });
 
 QUnit.test('bracketed nested statement', function(assert) {
@@ -363,6 +390,29 @@ QUnit.test('bracketed nested block params with block', function(assert) {
                  '  p Bracketed helper attrs!');
   assert.compilesTo(
     emblem, '{{#sally \'foo\' something="false"}}<p>Bracketed helper attrs!</p>{{/sally}}');
+});
+
+QUnit.test('bracketed nested block params with newline then block 1', function(assert) {
+  var emblem = w('',
+                 '= foo [',
+                 '  bar=1 ]',
+                 '',
+                 '  p baz');
+  assert.compilesTo(
+    emblem, '{{#foo bar=1}}<p>baz</p>{{/foo}}');
+});
+
+// Make sure there are tests with block params and different bracket arrangements
+
+QUnit.test('bracketed nested block params with newline then block 2', function (assert) {
+  var emblem = w('',
+    '= foo [',
+    '  bar=1',
+    ']',
+    '',
+    '  p baz');
+  assert.compilesTo(
+    emblem, '{{#foo bar=1}}<p>baz</p>{{/foo}}');
 });
 
 QUnit.test('bracketed statement with multiple initial arguments', function(assert) {
@@ -563,10 +613,10 @@ QUnit.test('named block with block param', function(assert) {
   assert.compilesTo(emblem, '{{#x-layout as |@widget|}}{{#@widget as |a b c|}}Hi.{{/@widget}}{{/x-layout}}');
 });
 
-test('module namespaces', function() {
+QUnit.test('module namespaces', function(assert) {
   var emblem = w(
     '= my-addon::foo'
   )
 
-  compilesTo(emblem, '{{my-addon::foo}}');
+  assert.compilesTo(emblem, '{{my-addon::foo}}');
 });

@@ -339,15 +339,29 @@ QUnit.test('explicit mustache with "/" in name', function(assert) {
   assert.compilesTo(emblem, '{{navigation/button-list}}');
 });
 
-QUnit.test('bracketed statement with comment and blank lines', function(assert) {
+QUnit.test('bracketed statement with blank lines', function(assert) {
   var emblem = w('sally [',
+                 '',
                  '  \'foo\'',
                  '',
                  '  ',
-                 '  / We need to add more',
+                 '',
+                 '  baz=true',
                  ']');
   assert.compilesTo(
-    emblem, '{{sally \'foo\'}}');
+    emblem, '{{sally \'foo\' baz=true}}');
+});
+
+QUnit.test('bracketed statement with comments', function(assert) {
+  var emblem = w('sally [ /blah',
+                 '  / foo',
+                 '  \'foo\'',
+                 '  / bar',
+                 '    what is this madness?',
+                 '  baz=true',
+                 ']');
+  assert.compilesTo(
+    emblem, '{{sally \'foo\' baz=true}}');
 });
 
 QUnit.test('bracketed nested statement', function(assert) {
@@ -368,6 +382,29 @@ QUnit.test('bracketed nested block params with block', function(assert) {
                  '  p Bracketed helper attrs!');
   assert.compilesTo(
     emblem, '{{#sally \'foo\' something="false"}}<p>Bracketed helper attrs!</p>{{/sally}}');
+});
+
+QUnit.test('bracketed nested block params with newline then block 1', function(assert) {
+  var emblem = w('',
+                 '= foo [',
+                 '  bar=1 ]',
+                 '',
+                 '  p baz');
+  assert.compilesTo(
+    emblem, '{{#foo bar=1}}<p>baz</p>{{/foo}}');
+});
+
+// Make sure there are tests with block params and different bracket arrangements
+
+QUnit.test('bracketed nested block params with newline then block 2', function (assert) {
+  var emblem = w('',
+    '= foo [',
+    '  bar=1',
+    ']',
+    '',
+    '  p baz');
+  assert.compilesTo(
+    emblem, '{{#foo bar=1}}<p>baz</p>{{/foo}}');
 });
 
 QUnit.test('bracketed statement with multiple initial arguments', function(assert) {

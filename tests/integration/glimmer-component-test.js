@@ -145,10 +145,10 @@ QUnit.test('named block support', function(assert) {
   assert.compilesTo(emblem, '<x-modal><@header as |@title|>Header {{title}}</@header><@body>Body</@body><@footer>Footer</@footer></x-modal>');
 });
 
-test('module namespaces', function() {
+QUnit.test('module namespaces', function(assert) {
   var emblem = w(
     '% my-addon::foo'
   )
 
-  compilesTo(emblem, '<my-addon::foo></my-addon::foo>');
+  assert.compilesTo(emblem, '<my-addon::foo></my-addon::foo>');
 });

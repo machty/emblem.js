@@ -10,10 +10,10 @@
 
   <script src="/testem.js"></script>
   <script src="loader.js/loader.js"></script>
-  <script src="qunit/qunit.js"></script>
   <script src="jquery/jquery.js"></script>
   <script src="handlebars/handlebars.js"></script>
 
+  <script src="qunit/qunit.js"></script>
   <!-- Used for integration tests -->
   <script src="../emblem.amd.js"></script>
 
@@ -23,5 +23,8 @@
   <!-- Tests -->
   <script src="tests.js"></script>
 
+  <script>
+    require('tests/test-runner');
+  </script>
 </body>
 </html>

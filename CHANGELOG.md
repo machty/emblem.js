@@ -1,3 +1,6 @@
+# [0.12.1](https://github.com/machty/emblem.js/releases/tag/v0.12.0)
+- Fix issue with spacing around explicit mustache [#329](https://github.com/machty/emblem.js/pul / multiple small bugfixesl/329)
+
 # [0.12.0](https://github.com/machty/emblem.js/releases/tag/v0.12.0)
 - Test reorg [#325](https://github.com/machty/emblem.js/pul / multiple small bugfixesl/325)
 - Mustache keys can have underscores [#323](https://github.com/machty/emblem.js/pul / multiple small bugfixesl/323)

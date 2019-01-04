@@ -1,4 +1,16 @@
-# [0.11.1](https://github.com/machty/emblem.js/releases/tag/v0.10.0)
+# [0.12.0](https://github.com/machty/emblem.js/releases/tag/v0.12.0)
+- Test reorg [#325](https://github.com/machty/emblem.js/pul / multiple small bugfixesl/325)
+- Mustache keys can have underscores [#323](https://github.com/machty/emblem.js/pul / multiple small bugfixesl/323)
+- Better errors / multiple small bugfixes [#322](https://github.com/machty/emblem.js/pul / multiple small bugfixesl/322)
+    * Fix #320 Remove legacy partial syntax
+    * Fix #318 Add spread attributes to glimmer components
+    * Fix #317 Block params can have @
+    * Fix #316 Make bracket params more flexible with newlines and comments
+    * Fix #279 $ in attribute/value names
+- Updated build tools [#319](https://github.com/machty/emblem.js/pull/319)
+- Module namespace support [#313](https://github.com/machty/emblem.js/pull/313)
+
+# [0.11.1](https://github.com/machty/emblem.js/releases/tag/v0.11.0)
 - Bump support for Handlebars >= 2.0 [#315](https://github.com/machty/emblem.js/pull/315)
 
 # [0.10.0# [0.10.0](https://github.com/machty/emblem.js/releases/tag/v0.10.0)

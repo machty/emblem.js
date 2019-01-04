@@ -111,6 +111,10 @@ module('mustache: handlebars expressions', function (hooks) {
     assert.compilesTo(emblem, '{{navigation/button-list}}');
   });
 
+  test('explicit mustache with spacing issues', function(assert) {
+    assert.compilesTo('=  link-to  foo=bar', '{{link-to foo=bar}}');
+  });
+
   test("should not kick in if preceded by equal sign", function (assert) {
     const emblem = w(
       "= SomeView"

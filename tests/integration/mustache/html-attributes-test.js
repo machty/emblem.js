@@ -35,4 +35,14 @@ module('mustache: html attributes', function (hooks) {
   test("with doublestache", function (assert) {
     assert.compilesTo('p{{insertClass foo}} Hello', '<p {{insertClass foo}}>Hello</p>');
   });
+
+  test("with multi-line", function (assert) {
+    const emblem = w(
+      "div{did-insert this.handler} [",
+      "  class='test'",
+      "]",
+    );
+
+    assert.compilesTo(emblem, '<div {{did-insert this.handler}} class="test"></div>');
+  });
 });

@@ -20,7 +20,7 @@ module('glimmer: blocks', function (hooks) {
 
     assert.compilesTo(emblem,
       '<MyComponent @value={{foo}} as |comp1 @comp2|>{{comp.name}}</MyComponent>');
-  });
+  });  
 
   test('recursive nesting part 2', function (assert) {
     const emblem = w(
@@ -32,5 +32,16 @@ module('glimmer: blocks', function (hooks) {
 
     assert.compilesTo(emblem, '<my-comp-1><my-comp-2><p>Hello</p></my-comp-2></my-comp-1>');
   });
+
+
+  test("block params with nested comp", function (assert) {
+    const emblem = w(
+      "%MyComponent @value=foo as |comp1 @comp2|",
+      "  %comp.name @value1=foo"
+    );
+
+    assert.compilesTo(emblem,
+      '<MyComponent @value={{foo}} as |comp1 @comp2|><comp.name @value1={{foo}}></comp.name></MyComponent>');
+  }); 
 
 });

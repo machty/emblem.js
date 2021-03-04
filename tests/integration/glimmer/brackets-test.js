@@ -61,4 +61,42 @@ module('glimmer: brackets', function (hooks) {
 
     assert.compilesTo(emblem, '<MyComponent onclick={{action \'doSometing\' foo bar}} {{action \"otherAction\" on=\"change\"}} @something=\"false\"><p>Bracketed helper attrs!</p></MyComponent>');
   });
+
+  test('bracketed modifiers', function (assert) {
+    const emblem = w(
+      '%MyComponent [',
+      '  {did-insert this.handler}',
+      '  {on "input" @onInput}',
+      '',
+      '  @something="false"',
+      ']',
+      '  p Bracketed helper attrs!'
+    );
+
+    assert.compilesTo(emblem, '<MyComponent {{did-insert this.handler}} {{on "input" @onInput}} @something=\"false\"><p>Bracketed helper attrs!</p></MyComponent>');
+  });
+
+  test('bracketed with in-tag modifier', function (assert) {
+    const emblem = w(
+      '%MyComponent{did-insert this.handler} [',
+      '',
+      '  @something="false"',
+      ']',
+      '  p Bracketed helper attrs!'
+    );
+
+    assert.compilesTo(emblem, '<MyComponent {{did-insert this.handler}} @something=\"false\"><p>Bracketed helper attrs!</p></MyComponent>');
+  });
+
+  test('tag modifiers with multi-line', function (assert) {
+    const emblem = w(
+      '%MyComponent{did-insert this.handler} [',
+      '  {on "input" @onInput}',
+      '  ',
+      '  @something="false" ]',
+      '  p Bracketed helper attrs!'
+    );
+
+    assert.compilesTo(emblem, '<MyComponent {{did-insert this.handler}} {{on "input" @onInput}} @something=\"false\"><p>Bracketed helper attrs!</p></MyComponent>');
+  });
 });

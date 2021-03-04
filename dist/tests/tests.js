@@ -1358,6 +1358,18 @@ define("tests/integration/glimmer/brackets-test", ["qunit", "tests/support/utils
       const emblem = (0, _utils.w)('', '%MyComponent [', '  onclick={ action \'doSometing\' foo bar }', '  change=\'otherAction\'', '  @something="false" ]', '  p Bracketed helper attrs!');
       assert.compilesTo(emblem, '<MyComponent onclick={{action \'doSometing\' foo bar}} {{action \"otherAction\" on=\"change\"}} @something=\"false\"><p>Bracketed helper attrs!</p></MyComponent>');
     });
+    (0, _qunit.test)('bracketed modifiers', function (assert) {
+      const emblem = (0, _utils.w)('%MyComponent [', '  {did-insert this.handler}', '  {on "input" @onInput}', '', '  @something="false"', ']', '  p Bracketed helper attrs!');
+      assert.compilesTo(emblem, '<MyComponent {{did-insert this.handler}} {{on "input" @onInput}} @something=\"false\"><p>Bracketed helper attrs!</p></MyComponent>');
+    });
+    (0, _qunit.test)('bracketed with in-tag modifier', function (assert) {
+      const emblem = (0, _utils.w)('%MyComponent{did-insert this.handler} [', '', '  @something="false"', ']', '  p Bracketed helper attrs!');
+      assert.compilesTo(emblem, '<MyComponent {{did-insert this.handler}} @something=\"false\"><p>Bracketed helper attrs!</p></MyComponent>');
+    });
+    (0, _qunit.test)('tag modifiers with multi-line', function (assert) {
+      const emblem = (0, _utils.w)('%MyComponent{did-insert this.handler} [', '  {on "input" @onInput}', '  ', '  @something="false" ]', '  p Bracketed helper attrs!');
+      assert.compilesTo(emblem, '<MyComponent {{did-insert this.handler}} {{on "input" @onInput}} @something=\"false\"><p>Bracketed helper attrs!</p></MyComponent>');
+    });
   });
 });
 define("tests/integration/glimmer/named-blocks-test", ["qunit", "tests/support/utils"], function (_qunit, _utils) {
@@ -1828,9 +1840,17 @@ define("tests/integration/mustache/html-attributes-test", ["qunit", "tests/suppo
     (0, _qunit.test)("with doublestache", function (assert) {
       assert.compilesTo('p{{insertClass foo}} Hello', '<p {{insertClass foo}}>Hello</p>');
     });
-    (0, _qunit.test)("with multi-line", function (assert) {
-      const emblem = (0, _utils.w)("div{did-insert this.handler} [", "  class='test'", "]");
-      assert.compilesTo(emblem, '<div {{did-insert this.handler}} class="test"></div>');
+    (0, _qunit.test)("bracketed modifiers", function (assert) {
+      const emblem = (0, _utils.w)('div [', '  {did-insert this.handler}', '  {on "input" @onInput}', "  class='test'", "]");
+      assert.compilesTo(emblem, '<div {{did-insert this.handler}} {{on "input" @onInput}} class="test"></div>');
+    });
+    (0, _qunit.test)("tag modifiers with multi-line", function (assert) {
+      const emblem = (0, _utils.w)('div{did-insert this.handler}{on "input" @onInput} [', "  class='test'", "]");
+      assert.compilesTo(emblem, '<div {{did-insert this.handler}} {{on "input" @onInput}} class="test"></div>');
+    });
+    (0, _qunit.test)("tag modifier with multi-line modifier", function (assert) {
+      const emblem = (0, _utils.w)("div{did-insert this.handler} [", '  {on "input" @onInput}', '  ', '  class="test" ]');
+      assert.compilesTo(emblem, '<div {{did-insert this.handler}} {{on "input" @onInput}} class="test"></div>');
     });
   });
 });
@@ -2704,14 +2724,14 @@ define("tests/unit/parser-test", ["../../emblem/parser", "../../emblem/preproces
   astTest('nested elements interspersed with content', ['p', '  | blah blah', '  b bold text'].join('\n'), function (assert, ast) {
     assert.deepEqual(ast, program([element('p', [text('blah blah'), element('b', [text('bold text')])])]));
   });
-  astTest('action in bracketed attributes', ['p [', 'click="test" ]'].join('\n'), function (assert, ast) {
+  astTest('action in bracketed attributes', ['p [', '  click="test" ]'].join('\n'), function (assert, ast) {
     assert.deepEqual(ast, program([element('p', [], [{
       type: 'mustache',
       escaped: true,
       content: 'action "test" on="click"'
     }])]));
   });
-  astTest('action in bracketed attributes with dom event', ['p [', 'onclick={ action "test" } ]'].join('\n'), function (assert, ast) {
+  astTest('action in bracketed attributes with dom event', ['p [', '  onclick={ action "test" } ]'].join('\n'), function (assert, ast) {
     assert.deepEqual(ast, program([element('p', [], [{
       type: 'assignedMustache',
       key: 'onclick',

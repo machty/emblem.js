@@ -214,7 +214,7 @@ astTest('nested elements interspersed with content',
 
 astTest('action in bracketed attributes',
     ['p [',
-      'click="test" ]'].join('\n'), function(assert, ast){
+      '  click="test" ]'].join('\n'), function(assert, ast){
       assert.deepEqual(
           ast,
           program([
@@ -231,7 +231,7 @@ astTest('action in bracketed attributes',
 
 astTest('action in bracketed attributes with dom event',
     ['p [',
-      'onclick={ action "test" } ]'].join('\n'), function(assert, ast){
+      '  onclick={ action "test" } ]'].join('\n'), function(assert, ast){
       assert.deepEqual(
           ast,
           program([

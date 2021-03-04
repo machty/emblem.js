@@ -36,13 +36,36 @@ module('mustache: html attributes', function (hooks) {
     assert.compilesTo('p{{insertClass foo}} Hello', '<p {{insertClass foo}}>Hello</p>');
   });
 
-  test("with multi-line", function (assert) {
+  test("bracketed modifiers", function (assert) {
     const emblem = w(
-      "div{did-insert this.handler} [",
+      'div [',
+      '  {did-insert this.handler}',
+      '  {on "input" @onInput}',
       "  class='test'",
       "]",
     );
 
-    assert.compilesTo(emblem, '<div {{did-insert this.handler}} class="test"></div>');
+    assert.compilesTo(emblem, '<div {{did-insert this.handler}} {{on "input" @onInput}} class="test"></div>');
+  });
+
+  test("tag modifiers with multi-line", function (assert) {
+    const emblem = w(
+      'div{did-insert this.handler}{on "input" @onInput} [',
+      "  class='test'",
+      "]",
+    );
+
+    assert.compilesTo(emblem, '<div {{did-insert this.handler}} {{on "input" @onInput}} class="test"></div>');
+  });
+
+  test("tag modifier with multi-line modifier", function (assert) {
+    const emblem = w(
+      "div{did-insert this.handler} [",
+      '  {on "input" @onInput}',
+      '  ',
+      '  class="test" ]',
+    );
+
+    assert.compilesTo(emblem, '<div {{did-insert this.handler}} {{on "input" @onInput}} class="test"></div>');
   });
 });

@@ -1370,6 +1370,10 @@ define("tests/integration/glimmer/brackets-test", ["qunit", "tests/support/utils
       const emblem = (0, _utils.w)('%MyComponent{did-insert this.handler} [', '  {on "input" @onInput}', '  ', '  @something="false" ]', '  p Bracketed helper attrs!');
       assert.compilesTo(emblem, '<MyComponent {{did-insert this.handler}} {{on "input" @onInput}} @something=\"false\"><p>Bracketed helper attrs!</p></MyComponent>');
     });
+    (0, _qunit.test)("bracketed with Sub-expressions", function (assert) {
+      const emblem = (0, _utils.w)('%MyComponent [', '  @onClose={action (queue [', '    (action this.closeWizard)', '    (transition-to "home")', '  ])}', ']');
+      assert.compilesTo(emblem, '<MyComponent @onClose={{action (queue (action this.closeWizard) (transition-to "home"))}}></MyComponent>');
+    });
   });
 });
 define("tests/integration/glimmer/named-blocks-test", ["qunit", "tests/support/utils"], function (_qunit, _utils) {

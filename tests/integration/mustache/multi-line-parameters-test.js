@@ -19,7 +19,7 @@ module('mustache: multi-line parameters', function (hooks) {
 
   test('bracketed statement with comments', function (assert) {
     const emblem = w(
-      'sally [ /blah',
+      'sally [ / blah',
       '  / foo',
       '  \'foo\'',
       '  / bar',
@@ -129,14 +129,14 @@ module('mustache: multi-line parameters', function (hooks) {
   test('bracketed with close on newline, with block params and block', function (assert) {
     const emblem = w(
       '',
-      'sally [',
+      '= sally baz [',
       '  \'foo\'',
       '  something="false"',
       '] as |foo|',
       '  p = foo'
     );
 
-      assert.compilesTo(emblem, '{{#sally \'foo\' something="false" as |foo|}}<p>{{foo}}</p>{{/sally}}');
+      assert.compilesTo(emblem, '{{#sally baz \'foo\' something="false" as |foo|}}<p>{{foo}}</p>{{/sally}}');
   });
 
   test('bracketed action attribute', function (assert) {

@@ -100,6 +100,64 @@ module('glimmer: brackets', function (hooks) {
     assert.compilesTo(emblem, '<MyComponent {{did-insert this.handler}} {{on "input" @onInput}} @something=\"false\"><p>Bracketed helper attrs!</p></MyComponent>');
   });
 
+  test('tag modifiers with multi-line - second case', function (assert) {
+    const emblem = w(
+      '%MyComponent{did-insert this.handler} [',
+      '  {on "input" @onInput}',
+      '  ',
+      '  @something="false"',
+      ']',
+      '  p Bracketed helper attrs!'
+    );
+
+    assert.compilesTo(emblem, '<MyComponent {{did-insert this.handler}} {{on "input" @onInput}} @something=\"false\"><p>Bracketed helper attrs!</p></MyComponent>');
+  });
+
+  test('tag multi-line modifier', function (assert) {
+    const emblem = w(
+      '%MyComponent{did-insert (queue [',
+      '  (action this.closeWizard)',
+      '  (transition-to "home")',
+      '])} [',
+      '  ',
+      '  @something="false"',
+      ']',
+      '  p Bracketed helper attrs!'
+    );
+
+    assert.compilesTo(emblem, '<MyComponent {{did-insert (queue (action this.closeWizard) (transition-to "home"))}} @something=\"false\"><p>Bracketed helper attrs!</p></MyComponent>');
+  });
+
+  test('tag multi-line modifier - second case', function (assert) {
+    const emblem = w(
+      '%MyComponent{queue [',
+      '  (action this.closeWizard)',
+      '  (transition-to "home")',
+      ']} [',
+      '  ',
+      '  @something="false"',
+      ']',
+      '  p Bracketed helper attrs!'
+    );
+
+    assert.compilesTo(emblem, '<MyComponent {{queue (action this.closeWizard) (transition-to "home")}} @something=\"false\"><p>Bracketed helper attrs!</p></MyComponent>');
+  });
+
+  test('tag multi-line modifier - third case', function (assert) {
+    const emblem = w(
+      '%MyComponent{action (queue [',
+      '  (action this.closeWizard)',
+      '  (transition-to "home")',
+      '])} [',
+      '  ',
+      '  @something="false"',
+      ']',
+      '  p Bracketed helper attrs!'
+    );
+
+    assert.compilesTo(emblem, '<MyComponent {{action (queue (action this.closeWizard) (transition-to "home"))}} @something=\"false\"><p>Bracketed helper attrs!</p></MyComponent>');
+  });
+
   test("bracketed with Sub-expressions", function (assert) {
     const emblem = w(
       '%MyComponent [',
@@ -112,5 +170,19 @@ module('glimmer: brackets', function (hooks) {
 
     assert.compilesTo(emblem,
       '<MyComponent @onClose={{action (queue (action this.closeWizard) (transition-to "home"))}}></MyComponent>');
+  });
+
+  test("bracketed from first with Sub-expressions", function (assert) {
+    const emblem = w(
+      '%MyComponent [',
+      '  @onClose={coop [',
+      '    (action this.closeWizard)',
+      '    (transition-to "home")',
+      '  ]}',
+      ']'
+    );
+
+    assert.compilesTo(emblem,
+      '<MyComponent @onClose={{coop (action this.closeWizard) (transition-to "home")}}></MyComponent>');
   });
 });

@@ -15,11 +15,21 @@ module('glimmer: blocks', function (hooks) {
   test("block params", function (assert) {
     const emblem = w(
       "%MyComponent @value=foo as |comp1 @comp2|",
-      "  = comp.name"
+      "  = comp1.name"
     );
 
     assert.compilesTo(emblem,
-      '<MyComponent @value={{foo}} as |comp1 @comp2|>{{comp.name}}</MyComponent>');
+      '<MyComponent @value={{foo}} as |comp1 @comp2|>{{comp1.name}}</MyComponent>');
+  });
+
+  test("block params with nested angle bracket", function (assert) {
+    const emblem = w(
+      "%MyComponent @value=foo as |comp|",
+      "  % comp>subcomp @value=foo"
+    );
+
+    assert.compilesTo(emblem,
+      '<MyComponent @value={{foo}} as |comp|><comp.subcomp @value={{foo}}></comp.subcomp></MyComponent>');
   });
 
   test('recursive nesting part 2', function (assert) {

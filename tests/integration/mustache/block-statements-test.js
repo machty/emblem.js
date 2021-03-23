@@ -37,10 +37,10 @@ module('mustache: block statements', function (hooks) {
   test("block as #each", function (assert) {
     const emblem = w(
       'thangs',
-      '  p Woot #{yeah}'
+      '  p Woot #{yeah} ${hohoho}'
     );
 
-    assert.compilesTo(emblem, '{{#thangs}}<p>Woot {{yeah}}</p>{{/thangs}}');
+    assert.compilesTo(emblem, '{{#thangs}}<p>Woot {{yeah}} {{hohoho}}</p>{{/thangs}}');
   });
 
   test("w/ mustaches", function (assert) {

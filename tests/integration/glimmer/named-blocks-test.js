@@ -8,11 +8,11 @@ module('glimmer: named blocks', function (hooks) {
       '  % @header as |@title|',
       '    |Header #{title}',
       '  % @body',
-      '    |Body',
+      '    |Body ${title}',
       '  % @footer',
       '    |Footer'
     );
 
-    assert.compilesTo(emblem, '<x-modal><@header as |@title|>Header {{title}}</@header><@body>Body</@body><@footer>Footer</@footer></x-modal>');
+    assert.compilesTo(emblem, '<x-modal><@header as |@title|>Header {{title}}</@header><@body>Body {{title}}</@body><@footer>Footer</@footer></x-modal>');
   });
 });

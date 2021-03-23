@@ -85,7 +85,7 @@ module('ember: inline if', function (hooks) {
 
   test("within a string", function (assert) {
     const emblem = 'div style="{{ if isActive \"15\" \"25\" }}px"';
-    assert.compilesTo(emblem, '<div style=\"{{if isActive \\"15\\" \\"25\\" }}px\"></div>');
+    assert.compilesTo(emblem, '<div style=\"{{if isActive \\"15\\" \\"25\\"}}px\"></div>');
   });
 
   test("with dot params", function (assert) {

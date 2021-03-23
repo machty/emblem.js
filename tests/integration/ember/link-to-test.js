@@ -46,8 +46,8 @@ module('ember: link-to', function (hooks) {
   });
 
   test("brace works with text pipe", function (assert) {
-    const emblem = `= link-to 'users.view' user | View user #{ user.name } #{ user.id }`;
+    const emblem = "= link-to 'users.view' user | View user #{ user.name } ${ user.id }";
 
-    assert.compilesTo(emblem, '{{#link-to \'users.view\' user}}View user {{user.name }} {{user.id }}{{/link-to}}');
+    assert.compilesTo(emblem, '{{#link-to \'users.view\' user}}View user {{user.name}} {{user.id}}{{/link-to}}');
   });
 });

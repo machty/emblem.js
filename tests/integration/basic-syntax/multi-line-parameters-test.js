@@ -17,13 +17,13 @@ module('basic syntax: multi-line-parameters', function (hooks) {
   test('bracketed text', function (assert) {
     const emblem = "p [ Bracketed text is cool ]";
 
-    assert.compilerThrows(emblem, '<p>[ Bracketed text is cool ]</p>');
+    assert.compilerThrows(emblem);
   });
 
   test('bracketed text indented', function (assert) {
     const emblem = "p\n  | [ Bracketed text is cool ]";
 
-    assert.compilerThrows(emblem, '<p>[ Bracketed text is cool ]</p>');
+    assert.compilerThrows(emblem);
   });
 
   test('bracketed statement with comment and blank lines', function (assert) {

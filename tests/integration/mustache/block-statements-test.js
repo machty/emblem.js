@@ -107,4 +107,30 @@ module('mustache: block statements', function (hooks) {
 
     assert.compilesTo(emblem, '{{#my-component value=child.[0]}}Thing{{/my-component}}');
   });
+
+  test("nested components with colon", function (assert) {
+    const emblem = w(
+      '= my-component: = my-other-component: p Hello',
+    );
+
+    assert.compilesTo(emblem, '{{#my-component}}{{#my-other-component}}<p>Hello</p>{{/my-other-component}}{{/my-component}}');
+  });
+
+  test("nested components with colon - case 2", function (assert) {
+    const emblem = w(
+      '= my-component value=this.someProp.[0]: = my-other-component value=this.someProp2: p Hello',
+    );
+
+    assert.compilesTo(emblem, '{{#my-component value=this.someProp.[0]}}{{#my-other-component value=this.someProp2}}<p>Hello</p>{{/my-other-component}}{{/my-component}}');
+  });
+
+  test("nested components with colon - case 3", function (assert) {
+    const emblem = w(
+      '= my-component [',
+      '  value=this.someProp.[0]',
+      ']: = my-other-component value=this.someProp2: p Hello',
+    );
+
+    assert.compilesTo(emblem, '{{#my-component value=this.someProp.[0]}}{{#my-other-component value=this.someProp2}}<p>Hello</p>{{/my-other-component}}{{/my-component}}');
+  });
 });

@@ -72,4 +72,31 @@ module('glimmer: basic syntax', function (hooks) {
     assert.compilesTo(emblem,
       '<MyComponent @value={{(or (eq foo \'bar\') (eq foo \'baz\'))}}></MyComponent>');
   });
+
+  test("nested glimmer components with colon", function (assert) {
+    const emblem = w(
+      '%my-component: %my-other-component: p Hello',
+    );
+
+    assert.compilesTo(emblem, '<my-component><my-other-component><p>Hello</p></my-other-component></my-component>');
+  });
+
+  test("nested glimmer components with colon - case 2", function (assert) {
+    const emblem = w(
+      '%my-component @value=fooValue data-hint="My special component" ...attributes: % my-other-component @onClose={ action "modalClosed" }: p Hello',
+    );
+
+    assert.compilesTo(emblem, '<my-component @value={{fooValue}} data-hint="My special component" ...attributes><my-other-component @onClose={{action "modalClosed"}}><p>Hello</p></my-other-component></my-component>');
+  });
+
+  test("nested glimmer components with colon - case 3", function (assert) {
+    const emblem = w(
+      '% my-component [',
+      '  value=this.someProp.[0]',
+      '  ...attributes',
+      ']: %MyOtherComponent value=this.someProp2 ...attributes: p Hello',
+    );
+
+    assert.compilesTo(emblem, '<my-component value={{this.someProp.[0]}} ...attributes><MyOtherComponent value={{this.someProp2}} ...attributes><p>Hello</p></MyOtherComponent></my-component>');
+  });
 });

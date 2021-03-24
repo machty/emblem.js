@@ -100,7 +100,8 @@ module('mustache: block statements', function (hooks) {
   test("multi-line mustaches can have array indexes with blocks", function (assert) {
     const emblem = w(
       'my-component [',
-      '  value=child.[0] ]',
+      '  value=child.[0]',
+      ']',
       '  | Thing'
     );
 

@@ -36,7 +36,8 @@ module('mustache: multi-line parameters', function (hooks) {
       '',
       'sally [',
       '  \'foo\'',
-      '  something="false" ]',
+      '  something="false"',
+      ']',
       '  | Bracketed helper attrs!'
     );
 
@@ -48,7 +49,8 @@ module('mustache: multi-line parameters', function (hooks) {
       '',
       'sally [',
       '  \'foo\'',
-      '  something="false" ]',
+      '  something="false"',
+      ']',
       '  p Bracketed helper attrs!'
     );
 
@@ -59,7 +61,8 @@ module('mustache: multi-line parameters', function (hooks) {
     const emblem = w(
       '',
       '= foo [',
-      '  bar=1 ]',
+      '  bar=1',
+      ']',
       '',
       '  p baz');
 
@@ -95,7 +98,8 @@ module('mustache: multi-line parameters', function (hooks) {
       '',
       'sally [',
       '  \'foo\'',
-      '  something="false" ] as |foo|'
+      '  something="false"',
+      '] as |foo|',
     );
 
     assert.compilesTo(emblem, '{{sally \'foo\' something="false" as |foo|}}');
@@ -106,7 +110,8 @@ module('mustache: multi-line parameters', function (hooks) {
       '',
       'sally [',
       '  \'foo\'',
-      '  something="false" ] as |foo|',
+      '  something="false"',
+      '] as |foo|',
       '  p = foo'
     );
 
@@ -143,7 +148,8 @@ module('mustache: multi-line parameters', function (hooks) {
     const emblem = w(
       '',
       'button [',
-      '  click="doSomething" ]',
+      '  click="doSomething"',
+      ']',
       '  | click here'
     );
 

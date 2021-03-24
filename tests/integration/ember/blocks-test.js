@@ -39,7 +39,8 @@ module('ember: blocks', function (hooks) {
     const emblem = w(
       "= component 'my-component' [",
       '  foo',
-      '  bar=baz ] as |left right|',
+      '  bar=baz',
+      '] as |left right|',
       '  span class={ left } = right'
     );
 

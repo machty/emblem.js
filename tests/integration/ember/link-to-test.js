@@ -45,6 +45,14 @@ module('ember: link-to', function (hooks) {
     assert.compilesTo(emblem, '<ul><li>{{#link-to "index"}}Home{{/link-to}}</li><li>{{#link-to "about"}}About Us{{/link-to}}</li></ul>');
   });
 
+  test('example 6', function (assert) {
+    const emblem = w(
+      '= link-to "items.list" (query-params page=2): | Go to page 2'
+    );
+
+    assert.compilesTo(emblem, '{{#link-to "items.list" (query-params page=2)}}Go to page 2{{/link-to}}');
+  });
+
   test("brace works with text pipe", function (assert) {
     const emblem = "= link-to 'users.view' user | View user #{ user.name } ${ user.id }";
 

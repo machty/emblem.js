@@ -147,7 +147,8 @@ module('mustache: html attributes', function (hooks) {
       "div{did-insert this.handler} [",
       '  {on "input" @onInput}',
       '  ',
-      '  class="test" ]',
+      '  class="test"',
+      ']'
     );
 
     assert.compilesTo(emblem, '<div {{did-insert this.handler}} {{on "input" @onInput}} class="test"></div>');
@@ -249,7 +250,8 @@ module('mustache: html attributes', function (hooks) {
       "%some-new-tag{did-insert this.handler} [",
       '  {on "input" @onInput}',
       '  ',
-      '  class="test" ]',
+      '  class="test"',
+      ']'
     );
 
     assert.compilesTo(emblem, '<some-new-tag {{did-insert this.handler}} {{on "input" @onInput}} class="test"></some-new-tag>');

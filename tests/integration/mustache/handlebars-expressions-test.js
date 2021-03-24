@@ -206,17 +206,20 @@ module('mustache: handlebars expressions', function (hooks) {
     });
 
     test("in brackets", function (assert) {
-      const emblem = "p [\n  id=id some-data=data.ok]\n";
+      const emblem = "p [\n  id=id some-data=data.ok\n]\n";
 
       assert.compilesTo(emblem, '<p id={{id}} some-data={{data.ok}}></p>');
     });
 
     test('brackets with empty lines', function (assert) {
-      const emblem = w('p [',
+      const emblem = w(
+        'p [',
         '  id=id',
         '  ',
         '',
-        '  some-data=data.ok]');
+        '  some-data=data.ok',
+        ']'
+      );
 
       assert.compilesTo(emblem, '<p id={{id}} some-data={{data.ok}}></p>');
     });

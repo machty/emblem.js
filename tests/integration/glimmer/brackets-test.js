@@ -14,6 +14,32 @@ module('glimmer: brackets', function (hooks) {
     assert.compilesTo(emblem, '<MyComponent @foo={{bar}} @baz=\"food\"></MyComponent>');
   });
 
+  test('brackets with block params in the start', function (assert) {
+    const emblem = w(
+      '',
+      '%MyComponent as |comp| [',
+      '  @foo=bar',
+      '  @baz=\'food\'',
+      ']',
+      "  = comp.name"
+    );
+
+    assert.compilesTo(emblem, '<MyComponent @foo={{bar}} @baz=\"food\" as |comp|>{{comp.name}}</MyComponent>');
+  });
+
+  test('brackets with block params in the end', function (assert) {
+    const emblem = w(
+      '',
+      '%MyComponent [',
+      '  @foo=bar',
+      '  @baz=\'food\'',
+      '] as |comp|',
+      "  = comp.name"
+    );
+
+    assert.compilesTo(emblem, '<MyComponent @foo={{bar}} @baz=\"food\" as |comp|>{{comp.name}}</MyComponent>');
+  });
+
   test('brackets with dedent end', function (assert) {
     const emblem = w(
       '',

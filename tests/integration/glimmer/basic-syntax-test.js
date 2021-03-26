@@ -14,6 +14,14 @@ module('glimmer: basic syntax', function (hooks) {
     assert.compilesTo('= @bar', '{{@bar}}');
   });
 
+  test('basic syntax for shorthands 1', function (assert) {
+    assert.compilesTo("%my-comp#hello .woot @value=foo data-hint=\"not-my-component%%::\"", '<my-comp id="hello" @value={{foo}} data-hint=\"not-my-component%%::\" class="woot"></my-comp>');
+    assert.compilesTo("%MyComp.woot #hello @value=foo", '<MyComp id="hello" @value={{foo}} class="woot"></MyComp>');
+    assert.compilesTo("%my-comp#id.woot #hello @value=foo", '<my-comp id="hello" @value={{foo}} class="woot"></my-comp>');
+    assert.compilesTo("%my-comp .woot#hello @value=foo", '<my-comp id="hello" @value={{foo}} class="woot"></my-comp>');
+    assert.compilesTo("%my-comp .woot.loot#hello @value=foo", '<my-comp id="hello" @value={{foo}} class="woot loot"></my-comp>');
+  });
+
   test('basic syntax 1', function (assert) {
     const emblem = w(
       "%MyComponent @value=foo data-hint='not-my-component%%::'"

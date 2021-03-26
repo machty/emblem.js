@@ -9,13 +9,25 @@ module('basic syntax: css-classes', function (hooks) {
     assert.compilesTo(".woot", '<div class="woot"></div>');
     assert.compilesTo("span.woot", '<span class="woot"></span>');
     assert.compilesTo("span.woot.loot", '<span class="woot loot"></span>');
+    assert.compilesTo("span .woot.loot", '<span class="woot loot"></span>');
+    assert.compilesTo("span.woot .loot", '<span class="woot loot"></span>');
   });
 
   test('classes + ids', function (assert) {
     assert.compilesTo(".woot#hello", '<div id="hello" class="woot"></div>');
+    assert.compilesTo("#hello .woot", '<div id="hello" class="woot"></div>');
+    assert.compilesTo(".woot #hello", '<div id="hello" class="woot"></div>');
+    assert.compilesTo("#id.woot #hello", '<div id="hello" class="woot"></div>');
     assert.compilesTo("span.woot#hello", '<span id="hello" class="woot"></span>');
+    assert.compilesTo("span .woot#hello", '<span id="hello" class="woot"></span>');
+    assert.compilesTo("span.woot #hello", '<span id="hello" class="woot"></span>');
     assert.compilesTo("span.woot.loot#hello", '<span id="hello" class="woot loot"></span>');
+    assert.compilesTo("span .woot.loot#hello", '<span id="hello" class="woot loot"></span>');
+    assert.compilesTo("span.woot.loot #hello", '<span id="hello" class="woot loot"></span>');
     assert.compilesTo("span.woot.loot#hello.boot", '<span id="hello" class="woot loot boot"></span>');
+    assert.compilesTo("span.woot.loot #hello.boot", '<span id="hello" class="woot loot boot"></span>');
+    assert.compilesTo("span#id.woot.loot #hello.boot", '<span id="hello" class="woot loot boot"></span>');
+    assert.compilesTo("span.woot#id.loot #hello.boot", '<span id="hello" class="woot loot boot"></span>');
   });
 
   test('class and id', function (assert) {

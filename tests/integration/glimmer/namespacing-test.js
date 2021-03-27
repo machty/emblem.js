@@ -8,7 +8,7 @@ module('glimmer: namespacing', function (hooks) {
     );
 
     assert.compilesTo(emblem,
-      '<inputs:MyComponent @value={{foo}}></inputs:MyComponent>');
+      '<inputs:MyComponent @value={{foo}}/>');
   });
 
   test('module namespaces', function (assert) {
@@ -16,6 +16,6 @@ module('glimmer: namespacing', function (hooks) {
       '% my-addon::foo'
     );
 
-    assert.compilesTo(emblem, '<my-addon::foo></my-addon::foo>');
+    assert.compilesTo(emblem, '<my-addon::foo/>');
   });
 });

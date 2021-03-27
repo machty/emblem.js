@@ -623,7 +623,7 @@ module('basic syntax: plain-text', function (hooks) {
     test("self closing tag with forward slash", function (assert) {
       const emblem = 'hr/';
 
-      assert.compilesTo(emblem, '<hr>');
+      assert.compilesTo(emblem, '<hr/>');
     });
 
     test("non-void elements are still closed correctly", function (assert) {

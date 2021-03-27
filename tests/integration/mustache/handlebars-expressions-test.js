@@ -90,7 +90,7 @@ module('mustache: handlebars expressions', function (hooks) {
   test('mustache attr with underscore', function (assert) {
     const emblem = 'input placeholder=cat_name';
 
-    assert.compilesTo(emblem, '<input placeholder={{cat_name}}>');
+    assert.compilesTo(emblem, '<input placeholder={{cat_name}}/>');
   });
 
   test('mustache with empty attr value (single-quoted string)', function (assert) {

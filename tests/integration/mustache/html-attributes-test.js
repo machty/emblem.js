@@ -165,7 +165,7 @@ module('mustache: html attributes', function (hooks) {
     );
 
     assert.compilesTo(emblem,
-      '<input value={{calc (action this.closeWizard) (transition-to "home")}}>');
+      '<input value={{calc (action this.closeWizard) (transition-to "home")}}/>');
   });
 
   test("tag bracketed from first with Sub-expressions - second case", function (assert) {
@@ -179,7 +179,7 @@ module('mustache: html attributes', function (hooks) {
     );
 
     assert.compilesTo(emblem,
-      '<input value={{calc (or (action this.closeWizard) (transition-to "home"))}}>');
+      '<input value={{calc (or (action this.closeWizard) (transition-to "home"))}}/>');
   });
 
   test("new-tag bracketed modifiers", function (assert) {
@@ -191,7 +191,7 @@ module('mustache: html attributes', function (hooks) {
       "]",
     );
 
-    assert.compilesTo(emblem, '<some-new-tag {{did-insert this.handler}} {{on "input" @onInput}} class="test"></some-new-tag>');
+    assert.compilesTo(emblem, '<some-new-tag {{did-insert this.handler}} {{on "input" @onInput}} class="test"/>');
   });
 
   test("new-tag bracketed multi-line modifiers", function (assert) {
@@ -206,7 +206,7 @@ module('mustache: html attributes', function (hooks) {
       "]",
     );
 
-    assert.compilesTo(emblem, '<some-new-tag {{did-insert (queue (action this.closeWizard) (transition-to "home"))}} {{on "input" @onInput}} class="test"></some-new-tag>');
+    assert.compilesTo(emblem, '<some-new-tag {{did-insert (queue (action this.closeWizard) (transition-to "home"))}} {{on "input" @onInput}} class="test"/>');
   });
 
   test("new-tag multi-line modifier", function (assert) {
@@ -219,7 +219,7 @@ module('mustache: html attributes', function (hooks) {
       "]",
     );
 
-    assert.compilesTo(emblem, '<some-new-tag {{action (queue (action this.closeWizard) (transition-to "home"))}} class="test"></some-new-tag>');
+    assert.compilesTo(emblem, '<some-new-tag {{action (queue (action this.closeWizard) (transition-to "home"))}} class="test"/>');
   });
 
   test("new-tag multi-line modifier - second case", function (assert) {
@@ -232,7 +232,7 @@ module('mustache: html attributes', function (hooks) {
       "]",
     );
 
-    assert.compilesTo(emblem, '<some-new-tag {{queue (action this.closeWizard) (transition-to "home")}} class="test"></some-new-tag>');
+    assert.compilesTo(emblem, '<some-new-tag {{queue (action this.closeWizard) (transition-to "home")}} class="test"/>');
   });
 
   test("new-tag modifiers with multi-line", function (assert) {
@@ -242,7 +242,7 @@ module('mustache: html attributes', function (hooks) {
       "]",
     );
 
-    assert.compilesTo(emblem, '<some-new-tag {{did-insert this.handler}} {{on "input" @onInput}} class="test"></some-new-tag>');
+    assert.compilesTo(emblem, '<some-new-tag {{did-insert this.handler}} {{on "input" @onInput}} class="test"/>');
   });
 
   test("new-tag modifier with multi-line modifier", function (assert) {
@@ -254,7 +254,7 @@ module('mustache: html attributes', function (hooks) {
       ']'
     );
 
-    assert.compilesTo(emblem, '<some-new-tag {{did-insert this.handler}} {{on "input" @onInput}} class="test"></some-new-tag>');
+    assert.compilesTo(emblem, '<some-new-tag {{did-insert this.handler}} {{on "input" @onInput}} class="test"/>');
   });
 
   test("bracketed from first with Sub-expressions", function (assert) {

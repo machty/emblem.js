@@ -12,6 +12,24 @@ module('glimmer: blocks', function (hooks) {
       '<MyComponent @value={{foo}}>Hi!</MyComponent>');
   });
 
+  test("basic without block", function (assert) {
+    const emblem = w(
+      "%MyComponent/ @value=foo"
+    );
+
+    assert.compilesTo(emblem,
+      '<MyComponent @value={{foo}}/>');
+  });
+
+  test("basic without block - case 2", function (assert) {
+    const emblem = w(
+      "%MyComponent @value=foo"
+    );
+
+    assert.compilesTo(emblem,
+      '<MyComponent @value={{foo}}/>');
+  });
+
   test("block params", function (assert) {
     const emblem = w(
       "%MyComponent @value=foo as |comp1 @comp2|",
@@ -29,7 +47,7 @@ module('glimmer: blocks', function (hooks) {
     );
 
     assert.compilesTo(emblem,
-      '<MyComponent @value={{foo}} as |comp|><comp.subcomp @value={{foo}}></comp.subcomp></MyComponent>');
+      '<MyComponent @value={{foo}} as |comp|><comp.subcomp @value={{foo}}/></MyComponent>');
   });
 
   test('recursive nesting part 2', function (assert) {

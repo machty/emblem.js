@@ -11,7 +11,7 @@ module('glimmer: brackets', function (hooks) {
       ']'
     );
 
-    assert.compilesTo(emblem, '<MyComponent @foo={{bar}} @baz=\"food\"></MyComponent>');
+    assert.compilesTo(emblem, '<MyComponent @foo={{bar}} @baz=\"food\"/>');
   });
 
   test('brackets with block params in the start', function (assert) {
@@ -49,7 +49,7 @@ module('glimmer: brackets', function (hooks) {
       ']'
     );
 
-    assert.compilesTo(emblem, '<MyComponent @foo={{bar}} @baz=\"food\"></MyComponent>');
+    assert.compilesTo(emblem, '<MyComponent @foo={{bar}} @baz=\"food\"/>');
   });
 
   test('bracketed nested block 1', function (assert) {
@@ -186,7 +186,7 @@ module('glimmer: brackets', function (hooks) {
     );
 
     assert.compilesTo(emblem,
-      '<MyComponent @onClose={{action (queue (action this.closeWizard) (transition-to "home"))}}></MyComponent>');
+      '<MyComponent @onClose={{action (queue (action this.closeWizard) (transition-to "home"))}}/>');
   });
 
   test("bracketed from first with Sub-expressions", function (assert) {
@@ -200,6 +200,6 @@ module('glimmer: brackets', function (hooks) {
     );
 
     assert.compilesTo(emblem,
-      '<MyComponent @onClose={{coop (action this.closeWizard) (transition-to "home")}}></MyComponent>');
+      '<MyComponent @onClose={{coop (action this.closeWizard) (transition-to "home")}}/>');
   });
 });

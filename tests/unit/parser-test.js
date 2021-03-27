@@ -124,9 +124,11 @@ astTest('element with shorthand attributes', '#my-id.my-class', function(assert,
 });
 
 astTest('special element', '%blink', function(assert, ast){
+  const testElement = element('blink', [], [])
+  testElement.isVoid = true
   assert.deepEqual(
     ast,
-    program([ element('blink', [], []) ])
+    program([ testElement ])
   );
 });
 

@@ -82,25 +82,25 @@ module('basic syntax: tags', function (hooks) {
     test("br", function (assert) {
       const emblem = "br";
 
-      assert.compilesTo(emblem, '<br>');
+      assert.compilesTo(emblem, '<br/>');
     });
 
     test("hr", function (assert) {
       const emblem = "hr";
 
-      assert.compilesTo(emblem, '<hr>');
+      assert.compilesTo(emblem, '<hr/>');
     });
 
     test("br paragraph example", function (assert) {
       const emblem = "p\n  | LOL!\n  br\n  | BORF!";
 
-      assert.compilesTo(emblem, '<p>LOL!<br>BORF!</p>');
+      assert.compilesTo(emblem, '<p>LOL!<br/>BORF!</p>');
     });
 
     test("input", function (assert) {
       const emblem = "input type=\"text\"";
 
-      assert.compilesTo(emblem, '<input type="text">');
+      assert.compilesTo(emblem, '<input type="text"/>');
     });
 
     test("nested content under self-closing tag should fail", function (assert) {
@@ -114,7 +114,7 @@ module('basic syntax: tags', function (hooks) {
     test("basic", function (assert) {
       const emblem = "%borf";
 
-      assert.compilesTo(emblem, '<borf></borf>');
+      assert.compilesTo(emblem, '<borf/>');
     });
 
     test("nested", function (assert) {
@@ -126,14 +126,14 @@ module('basic syntax: tags', function (hooks) {
     test("capitalized", function (assert) {
       const emblem = "%Alex alex\n%Alex\n  %Woot";
 
-      assert.compilesTo(emblem, '<Alex>alex</Alex><Alex><Woot></Woot></Alex>');
+      assert.compilesTo(emblem, '<Alex>alex</Alex><Alex><Woot/></Alex>');
     });
 
     test("funky chars", function (assert) {
       const emblem = "%borf:narf\n%borf:narf Hello, {{foo}}.\n%alex = foo";
 
       assert.compilesTo(emblem,
-        '<borf:narf></borf:narf><borf:narf>Hello, {{foo}}.</borf:narf><alex>{{foo}}</alex>');
+        '<borf:narf/><borf:narf>Hello, {{foo}}.</borf:narf><alex>{{foo}}</alex>');
     });
   });
 });

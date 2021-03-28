@@ -124,9 +124,11 @@ astTest('element with shorthand attributes', '#my-id.my-class', function(assert,
 });
 
 astTest('special element', '%blink', function(assert, ast){
+  const testElement = element('blink', [], [])
+  testElement.isVoid = true
   assert.deepEqual(
     ast,
-    program([ element('blink', [], []) ])
+    program([ testElement ])
   );
 });
 
@@ -213,8 +215,11 @@ astTest('nested elements interspersed with content',
 });
 
 astTest('action in bracketed attributes',
-    ['p [',
-      'click="test" ]'].join('\n'), function(assert, ast){
+    [
+      'p [',
+      '  click="test"',
+      ']'
+    ].join('\n'), function(assert, ast){
       assert.deepEqual(
           ast,
           program([
@@ -230,8 +235,11 @@ astTest('action in bracketed attributes',
 );
 
 astTest('action in bracketed attributes with dom event',
-    ['p [',
-      'onclick={ action "test" } ]'].join('\n'), function(assert, ast){
+    [
+      'p [',
+      '  onclick={ action "test" }',
+      ']'
+    ].join('\n'), function(assert, ast){
       assert.deepEqual(
           ast,
           program([

@@ -66,16 +66,7 @@ QUnit.test('lowercase unquoted attr value', function(assert){
 QUnit.test('attrs with spaces', function(assert){
   var text = 'frank foo = bar boo = far';
 
-  assert.deepEqual(parseEmblem(text), {
-    "childNodes": [
-      {
-        "content": "frank foo=bar boo=far",
-        "escaped": true,
-        "type": "mustache"
-      }
-    ],
-    "type": "program"
-  });
+  assert.compilerThrows(text);
 });
 
 QUnit.test('multiple attrs', function(assert){

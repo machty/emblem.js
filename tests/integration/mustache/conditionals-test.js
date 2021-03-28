@@ -166,13 +166,13 @@ module('mustache: conditionals', function (hooks) {
     const emblem = w(
       "= if something",
       "  = my-component/widget-a value=model.options as |component indexWidget|",
-      "    p The current value is #{ indexWidget }",
+      "    p The current value is #{ indexWidget } ${ indexWidget }",
       "    strong = component.warningMessage",
       "= else if somethingElse",
       "  h5 Danger!"
     );
 
-    assert.compilesTo(emblem, '{{#if something}}{{#my-component/widget-a value=model.options as |component indexWidget|}}<p>The current value is {{indexWidget }}</p><strong>{{component.warningMessage}}</strong>{{/my-component/widget-a}}' +
+    assert.compilesTo(emblem, '{{#if something}}{{#my-component/widget-a value=model.options as |component indexWidget|}}<p>The current value is {{indexWidget}} {{indexWidget}}</p><strong>{{component.warningMessage}}</strong>{{/my-component/widget-a}}' +
       '{{else if somethingElse}}<h5>Danger!</h5>{{/if}}');
   });
 
@@ -206,13 +206,13 @@ module('mustache: conditionals', function (hooks) {
   test("truth helpers syntax test 2", function (assert) {
     const emblem = w(
       "= if (is-array siblings)",
-      "  = each siblings as |sibling|",
-      "    |My sibling: #{ sibling }",
+      "  = each siblings as |sibling index|",
+      "    |My sibling: #{ sibling }, #{ index }",
       "= else if (and (not model.isLoading) model.isError)",
       "  p Hey!"
     );
 
-    assert.compilesTo(emblem, "{{#if (is-array siblings)}}{{#each siblings as |sibling|}}My sibling: {{sibling }}{{/each}}" +
+    assert.compilesTo(emblem, "{{#if (is-array siblings)}}{{#each siblings as |sibling index|}}My sibling: {{sibling}}, {{index}}{{/each}}" +
       "{{else if (and (not model.isLoading) model.isError)}}<p>Hey!</p>{{/if}}");
   });
 

@@ -39,7 +39,8 @@ module('ember: blocks', function (hooks) {
     const emblem = w(
       "= component 'my-component' [",
       '  foo',
-      '  bar=baz ] as |left right|',
+      '  bar=baz',
+      '] as |left right|',
       '  span class={ left } = right'
     );
 
@@ -52,12 +53,12 @@ module('ember: blocks', function (hooks) {
       '  % @header as |@title|',
       '    |Header #{title}',
       '  % @body',
-      '    |Body',
+      '    |Body ${title}',
       '  % @footer',
       '    |Footer'
     );
 
-    assert.compilesTo(emblem, '{{#x-modal}}<@header as |@title|>Header {{title}}</@header><@body>Body</@body><@footer>Footer</@footer>{{/x-modal}}');
+    assert.compilesTo(emblem, '{{#x-modal}}<@header as |@title|>Header {{title}}</@header><@body>Body {{title}}</@body><@footer>Footer</@footer>{{/x-modal}}');
   });
 
   test('named block with block param', function (assert) {
@@ -121,6 +122,26 @@ module('ember: blocks', function (hooks) {
 
       assert.compilesTo(emblem,
         '{{#my-component as |item|}}<p>{{item.name}}</p>{{/my-component}}');
+    });
+
+    test("block params with destructuring hash", function (assert) {
+      const emblem = w(
+        "= my-component value=foo as |comp1 {subcomp subcomp2}=comp comp2|",
+        "  = subcomp value=foo: = subcomp2"
+      );
+
+      assert.compilesTo(emblem,
+        '{{#my-component value=foo as |comp1 comp2 comp|}}{{#let (get comp "subcomp") (get comp "subcomp2") as |subcomp subcomp2|}}{{#subcomp value=foo}}{{subcomp2}}{{/subcomp}}{{/let}}{{/my-component}}');
+    });
+
+    test("block params with destructuring array", function (assert) {
+      const emblem = w(
+        "= my-component value=foo as |comp1 [subcomp subcomp2]=comp comp2|",
+        "  = subcomp value=foo: = subcomp2"
+      );
+
+      assert.compilesTo(emblem,
+        '{{#my-component value=foo as |comp1 comp2 comp|}}{{#let (get comp 0) (get comp 1) as |subcomp subcomp2|}}{{#subcomp value=foo}}{{subcomp2}}{{/subcomp}}{{/let}}{{/my-component}}');
     });
   });
 });

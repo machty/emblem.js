@@ -3,9 +3,9 @@ import { w } from 'tests/support/utils';
 
 module('basic syntax: colon-syntax', function(hooks) {
   test('basic', function (assert) {
-    const emblem = 'each foo: p Hello, #{this}';
+    const emblem = 'each foo: p Hello, #{this}, ${this.name}';
 
-    assert.compilesTo(emblem, '{{#each foo}}<p>Hello, {{this}}</p>{{/each}}');
+    assert.compilesTo(emblem, '{{#each foo}}<p>Hello, {{this}}, {{this.name}}</p>{{/each}}');
   });
 
   test('html stack', function (assert) {

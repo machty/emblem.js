@@ -16,5 +16,5 @@ tmp
 sauce_connect.log
 spec/qunit_spec.js
 
-dist
+#dist
 npm-debug.log

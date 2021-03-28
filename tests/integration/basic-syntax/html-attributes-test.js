@@ -11,7 +11,7 @@ module('basic syntax: html-attributes', function (hooks) {
     });
 
     test('numbers in shorthand', function (assert) {
-      assert.compilesTo('%4', '<4></4>');
+      assert.compilesTo('%4', '<4/>');
       assert.compilesTo('%4 ermagerd', '<4>ermagerd</4>');
       assert.compilesTo('%4#4.4 ermagerd', '<4 id="4" class="4">ermagerd</4>');
     });

@@ -14,25 +14,33 @@ module('glimmer: basic syntax', function (hooks) {
     assert.compilesTo('= @bar', '{{@bar}}');
   });
 
+  test('basic syntax for shorthands 1', function (assert) {
+    assert.compilesTo("%my-comp#hello .woot @value=foo data-hint=\"not-my-component%%::\"", '<my-comp id="hello" @value={{foo}} data-hint=\"not-my-component%%::\" class="woot"/>');
+    assert.compilesTo("%MyComp.woot #hello @value=foo", '<MyComp id="hello" @value={{foo}} class="woot"/>');
+    assert.compilesTo("%my-comp#id.woot #hello @value=foo", '<my-comp id="hello" @value={{foo}} class="woot"/>');
+    assert.compilesTo("%my-comp .woot#hello @value=foo", '<my-comp id="hello" @value={{foo}} class="woot"/>');
+    assert.compilesTo("%my-comp .woot.loot#hello @value=foo", '<my-comp id="hello" @value={{foo}} class="woot loot"/>');
+  });
+
   test('basic syntax 1', function (assert) {
     const emblem = w(
       "%MyComponent @value=foo data-hint='not-my-component%%::'"
     );
 
     assert.compilesTo(emblem,
-      '<MyComponent @value={{foo}} data-hint=\"not-my-component%%::\"></MyComponent>');
+      '<MyComponent @value={{foo}} data-hint=\"not-my-component%%::\"/>');
   });
 
   test('basic syntax 2', function (assert) {
     const emblem = "% my-component @value=fooValue data-hint='My special component'";
 
-    assert.compilesTo(emblem, '<my-component @value={{fooValue}} data-hint="My special component"></my-component>');
+    assert.compilesTo(emblem, '<my-component @value={{fooValue}} data-hint="My special component"/>');
   });
 
   test('basic syntax 3', function (assert) {
     const emblem = "% modal-popup @onClose={ action 'modalClosed' }";
 
-    assert.compilesTo(emblem, "<modal-popup @onClose={{action 'modalClosed'}}></modal-popup>");
+    assert.compilesTo(emblem, "<modal-popup @onClose={{action 'modalClosed'}}/>");
   });
 
   test("basic syntax with legacy quoting", function (assert) {
@@ -41,7 +49,7 @@ module('glimmer: basic syntax', function (hooks) {
     );
 
     assert.compilesTo(emblem,
-      '<MyComponent value=\"{{foo}}\" data-hint=\"not-my-component%%::\"></MyComponent>', null, {
+      '<MyComponent value=\"{{foo}}\" data-hint=\"not-my-component%%::\"/>', null, {
         legacyAttributeQuoting: true
       });
   });
@@ -52,7 +60,7 @@ module('glimmer: basic syntax', function (hooks) {
     );
 
     assert.compilesTo(emblem,
-      '<MyComponent @multiselect={{false}}></MyComponent>');
+      '<MyComponent @multiselect={{false}}/>');
   });
 
   test("...attributes", function (assert) {
@@ -61,7 +69,7 @@ module('glimmer: basic syntax', function (hooks) {
     );
 
     assert.compilesTo(emblem,
-      '<MyComponent ...attributes type={{@post.type}}></MyComponent>');
+      '<MyComponent ...attributes type={{@post.type}}/>');
   });
 
   test("Sub-expressions", function (assert) {
@@ -70,6 +78,33 @@ module('glimmer: basic syntax', function (hooks) {
     );
 
     assert.compilesTo(emblem,
-      '<MyComponent @value={{(or (eq foo \'bar\') (eq foo \'baz\'))}}></MyComponent>');
+      '<MyComponent @value={{(or (eq foo \'bar\') (eq foo \'baz\'))}}/>');
+  });
+
+  test("nested glimmer components with colon", function (assert) {
+    const emblem = w(
+      '%my-component: %my-other-component: p Hello',
+    );
+
+    assert.compilesTo(emblem, '<my-component><my-other-component><p>Hello</p></my-other-component></my-component>');
+  });
+
+  test("nested glimmer components with colon - case 2", function (assert) {
+    const emblem = w(
+      '%my-component @value=fooValue data-hint="My special component" ...attributes: % my-other-component @onClose={ action "modalClosed" }: p Hello',
+    );
+
+    assert.compilesTo(emblem, '<my-component @value={{fooValue}} data-hint="My special component" ...attributes><my-other-component @onClose={{action "modalClosed"}}><p>Hello</p></my-other-component></my-component>');
+  });
+
+  test("nested glimmer components with colon - case 3", function (assert) {
+    const emblem = w(
+      '% my-component [',
+      '  value=this.someProp.[0]',
+      '  ...attributes',
+      ']: %MyOtherComponent value=this.someProp2 ...attributes: p Hello',
+    );
+
+    assert.compilesTo(emblem, '<my-component value={{this.someProp.[0]}} ...attributes><MyOtherComponent value={{this.someProp2}} ...attributes><p>Hello</p></MyOtherComponent></my-component>');
   });
 });

@@ -37,10 +37,10 @@ module('mustache: block statements', function (hooks) {
   test("block as #each", function (assert) {
     const emblem = w(
       'thangs',
-      '  p Woot #{yeah}'
+      '  p Woot #{yeah} ${hohoho}'
     );
 
-    assert.compilesTo(emblem, '{{#thangs}}<p>Woot {{yeah}}</p>{{/thangs}}');
+    assert.compilesTo(emblem, '{{#thangs}}<p>Woot {{yeah}} {{hohoho}}</p>{{/thangs}}');
   });
 
   test("w/ mustaches", function (assert) {
@@ -100,10 +100,37 @@ module('mustache: block statements', function (hooks) {
   test("multi-line mustaches can have array indexes with blocks", function (assert) {
     const emblem = w(
       'my-component [',
-      '  value=child.[0] ]',
+      '  value=child.[0]',
+      ']',
       '  | Thing'
     );
 
     assert.compilesTo(emblem, '{{#my-component value=child.[0]}}Thing{{/my-component}}');
+  });
+
+  test("nested components with colon", function (assert) {
+    const emblem = w(
+      '= my-component: = my-other-component: p Hello',
+    );
+
+    assert.compilesTo(emblem, '{{#my-component}}{{#my-other-component}}<p>Hello</p>{{/my-other-component}}{{/my-component}}');
+  });
+
+  test("nested components with colon - case 2", function (assert) {
+    const emblem = w(
+      '= my-component value=this.someProp.[0]: = my-other-component value=this.someProp2: p Hello',
+    );
+
+    assert.compilesTo(emblem, '{{#my-component value=this.someProp.[0]}}{{#my-other-component value=this.someProp2}}<p>Hello</p>{{/my-other-component}}{{/my-component}}');
+  });
+
+  test("nested components with colon - case 3", function (assert) {
+    const emblem = w(
+      '= my-component [',
+      '  value=this.someProp.[0]',
+      ']: = my-other-component value=this.someProp2: p Hello',
+    );
+
+    assert.compilesTo(emblem, '{{#my-component value=this.someProp.[0]}}{{#my-other-component value=this.someProp2}}<p>Hello</p>{{/my-other-component}}{{/my-component}}');
   });
 });

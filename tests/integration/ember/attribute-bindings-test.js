@@ -129,7 +129,7 @@ module('ember: attribute bindings', function (hooks) {
     test('mustache in attribute', function (assert) {
       const emblem = 'img src="{{unbound post.showLogoUrl}}" onerror="this.src=\'{{unbound orgSettings.onErrorBlankLogoImage}}\'"';
 
-      assert.compilesTo(emblem, '<img src="{{unbound post.showLogoUrl}}" onerror="this.src=\'{{unbound orgSettings.onErrorBlankLogoImage}}\'">');
+      assert.compilesTo(emblem, '<img src="{{unbound post.showLogoUrl}}" onerror="this.src=\'{{unbound orgSettings.onErrorBlankLogoImage}}\'"/>');
     });
 
     test('mustache in attribute with exclamation point', function (assert) {

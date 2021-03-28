@@ -35,4 +35,241 @@ module('mustache: html attributes', function (hooks) {
   test("with doublestache", function (assert) {
     assert.compilesTo('p{{insertClass foo}} Hello', '<p {{insertClass foo}}>Hello</p>');
   });
+
+  test("bracketed modifiers", function (assert) {
+    const emblem = w(
+      'div [',
+      '  {did-insert this.handler}',
+      '  {on "input" @onInput}',
+      "  class='test'",
+      "]",
+    );
+
+    assert.compilesTo(emblem, '<div {{did-insert this.handler}} {{on "input" @onInput}} class="test"></div>');
+  });
+
+  test("bracketed multi-line modifiers", function (assert) {
+    const emblem = w(
+      'div [',
+      '  {did-insert (queue [',
+      '    (action this.closeWizard)',
+      '    (transition-to "home")',
+      '  ])}',
+      '  {on "input" @onInput}',
+      "  class='test'",
+      "]",
+    );
+
+    assert.compilesTo(emblem, '<div {{did-insert (queue (action this.closeWizard) (transition-to "home"))}} {{on "input" @onInput}} class="test"></div>');
+  });
+
+  test("bracketed multi-line modifiers - second case", function (assert) {
+    const emblem = w(
+      'div [',
+      '  {queue [',
+      '    (action this.closeWizard)',
+      '    (transition-to "home")',
+      '  ]}',
+      '  {on "input" @onInput}',
+      "  class='test'",
+      "]",
+    );
+
+    assert.compilesTo(emblem, '<div {{queue (action this.closeWizard) (transition-to "home")}} {{on "input" @onInput}} class="test"></div>');
+  });
+
+  test("bracketed multi-line modifiers - third case", function (assert) {
+    const emblem = w(
+      'div [',
+      '  {action (queue [',
+      '    (action this.closeWizard)',
+      '    (transition-to "home")',
+      '  ])}',
+      '  {on "input" @onInput}',
+      "  class='test'",
+      "]",
+    );
+
+    assert.compilesTo(emblem, '<div {{action (queue (action this.closeWizard) (transition-to "home"))}} {{on "input" @onInput}} class="test"></div>');
+  });
+
+  test("tag multi-line modifier", function (assert) {
+    const emblem = w(
+      'div{did-insert (queue [',
+      '  (action this.closeWizard)',
+      '  (transition-to "home")',
+      '])} [',
+      "  class='test'",
+      "]",
+    );
+
+    assert.compilesTo(emblem, '<div {{did-insert (queue (action this.closeWizard) (transition-to "home"))}} class="test"></div>');
+  });
+
+  test("tag multi-line modifier - second case", function (assert) {
+    const emblem = w(
+      'div{queue [',
+      '  (action this.closeWizard)',
+      '  (transition-to "home")',
+      ']} [',
+      "  class='test'",
+      "]",
+    );
+
+    assert.compilesTo(emblem, '<div {{queue (action this.closeWizard) (transition-to "home")}} class="test"></div>');
+  });
+
+  test("tag multi-line modifier - third case", function (assert) {
+    const emblem = w(
+      'div{action (queue [',
+      '  (action this.closeWizard)',
+      '  (transition-to "home")',
+      '])} [',
+      "  class='test'",
+      "]",
+    );
+
+    assert.compilesTo(emblem, '<div {{action (queue (action this.closeWizard) (transition-to "home"))}} class="test"></div>');
+  });
+
+  test("tag modifiers with multi-line", function (assert) {
+    const emblem = w(
+      'div{did-insert this.handler}{on "input" @onInput} [',
+      "  class='test'",
+      "]",
+    );
+
+    assert.compilesTo(emblem, '<div {{did-insert this.handler}} {{on "input" @onInput}} class="test"></div>');
+  });
+
+  test("tag modifier with multi-line modifier", function (assert) {
+    const emblem = w(
+      "div{did-insert this.handler} [",
+      '  {on "input" @onInput}',
+      '  ',
+      '  class="test"',
+      ']'
+    );
+
+    assert.compilesTo(emblem, '<div {{did-insert this.handler}} {{on "input" @onInput}} class="test"></div>');
+  });
+
+  test("tag bracketed from first with Sub-expressions", function (assert) {
+    const emblem = w(
+      'input [',
+      '  value={calc [',
+      '    (action this.closeWizard)',
+      '    (transition-to "home")',
+      '  ]}',
+      ']'
+    );
+
+    assert.compilesTo(emblem,
+      '<input value={{calc (action this.closeWizard) (transition-to "home")}}/>');
+  });
+
+  test("tag bracketed from first with Sub-expressions - second case", function (assert) {
+    const emblem = w(
+      'input [',
+      '  value={calc (or [',
+      '    (action this.closeWizard)',
+      '    (transition-to "home")',
+      '  ])}',
+      ']'
+    );
+
+    assert.compilesTo(emblem,
+      '<input value={{calc (or (action this.closeWizard) (transition-to "home"))}}/>');
+  });
+
+  test("new-tag bracketed modifiers", function (assert) {
+    const emblem = w(
+      '%some-new-tag [',
+      '  {did-insert this.handler}',
+      '  {on "input" @onInput}',
+      "  class='test'",
+      "]",
+    );
+
+    assert.compilesTo(emblem, '<some-new-tag {{did-insert this.handler}} {{on "input" @onInput}} class="test"/>');
+  });
+
+  test("new-tag bracketed multi-line modifiers", function (assert) {
+    const emblem = w(
+      '%some-new-tag [',
+      '  {did-insert (queue [',
+      '    (action this.closeWizard)',
+      '    (transition-to "home")',
+      '  ])}',
+      '  {on "input" @onInput}',
+      "  class='test'",
+      "]",
+    );
+
+    assert.compilesTo(emblem, '<some-new-tag {{did-insert (queue (action this.closeWizard) (transition-to "home"))}} {{on "input" @onInput}} class="test"/>');
+  });
+
+  test("new-tag multi-line modifier", function (assert) {
+    const emblem = w(
+      '%some-new-tag{action (queue [',
+      '  (action this.closeWizard)',
+      '  (transition-to "home")',
+      '])} [',
+      "  class='test'",
+      "]",
+    );
+
+    assert.compilesTo(emblem, '<some-new-tag {{action (queue (action this.closeWizard) (transition-to "home"))}} class="test"/>');
+  });
+
+  test("new-tag multi-line modifier - second case", function (assert) {
+    const emblem = w(
+      '%some-new-tag{queue [',
+      '  (action this.closeWizard)',
+      '  (transition-to "home")',
+      ']} [',
+      "  class='test'",
+      "]",
+    );
+
+    assert.compilesTo(emblem, '<some-new-tag {{queue (action this.closeWizard) (transition-to "home")}} class="test"/>');
+  });
+
+  test("new-tag modifiers with multi-line", function (assert) {
+    const emblem = w(
+      '%some-new-tag{did-insert this.handler}{on "input" @onInput} [',
+      "  class='test'",
+      "]",
+    );
+
+    assert.compilesTo(emblem, '<some-new-tag {{did-insert this.handler}} {{on "input" @onInput}} class="test"/>');
+  });
+
+  test("new-tag modifier with multi-line modifier", function (assert) {
+    const emblem = w(
+      "%some-new-tag{did-insert this.handler} [",
+      '  {on "input" @onInput}',
+      '  ',
+      '  class="test"',
+      ']'
+    );
+
+    assert.compilesTo(emblem, '<some-new-tag {{did-insert this.handler}} {{on "input" @onInput}} class="test"/>');
+  });
+
+  test("bracketed from first with Sub-expressions", function (assert) {
+    const emblem = w(
+      '%some-new-tag [',
+      '  value={calc [',
+      '    (action this.closeWizard)',
+      '    (transition-to "home")',
+      '  ]}',
+      '  class="test"',
+      ']',
+      '  |ggggg'
+    );
+
+    assert.compilesTo(emblem,
+      '<some-new-tag value={{calc (action this.closeWizard) (transition-to "home")}} class="test">ggggg</some-new-tag>');
+  });
 });

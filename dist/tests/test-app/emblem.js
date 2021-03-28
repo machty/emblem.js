@@ -1482,7 +1482,7 @@ define("emblem/compiler", ["exports", "./parser", "./preprocessor", "./template-
 
     const traceResult = _pegjsUtil.default.parse(_parser.Parser, processedEmblem, options);
 
-    if (traceResult.error !== null && options.debugging) {
+    if (traceResult.error !== null) {
       console.log("ERROR: Parsing Failure:\n" + _pegjsUtil.default.errorMessage(traceResult.error, true).replace(/^/mg, "ERROR: "));
       throw new Error(traceResult.error.message);
     }

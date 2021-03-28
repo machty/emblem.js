@@ -14824,7 +14824,7 @@ function compile$1(emblem, customOptions) {
 
   const traceResult = PEGUtil.parse(Parser, processedEmblem, options);
 
-  if (traceResult.error !== null && options.debugging) {
+  if (traceResult.error !== null) {
     console.log("ERROR: Parsing Failure:\n" + PEGUtil.errorMessage(traceResult.error, true).replace(/^/mg, "ERROR: "));
     throw new Error(traceResult.error.message);
   }

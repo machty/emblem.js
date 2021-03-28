@@ -14824,12 +14824,10 @@ function compile$1(emblem, customOptions) {
 
   const traceResult = PEGUtil.parse(Parser, processedEmblem, options);
 
-  if (traceResult.error !== null
-  /*&& options.debugging*/
-  ) {
-      console.log("ERROR: Parsing Failure:\n" + PEGUtil.errorMessage(traceResult.error, true).replace(/^/mg, "ERROR: "));
-      throw new Error(traceResult.error.message);
-    }
+  if (traceResult.error !== null && options.debugging) {
+    console.log("ERROR: Parsing Failure:\n" + PEGUtil.errorMessage(traceResult.error, true).replace(/^/mg, "ERROR: "));
+    throw new Error(traceResult.error.message);
+  }
 
   const ast = builder.toAST();
   const result = compile(ast, options);
@@ -14875,7 +14873,7 @@ if (typeof window !== "undefined" && window !== null) {
   });
 }
 
-const VERSION = "0.13.1"; // Real exports
+const VERSION = "0.13.3"; // Real exports
 
 var emblem = {
   Parser: parse,

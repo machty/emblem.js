@@ -879,7 +879,7 @@ define("emblem", ["exports", "./emblem/parser", "./emblem/compiler", "./emblem/b
 
   function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-  const VERSION = "0.13.1"; // Real exports
+  const VERSION = "0.13.3"; // Real exports
 
   _exports.VERSION = VERSION;
   // Legacy support
@@ -1482,12 +1482,10 @@ define("emblem/compiler", ["exports", "./parser", "./preprocessor", "./template-
 
     const traceResult = _pegjsUtil.default.parse(_parser.Parser, processedEmblem, options);
 
-    if (traceResult.error !== null
-    /*&& options.debugging*/
-    ) {
-        console.log("ERROR: Parsing Failure:\n" + _pegjsUtil.default.errorMessage(traceResult.error, true).replace(/^/mg, "ERROR: "));
-        throw new Error(traceResult.error.message);
-      }
+    if (traceResult.error !== null && options.debugging) {
+      console.log("ERROR: Parsing Failure:\n" + _pegjsUtil.default.errorMessage(traceResult.error, true).replace(/^/mg, "ERROR: "));
+      throw new Error(traceResult.error.message);
+    }
 
     const ast = builder.toAST();
     const result = (0, _templateCompiler.compile)(ast, options);

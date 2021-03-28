@@ -13765,6 +13765,1044 @@ define('emblem', ['exports'], function (exports) { 'use strict';
     }
   };
 
+  var module$2 = {},
+      exports$1 = {};
+
+  (function () {
+    /*
+    **  ASTy -- Abstract Syntax Tree (AST) Data Structure
+    **  Copyright (c) 2014-2021 Dr. Ralf S. Engelschall <rse@engelschall.com>
+    **
+    **  Permission is hereby granted, free of charge, to any person obtaining
+    **  a copy of this software and associated documentation files (the
+    **  "Software"), to deal in the Software without restriction, including
+    **  without limitation the rights to use, copy, modify, merge, publish,
+    **  distribute, sublicense, and/or sell copies of the Software, and to
+    **  permit persons to whom the Software is furnished to do so, subject to
+    **  the following conditions:
+    **
+    **  The above copyright notice and this permission notice shall be included
+    **  in all copies or substantial portions of the Software.
+    **
+    **  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+    **  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    **  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    **  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    **  CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    **  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    **  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+    */
+    (function (f) {
+      if (typeof exports$1 === "object" && typeof module$2 !== "undefined") {
+        module$2.exports = f();
+      } else if (typeof define === "function" && define.amd) {
+        define([], f);
+      } else {
+        var g;
+
+        if (typeof window !== "undefined") {
+          g = window;
+        } else if (typeof global !== "undefined") {
+          g = global;
+        } else if (typeof self !== "undefined") {
+          g = self;
+        } else {
+          g = this;
+        }
+
+        g.ASTY = f();
+      }
+    })(function () {
+      return function () {
+        function r(e, n, t) {
+          function o(i, f) {
+            if (!n[i]) {
+              if (!e[i]) {
+                var c = "function" == typeof require && require;
+                if (!f && c) return c(i, !0);
+                if (u) return u(i, !0);
+                var a = new Error("Cannot find module '" + i + "'");
+                throw a.code = "MODULE_NOT_FOUND", a;
+              }
+
+              var p = n[i] = {
+                exports: {}
+              };
+              e[i][0].call(p.exports, function (r) {
+                var n = e[i][1][r];
+                return o(n || r);
+              }, p, p.exports, r, e, n, t);
+            }
+
+            return n[i].exports;
+          }
+
+          for (var u = "function" == typeof require && require, i = 0; i < t.length; i++) o(t[i]);
+
+          return o;
+        }
+
+        return r;
+      }()({
+        1: [function (_dereq_, module, exports) {
+
+          Object.defineProperty(exports, "__esModule", {
+            value: true
+          });
+          exports.default = void 0;
+          /*
+          **  ASTy -- Abstract Syntax Tree (AST) Data Structure
+          **  Copyright (c) 2014-2021 Dr. Ralf S. Engelschall <rse@engelschall.com>
+          **
+          **  Permission is hereby granted, free of charge, to any person obtaining
+          **  a copy of this software and associated documentation files (the
+          **  "Software"), to deal in the Software without restriction, including
+          **  without limitation the rights to use, copy, modify, merge, publish,
+          **  distribute, sublicense, and/or sell copies of the Software, and to
+          **  permit persons to whom the Software is furnished to do so, subject to
+          **  the following conditions:
+          **
+          **  The above copyright notice and this permission notice shall be included
+          **  in all copies or substantial portions of the Software.
+          **
+          **  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+          **  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+          **  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+          **  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+          **  CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+          **  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+          **  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+          */
+
+          class ASTYBase {
+            /*  AST node initialization  */
+            init(ctx, T, A, C) {
+              if (arguments.length < 2) throw new Error("init: invalid number of arguments");
+              this.ctx = ctx;
+              this.ASTy = true;
+              this.T = T;
+              this.L = {
+                L: 0,
+                C: 0,
+                O: 0
+              };
+              this.A = {};
+              this.C = [];
+              this.P = null;
+
+              if (typeof A === "object") {
+                for (let name in A) if (Object.prototype.hasOwnProperty.call(A, name)) this.set(name, A[name]);
+              }
+
+              if (typeof C === "object" && C instanceof Array) this.add(C);
+              return this;
+            }
+            /*  create new AST node  */
+
+
+            create(T, A, C) {
+              return this.ctx.create(T, A, C);
+            }
+            /*  check the type of an AST node  */
+
+
+            type(T) {
+              if (arguments.length === 0) return this.T;else if (arguments.length === 1) {
+                this.T = T;
+                return this;
+              } else throw new Error("type: invalid number of arguments");
+            }
+            /*  set the parsing position   */
+
+
+            pos(line, column, offset) {
+              if (arguments.length === 0) return {
+                line: this.L.L,
+                column: this.L.C,
+                offset: this.L.O
+              };else if (arguments.length <= 3) {
+                this.L.L = line || 0;
+                this.L.C = column || 0;
+                this.L.O = offset || 0;
+                return this;
+              } else throw new Error("pos: invalid number of arguments");
+            }
+            /*  set AST node attributes  */
+
+
+            set(...args) {
+              if (args.length === 1 && typeof args[0] === "object") {
+                Object.keys(args[0]).forEach(key => {
+                  if (args[0][key] !== undefined) this.A[key] = args[0][key];else delete this.A[key];
+                });
+              } else if (args.length === 2) {
+                if (args[1] !== undefined) this.A[args[0]] = args[1];else delete this.A[args[0]];
+              } else throw new Error("set: invalid number of arguments");
+
+              return this;
+            }
+            /*  unset AST node attributes  */
+
+
+            unset(...args) {
+              if (args.length === 1 && typeof args[0] === "object" && args[0] instanceof Array) {
+                args[0].forEach(key => {
+                  delete this.A[key];
+                });
+              } else if (args.length === 1) delete this.A[args[0]];else throw new Error("unset: invalid number of arguments");
+
+              return this;
+            }
+            /*  get AST node attributes  */
+
+
+            get(...args) {
+              if (args.length !== 1) throw new Error("get: invalid number of arguments");
+
+              if (typeof args[0] === "object" && args[0] instanceof Array) {
+                return args[0].map(key => {
+                  if (typeof key !== "string") throw new Error("get: invalid key argument");
+                  return this.A[key];
+                });
+              } else {
+                let key = args[0];
+                if (typeof key !== "string") throw new Error("get: invalid key argument");
+                return this.A[key];
+              }
+            }
+            /*  get names of all AST node attributes  */
+
+
+            attrs() {
+              return Object.keys(this.A);
+            }
+            /*  return current sibling position  */
+
+
+            nth() {
+              if (this.P === null) return 1;
+              let idx = this.P.C.indexOf(this);
+              if (idx < 0) throw new Error("nth: internal error -- node not in childs of its parent");
+              return idx;
+            }
+            /*  insert child AST node(s)  */
+
+
+            ins(pos, ...args) {
+              if (args.length === 0) throw new Error("ins: invalid number of arguments");
+              if (pos < 0) pos = this.C.length + 1 - pos;
+              if (!(pos >= 0 && pos <= this.C.length)) throw new Error("ins: invalid position");
+
+              let _ins = node => {
+                if (!this.ctx.isA(node)) throw new Error("ins: invalid AST node argument");
+                this.C.splice(pos++, 0, node);
+                node.P = this;
+              };
+
+              args.forEach(arg => {
+                if (typeof arg === "object" && arg instanceof Array) arg.forEach(arg => {
+                  _ins(arg);
+                });else if (arg !== null) _ins(arg);
+              });
+              return this;
+            }
+            /*  add child AST node(s)  */
+
+
+            add(...args) {
+              if (args.length === 0) throw new Error("add: invalid number of arguments");
+
+              let _add = node => {
+                if (!this.ctx.isA(node)) throw new Error("add: invalid AST node argument");
+                this.C.push(node);
+                node.P = this;
+              };
+
+              args.forEach(arg => {
+                if (typeof arg === "object" && arg instanceof Array) arg.forEach(arg => {
+                  _add(arg);
+                });else if (arg !== null) _add(arg);
+              });
+              return this;
+            }
+            /*  delete child AST node(s)  */
+
+
+            del(...args) {
+              if (args.length === 0) throw new Error("del: invalid number of arguments");
+              args.forEach(node => {
+                if (!this.ctx.isA(node)) throw new Error("del: invalid AST node argument");
+                let found = false;
+
+                for (let j = 0; j < this.C.length; j++) {
+                  if (this.C[j] === node) {
+                    this.C.splice(j, 1);
+                    node.P = null;
+                    found = true;
+                    break;
+                  }
+                }
+
+                if (!found) throw new Error("del: AST node not found in childs");
+              });
+              return this;
+            }
+            /*  get all or some child AST nodes  */
+
+
+            childs(...args) {
+              if (args.length > 2) throw new Error("childs: invalid number of arguments");
+              if (args.length === 2 && typeof args[0] === "number" && typeof args[1] === "number") return this.C.slice(args[0], args[1]);else if (args.length === 1 && typeof args[0] === "number") return this.C.slice(args[0]);else if (args.length === 0) return this.C;else throw new Error("childs: invalid type of arguments");
+            }
+            /*  get one child AST node  */
+
+
+            child(pos) {
+              if (typeof pos !== "number") throw new Error("child: invalid argument");
+              return pos < this.C.length ? this.C[pos] : null;
+            }
+            /*  get parent AST node  */
+
+
+            parent() {
+              return this.P;
+            }
+            /*  serialize AST node recursively  */
+
+
+            serialize() {
+              return this.ctx.__serialize(this);
+            }
+
+          }
+
+          exports.default = ASTYBase;
+        }, {}],
+        2: [function (_dereq_, module, exports) {
+
+          Object.defineProperty(exports, "__esModule", {
+            value: true
+          });
+          exports.default = void 0;
+          /*
+          **  ASTy -- Abstract Syntax Tree (AST) Data Structure
+          **  Copyright (c) 2014-2021 Dr. Ralf S. Engelschall <rse@engelschall.com>
+          **
+          **  Permission is hereby granted, free of charge, to any person obtaining
+          **  a copy of this software and associated documentation files (the
+          **  "Software"), to deal in the Software without restriction, including
+          **  without limitation the rights to use, copy, modify, merge, publish,
+          **  distribute, sublicense, and/or sell copies of the Software, and to
+          **  permit persons to whom the Software is furnished to do so, subject to
+          **  the following conditions:
+          **
+          **  The above copyright notice and this permission notice shall be included
+          **  in all copies or substantial portions of the Software.
+          **
+          **  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+          **  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+          **  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+          **  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+          **  CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+          **  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+          **  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+          */
+
+          const tree = {
+            mid: {
+              unicode: String.fromCharCode(9500),
+              ascii: "+"
+            },
+            last: {
+              unicode: String.fromCharCode(9492),
+              ascii: "+"
+            },
+            down: {
+              unicode: String.fromCharCode(9474),
+              ascii: "|"
+            },
+            left: {
+              unicode: String.fromCharCode(9472),
+              ascii: "-"
+            }
+          };
+
+          class ASTYDump {
+            /*  dump the AST recursively  */
+            dump(maxDepth = Infinity, colorize = (type, txt) => txt, unicode = true) {
+              let out = "";
+              let self = this;
+              this.walk((node, depth
+              /*, parent, when */
+              ) => {
+                /*  short-circuit processing at a certain depth  */
+                if (depth > maxDepth) return;
+                /*  draw tree structure  */
+
+                if (depth > 0) {
+                  const nodeIndex = node => {
+                    let nth = 0;
+                    let max = 0;
+
+                    if (node.P !== null) {
+                      nth = node.P.C.indexOf(node);
+                      max = node.P.C.length - 1;
+                    }
+
+                    return {
+                      nth,
+                      max
+                    };
+                  };
+
+                  let {
+                    nth,
+                    max
+                  } = nodeIndex(node);
+                  let prefix = " ";
+                  if (unicode) prefix = `${tree.left.unicode}${tree.left.unicode}${prefix}`;else prefix = `${tree.left.ascii}${tree.left.ascii}${prefix}`;
+                  if (nth < max) prefix = `${unicode ? tree.mid.unicode : tree.mid.ascii}${prefix}`;else prefix = `${unicode ? tree.last.unicode : tree.last.ascii}${prefix}`;
+
+                  for (let parent = node.P; parent !== null && parent !== self; parent = parent.P) {
+                    if (parent.P !== null) {
+                      let {
+                        nth,
+                        max
+                      } = nodeIndex(parent);
+                      if (nth < max) prefix = `${unicode ? tree.down.unicode : tree.down.ascii}   ${prefix}`;else prefix = `    ${prefix}`;
+                    }
+                  }
+
+                  out += colorize("tree", prefix);
+                }
+                /*  draw node type  */
+
+
+                out += colorize("type", node.T) + " ";
+                /*  draw node attributes  */
+
+                let keys = Object.keys(node.A).filter(key => !key.match(/^__/));
+
+                if (keys.length > 0) {
+                  out += colorize("parenthesis", "(");
+                  let first = true;
+                  keys.forEach(key => {
+                    if (!first) out += colorize("comma", ",") + " ";else first = false;
+                    out += colorize("key", key) + colorize("colon", ":") + " ";
+                    let value = node.A[key];
+
+                    switch (typeof value) {
+                      case "boolean":
+                      case "number":
+                        out += colorize("value", value.toString());
+                        break;
+
+                      case "string":
+                        {
+                          let hex = ch => ch.charCodeAt(0).toString(16).toUpperCase();
+                          /* eslint no-control-regex: off */
+
+
+                          out += colorize("value", "\"" + value.replace(/\\/g, "\\\\").replace(/"/g, "\\\"").replace(/\x08/g, "\\b").replace(/\t/g, "\\t").replace(/\n/g, "\\n").replace(/\f/g, "\\f").replace(/\r/g, "\\r").replace(/[\x00-\x07\x0B\x0E\x0F]/g, ch => "\\x0" + hex(ch)).replace(/[\x10-\x1F\x80-\xFF]/g, ch => "\\x" + hex(ch)).replace(/[\u0100-\u0FFF]/g, ch => "\\u0" + hex(ch)).replace(/[\u1000-\uFFFF]/g, ch => "\\u" + hex(ch)) + "\"");
+                          break;
+                        }
+
+                      case "object":
+                        if (value instanceof RegExp) out += colorize("value", "/" + value.source + "/");else out += colorize("value", JSON.stringify(value));
+                        break;
+
+                      default:
+                        out += colorize("value", JSON.stringify(value));
+                        break;
+                    }
+                  });
+                  out += colorize("parenthesis", ")") + " ";
+                }
+                /*  draw node position  */
+
+
+                out += colorize("position", colorize("bracket", "[") + colorize("line", node.L.L) + colorize("slash", ",") + colorize("column", node.L.C) + colorize("bracket", "]"));
+                out += "\n";
+              }, "downward");
+              return out;
+            }
+
+          }
+
+          exports.default = ASTYDump;
+        }, {}],
+        3: [function (_dereq_, module, exports) {
+
+          Object.defineProperty(exports, "__esModule", {
+            value: true
+          });
+          exports.default = void 0;
+          /*
+          **  ASTy -- Abstract Syntax Tree (AST) Data Structure
+          **  Copyright (c) 2014-2021 Dr. Ralf S. Engelschall <rse@engelschall.com>
+          **
+          **  Permission is hereby granted, free of charge, to any person obtaining
+          **  a copy of this software and associated documentation files (the
+          **  "Software"), to deal in the Software without restriction, including
+          **  without limitation the rights to use, copy, modify, merge, publish,
+          **  distribute, sublicense, and/or sell copies of the Software, and to
+          **  permit persons to whom the Software is furnished to do so, subject to
+          **  the following conditions:
+          **
+          **  The above copyright notice and this permission notice shall be included
+          **  in all copies or substantial portions of the Software.
+          **
+          **  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+          **  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+          **  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+          **  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+          **  CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+          **  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+          **  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+          */
+
+          class ASTYMerge {
+            /*  merge attributes and childs of an AST node  */
+            merge(node, takePos = false, attrMap = {}) {
+              if (node === null) return this;
+              if (!this.ctx.isA(node)) throw new Error("merge: invalid AST node argument");
+
+              if (takePos) {
+                let pos = node.pos();
+                this.pos(pos.line, pos.column, pos.offset);
+              }
+
+              node.attrs().forEach(attrSource => {
+                let attrTarget = typeof attrMap[attrSource] !== "undefined" ? attrMap[attrSource] : attrSource;
+                if (attrTarget !== null) this.set(attrTarget, node.get(attrSource));
+              });
+              node.childs().forEach(child => {
+                node.del(child);
+                this.add(child);
+              });
+              let parent = node.parent();
+              if (parent !== null) parent.del(node);
+              return this;
+            }
+
+          }
+
+          exports.default = ASTYMerge;
+        }, {}],
+        4: [function (_dereq_, module, exports) {
+
+          Object.defineProperty(exports, "__esModule", {
+            value: true
+          });
+          exports.default = void 0;
+          /*
+          **  ASTy -- Abstract Syntax Tree (AST) Data Structure
+          **  Copyright (c) 2014-2021 Dr. Ralf S. Engelschall <rse@engelschall.com>
+          **
+          **  Permission is hereby granted, free of charge, to any person obtaining
+          **  a copy of this software and associated documentation files (the
+          **  "Software"), to deal in the Software without restriction, including
+          **  without limitation the rights to use, copy, modify, merge, publish,
+          **  distribute, sublicense, and/or sell copies of the Software, and to
+          **  permit persons to whom the Software is furnished to do so, subject to
+          **  the following conditions:
+          **
+          **  The above copyright notice and this permission notice shall be included
+          **  in all copies or substantial portions of the Software.
+          **
+          **  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+          **  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+          **  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+          **  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+          **  CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+          **  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+          **  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+          */
+
+          class ASTYSerialize {
+            /*  recursively serialize AST nodes into JSON string  */
+            static serialize(asty, node) {
+              const serializeNode = node => {
+                let clone = {
+                  T: node.T,
+                  L: {
+                    L: node.L.L,
+                    C: node.L.C,
+                    O: node.L.O
+                  }
+                };
+                let keys = Object.keys(node.A);
+
+                if (keys.length > 0) {
+                  clone.A = {};
+                  keys.forEach(key => {
+                    let value = node.A[key];
+
+                    switch (typeof value) {
+                      case "boolean":
+                      case "number":
+                      case "string":
+                        clone.A[key] = value;
+                        break;
+
+                      default:
+                        /*  use the slow approach only for non-atomic attributes  */
+                        clone.A[key] = JSON.parse(JSON.stringify(value));
+                        break;
+                    }
+                  });
+                }
+
+                if (node.C.length > 0) clone.C = node.C.map(C => serializeNode(C));
+                return clone;
+              };
+
+              if (!asty.isA(node)) throw new Error("serialize: not an ASTy node");
+              return JSON.stringify({
+                ASTy: serializeNode(node)
+              });
+            }
+            /*  recursively unserialize JSON string into AST nodes  */
+
+
+            static unserialize(asty, json) {
+              const unserializeNode = clone => {
+                let node = asty.create(clone.T);
+                node.pos(clone.L.L, clone.L.C, clone.L.O);
+
+                if (typeof clone.A === "object") {
+                  Object.keys(clone.A).forEach(key => {
+                    let value = clone.A[key];
+
+                    switch (typeof value) {
+                      case "boolean":
+                      case "number":
+                      case "string":
+                        node.set(key, value);
+                        break;
+
+                      default:
+                        /*  use the slow approach only for non-atomic attributes  */
+                        node.set(key, JSON.parse(JSON.stringify(value)));
+                        break;
+                    }
+                  });
+                }
+
+                if (typeof clone.C === "object" && clone.C instanceof Array) node.add(clone.C.map(C => unserializeNode(C)));
+                return node;
+              };
+
+              let obj = JSON.parse(json);
+              if (typeof obj !== "object" || typeof obj.ASTy !== "object") throw new Error("unserialize: not an ASTy JSON export");
+              return unserializeNode(obj.ASTy);
+            }
+
+          }
+
+          exports.default = ASTYSerialize;
+        }, {}],
+        5: [function (_dereq_, module, exports) {
+
+          Object.defineProperty(exports, "__esModule", {
+            value: true
+          });
+          exports.default = void 0;
+          /*
+          **  ASTy -- Abstract Syntax Tree (AST) Data Structure
+          **  Copyright (c) 2014-2021 Dr. Ralf S. Engelschall <rse@engelschall.com>
+          **
+          **  Permission is hereby granted, free of charge, to any person obtaining
+          **  a copy of this software and associated documentation files (the
+          **  "Software"), to deal in the Software without restriction, including
+          **  without limitation the rights to use, copy, modify, merge, publish,
+          **  distribute, sublicense, and/or sell copies of the Software, and to
+          **  permit persons to whom the Software is furnished to do so, subject to
+          **  the following conditions:
+          **
+          **  The above copyright notice and this permission notice shall be included
+          **  in all copies or substantial portions of the Software.
+          **
+          **  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+          **  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+          **  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+          **  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+          **  CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+          **  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+          **  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+          */
+
+          /* global 1: false */
+
+          /* global 8: false */
+
+          /* global 14: false */
+
+          /* global 20210107:  false */
+
+          const version = {
+            major: 1,
+            minor: 8,
+            micro: 14,
+            date: 20210107
+          };
+          var _default = version;
+          exports.default = _default;
+        }, {}],
+        6: [function (_dereq_, module, exports) {
+
+          Object.defineProperty(exports, "__esModule", {
+            value: true
+          });
+          exports.default = void 0;
+          /*
+          **  ASTy -- Abstract Syntax Tree (AST) Data Structure
+          **  Copyright (c) 2014-2021 Dr. Ralf S. Engelschall <rse@engelschall.com>
+          **
+          **  Permission is hereby granted, free of charge, to any person obtaining
+          **  a copy of this software and associated documentation files (the
+          **  "Software"), to deal in the Software without restriction, including
+          **  without limitation the rights to use, copy, modify, merge, publish,
+          **  distribute, sublicense, and/or sell copies of the Software, and to
+          **  permit persons to whom the Software is furnished to do so, subject to
+          **  the following conditions:
+          **
+          **  The above copyright notice and this permission notice shall be included
+          **  in all copies or substantial portions of the Software.
+          **
+          **  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+          **  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+          **  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+          **  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+          **  CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+          **  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+          **  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+          */
+
+          class ASTYWalk {
+            /*  walk the AST recursively  */
+            walk(cb, when = "downward") {
+              let _walk = (node, depth, parent) => {
+                if (when === "downward" || when === "both") cb(node, depth, parent, "downward");
+                node.C.forEach(child => {
+                  _walk(child, depth + 1, node);
+                });
+                if (when === "upward" || when === "both") cb(node, depth, parent, "upward");
+              };
+
+              _walk(this, 0, null);
+
+              return this;
+            }
+
+          }
+
+          exports.default = ASTYWalk;
+        }, {}],
+        7: [function (_dereq_, module, exports) {
+
+          var _astyBase = _interopRequireDefault(_dereq_("./asty-base.js"));
+
+          var _astyMerge = _interopRequireDefault(_dereq_("./asty-merge.js"));
+
+          var _astyWalk = _interopRequireDefault(_dereq_("./asty-walk.js"));
+
+          var _astyDump = _interopRequireDefault(_dereq_("./asty-dump.js"));
+
+          var _astySerialize = _interopRequireDefault(_dereq_("./asty-serialize.js"));
+
+          var _astyVersion = _interopRequireDefault(_dereq_("./asty-version.js"));
+
+          function _interopRequireDefault(obj) {
+            return obj && obj.__esModule ? obj : {
+              default: obj
+            };
+          }
+          /*
+          **  ASTy -- Abstract Syntax Tree (AST) Data Structure
+          **  Copyright (c) 2014-2021 Dr. Ralf S. Engelschall <rse@engelschall.com>
+          **
+          **  Permission is hereby granted, free of charge, to any person obtaining
+          **  a copy of this software and associated documentation files (the
+          **  "Software"), to deal in the Software without restriction, including
+          **  without limitation the rights to use, copy, modify, merge, publish,
+          **  distribute, sublicense, and/or sell copies of the Software, and to
+          **  permit persons to whom the Software is furnished to do so, subject to
+          **  the following conditions:
+          **
+          **  The above copyright notice and this permission notice shall be included
+          **  in all copies or substantial portions of the Software.
+          **
+          **  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+          **  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+          **  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+          **  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+          **  CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+          **  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+          **  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+          */
+
+
+          class ASTYCtx {
+            constructor() {
+              this.ASTYNode = class ASTYNode {};
+              let mixins = [[_astyBase.default, "init", "create", "type", "pos", "set", "unset", "get", "attrs", "nth", "ins", "add", "del", "childs", "child", "parent", "serialize"], [_astyMerge.default, "merge"], [_astyWalk.default, "walk"], [_astyDump.default, "dump"]];
+              mixins.forEach(mixin => {
+                let proto = mixin[0].prototype;
+                mixin.slice(1).forEach(method => {
+                  this.ASTYNode.prototype[method] = proto[method];
+                });
+              });
+              return this;
+            }
+
+            version() {
+              return _astyVersion.default;
+            }
+
+            extend(mixin) {
+              for (let method in mixin) if (Object.prototype.hasOwnProperty.call(mixin, method)) this.ASTYNode.prototype[method] = mixin[method];
+
+              return this;
+            }
+
+            create(type, attrs, childs) {
+              return new this.ASTYNode().init(this, type, attrs, childs);
+            }
+
+            isA(node) {
+              return typeof node === "object" && node instanceof this.ASTYNode && typeof node.ASTy === "boolean" && node.ASTy === true;
+            }
+
+            __serialize(node) {
+              return ASTYCtx.serialize(node);
+            }
+
+            static serialize(node) {
+              return _astySerialize.default.serialize(node.ctx, node);
+            }
+
+            static unserialize(json) {
+              let Ctx = this;
+              return _astySerialize.default.unserialize(new Ctx(), json);
+            }
+
+          }
+          /*  export the traditional way for interoperability reasons
+              (as Babel would export an object with a 'default' field)  */
+
+
+          module.exports = ASTYCtx;
+        }, {
+          "./asty-base.js": 1,
+          "./asty-dump.js": 2,
+          "./asty-merge.js": 3,
+          "./asty-serialize.js": 4,
+          "./asty-version.js": 5,
+          "./asty-walk.js": 6
+        }]
+      }, {}, [1, 2, 3, 4, 5, 6, 7])(7);
+    });
+  })();
+
+  var ASTY = module$2.exports;
+
+  var module$3 = {};
+  module$3.exports = {};
+
+  (function () {
+    /*
+    **  pegjs-util -- Utility Class for PEG.js
+    **  Copyright (c) 2014-2021 Dr. Ralf S. Engelschall <rse@engelschall.com>
+    **
+    **  Permission is hereby granted, free of charge, to any person obtaining
+    **  a copy of this software and associated documentation files (the
+    **  "Software"), to deal in the Software without restriction, including
+    **  without limitation the rights to use, copy, modify, merge, publish,
+    **  distribute, sublicense, and/or sell copies of the Software, and to
+    **  permit persons to whom the Software is furnished to do so, subject to
+    **  the following conditions:
+    **
+    **  The above copyright notice and this permission notice shall be included
+    **  in all copies or substantial portions of the Software.
+    **
+    **  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+    **  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    **  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    **  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    **  CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    **  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    **  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+    */
+
+    /*  Universal Module Definition (UMD) for Library  */
+    (function (root, name, factory) {
+      /* global define: false */
+
+      /* global module: false */
+      if (typeof module$3 === "object" && typeof module$3.exports === "object")
+        /*  CommonJS environment  */
+        module$3.exports = factory(root);else if (typeof define === "function" && typeof define.amd !== "undefined")
+        /*  AMD environment  */
+        define(name, function () {
+          return factory(root);
+        });else
+        /*  Browser environment  */
+        root[name] = factory(root);
+    })(
+    /* global global: false */
+    typeof global !== "undefined" ? global :
+    /* global window: false */
+    typeof window !== "undefined" ? window : this, "PEGUtil", function ()
+    /* root */
+    {
+      var PEGUtil = {};
+      /*  helper function for generating a function to generate an AST node  */
+
+      PEGUtil.makeAST = function makeAST(location, options) {
+        return function () {
+          return options.util.__makeAST.call(null, location().start.line, location().start.column, location().start.offset, arguments);
+        };
+      };
+      /*  helper function for generating a function to unroll the parse stack  */
+
+
+      PEGUtil.makeUnroll = function (location, options) {
+        return function (first, list, take) {
+          if (typeof list !== "object" || !(list instanceof Array)) throw new options.util.__SyntaxError("unroll: invalid list argument for unrolling", typeof list, "Array", location());
+
+          if (typeof take !== "undefined") {
+            if (typeof take === "number") take = [take];
+            var result = [];
+            if (first !== null) result.push(first);
+
+            for (var i = 0; i < list.length; i++) {
+              for (var j = 0; j < take.length; j++) result.push(list[i][take[j]]);
+            }
+
+            return result;
+          } else {
+            if (first !== null) list.unshift(first);
+            return list;
+          }
+        };
+      };
+      /*  utility function: create a source excerpt  */
+
+
+      var excerpt = function (txt, o) {
+        var l = txt.length;
+        var b = o - 20;
+        if (b < 0) b = 0;
+        var e = o + 20;
+        if (e > l) e = l;
+
+        var hex = function (ch) {
+          return ch.charCodeAt(0).toString(16).toUpperCase();
+        };
+
+        var extract = function (txt, pos, len) {
+          return txt.substr(pos, len).replace(/\\/g, "\\\\").replace(/\x08/g, "\\b").replace(/\t/g, "\\t").replace(/\n/g, "\\n").replace(/\f/g, "\\f").replace(/\r/g, "\\r").replace(/[\x00-\x07\x0B\x0E\x0F]/g, function (ch) {
+            return "\\x0" + hex(ch);
+          }).replace(/[\x10-\x1F\x80-\xFF]/g, function (ch) {
+            return "\\x" + hex(ch);
+          }).replace(/[\u0100-\u0FFF]/g, function (ch) {
+            return "\\u0" + hex(ch);
+          }).replace(/[\u1000-\uFFFF]/g, function (ch) {
+            return "\\u" + hex(ch);
+          });
+        };
+
+        return {
+          prolog: extract(txt, b, o - b),
+          token: extract(txt, o, 1),
+          epilog: extract(txt, o + 1, e - (o + 1))
+        };
+      };
+      /*  provide top-level parsing functionality  */
+
+
+      PEGUtil.parse = function (parser, txt, options) {
+        if (typeof parser !== "object") throw new Error("invalid parser object (not an object)");
+        if (typeof parser.parse !== "function") throw new Error("invalid parser object (no \"parse\" function)");
+        if (typeof txt !== "string") throw new Error("invalid input text (not a string)");
+        if (typeof options !== "undefined" && typeof options !== "object") throw new Error("invalid options (not an object)");
+        if (typeof options === "undefined") options = {};
+        var result = {
+          ast: null,
+          error: null
+        };
+
+        try {
+          var makeAST;
+          if (typeof options.makeAST === "function") makeAST = options.makeAST;else {
+            makeAST = function (location, args) {
+              return {
+                line: location().start.line,
+                column: location().start.column,
+                offset: location().start.offset,
+                args: args
+              };
+            };
+          }
+          options.util = {
+            makeUnroll: PEGUtil.makeUnroll,
+            makeAST: PEGUtil.makeAST,
+            __makeAST: makeAST,
+            __SyntaxError: parser.SyntaxError
+          };
+          result.ast = parser.parse(txt, options);
+          result.error = null;
+        } catch (e) {
+          result.ast = null;
+
+          if (e instanceof parser.SyntaxError) {
+            var definedOrElse = function (value, fallback) {
+              return typeof value !== "undefined" ? value : fallback;
+            };
+
+            result.error = {
+              line: definedOrElse(e.location.start.line, 0),
+              column: definedOrElse(e.location.start.column, 0),
+              message: e.message,
+              found: definedOrElse(e.found, ""),
+              expected: definedOrElse(e.expected, ""),
+              location: excerpt(txt, definedOrElse(e.location.start.offset, 0))
+            };
+          } else {
+            result.error = {
+              line: 0,
+              column: 0,
+              message: e.message,
+              found: "",
+              expected: "",
+              location: excerpt("", 0)
+            };
+          }
+        }
+
+        return result;
+      };
+      /*  render a useful error message  */
+
+
+      PEGUtil.errorMessage = function (e, noFinalNewline) {
+        var l = e.location;
+        var prefix1 = "line " + e.line + " (column " + e.column + "): ";
+        var prefix2 = "";
+
+        for (var i = 0; i < prefix1.length + l.prolog.length; i++) prefix2 += "-";
+
+        var msg = prefix1 + l.prolog + l.token + l.epilog + "\n" + prefix2 + "^" + "\n" + e.message + (noFinalNewline ? "" : "\n");
+        return msg;
+      };
+
+      return PEGUtil;
+    });
+  })();
+
+  var PEGUtil = module$3.exports;
+
   /**
     options can include:
       quite: disable deprecation notices
@@ -13772,18 +14810,27 @@ define('emblem', ['exports'], function (exports) { 'use strict';
   */
 
   function compile$1(emblem, customOptions) {
-    var builder = generateBuilder();
-    var options = customOptions || {};
-    var processedEmblem = processSync(emblem);
+    const builder = generateBuilder();
+    const options = customOptions || {};
+    const processedEmblem = processSync(emblem);
+    const asty = new ASTY();
     options['builder'] = builder;
-    parse(processedEmblem, options);
-    var ast = builder.toAST();
-    var result = compile(ast, options);
 
-    if (options.debugging) {
-      console.log(result);
-    }
+    options['makeAST'] = function (line, column, offset, args) {
+      return asty.create.apply(asty, args).pos(line, column, offset);
+    };
 
+    const traceResult = PEGUtil.parse(Parser, processedEmblem, options);
+
+    if (traceResult.error !== null
+    /*&& options.debugging*/
+    ) {
+        console.log("ERROR: Parsing Failure:\n" + PEGUtil.errorMessage(traceResult.error, true).replace(/^/mg, "ERROR: "));
+        throw new Error(traceResult.error.message);
+      }
+
+    const ast = builder.toAST();
+    const result = compile(ast, options);
     return result;
   }
 
@@ -13826,7 +14873,7 @@ define('emblem', ['exports'], function (exports) { 'use strict';
     });
   }
 
-  const VERSION = "0.13.0"; // Real exports
+  const VERSION = "0.13.1"; // Real exports
 
   var emblem = {
     Parser: parse,

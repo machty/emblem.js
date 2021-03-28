@@ -798,6 +798,11 @@ assign-symbols@^1.0.0:
   resolved "https://registry.yarnpkg.com/assign-symbols/-/assign-symbols-1.0.0.tgz#59667f41fadd4f20ccbc2bb96b8d4f7f78ec0367"
   integrity sha1-WWZ/QfrdTyDMvCu5a41Pf3jsA2c=
 
+asty@^1.8.14:
+  version "1.8.14"
+  resolved "https://registry.yarnpkg.com/asty/-/asty-1.8.14.tgz#dd5eb7e916b93ba3e85c135ffe56b8792b1b0689"
+  integrity sha512-mdXrb7dV/hhgiUXy4QT7/V7FEckB38KX2wOAGZjmU4ZKclQMKFul0W7uNzHLzRvtf7acCiilG4wjuvdtQ1kU3w==
+
 async-array-reduce@^0.2.1:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/async-array-reduce/-/async-array-reduce-0.2.1.tgz#c8be010a2b5cd00dea96c81116034693dfdd82d1"
@@ -5190,7 +5195,14 @@ path-type@^1.0.0:
     pify "^2.0.0"
     pinkie-promise "^2.0.0"
 
-pegjs@0.10.0, pegjs@^0.10.0:
+pegjs-util@1.4.21:
+  version "1.4.21"
+  resolved "https://registry.yarnpkg.com/pegjs-util/-/pegjs-util-1.4.21.tgz#de8d07cabcf037267ce57037f821a8b30af70e99"
+  integrity sha512-0z15BXCjxwgeD+pO5QImUgOFsJ86jFt6oDqatveLggeARSS5wmrt9SxCONkUvOeSsob2faVBC9H4wpl4zudg9A==
+  dependencies:
+    pegjs ">=0.10.0"
+
+pegjs@0.10.0, pegjs@>=0.10.0, pegjs@^0.10.0:
   version "0.10.0"
   resolved "https://registry.yarnpkg.com/pegjs/-/pegjs-0.10.0.tgz#cf8bafae6eddff4b5a7efb185269eaaf4610ddbd"
   integrity sha1-z4uvrm7d/0tafvsYUmnqr0YQ3b0=
